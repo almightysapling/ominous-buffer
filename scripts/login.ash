@@ -147,6 +147,16 @@ void checkapps(){
  }
 }
 
+void sendMeat(string who, int amount){
+ while(get_property("_isadventuring")!="") {waitq(1);}
+ set_property("_isadventuring","1");
+ take_closet(amount,$item[dense meat stack]);
+ string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
+ sender+="&fromwhere=0&action=Yep.";
+ visit_url(sender);
+ set_property("_isadventuring","");
+}
+
 void gRR(){
  gameData game=loadGame();
  if (!game.gameStarted){
@@ -156,14 +166,16 @@ void gRR(){
  }
 }
 
-void sendMeat(string who, int amount){
- while(get_property("_isadventuring")!="") {waitq(1);}
- set_property("_isadventuring","1");
- take_closet(amount,$item[dense meat stack]);
- string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
- sender+="&fromwhere=0&action=Yep.";
- visit_url(sender);
- set_property("_isadventuring","");
+void gWS(){
+ gameData game=loadGame();
+ if(game.intervals==-1){
+  string winner;
+  string word;
+  foreach k,v in game.players if(v==2) winner=k; else word=k;
+  chat_clan("Winner! "+winner+" won with '"+word+"'!");
+  chat_private(game.host,"Winner of wordshot: "+winner);
+ }
+ closeGame();
 }
 
 void checkLotto(){
@@ -501,6 +513,9 @@ void main(){try{
   switch (gameType()){
    case gameRoulette:
     gRR();
+    break;
+   case gameWordshot:
+    gWS();
     break;
    default:
     
