@@ -3,54 +3,7 @@ import <market.ash>
 import <games.ash>
 import <mathlib.ash>
 /*
-CHANGELOG:
-20110208 Added Conditional triggers to chatbot functions. [GLOBAL, train, search]
-    Added $trigger variables. [GLOBAL, replyParser, nopredpass]
-20110209 Changed the way genders were handled, should be easier now to add more pronoun sets. [GLOBAL, genderString, genderPronoun, replyParser]
-20110209 Added ability to comma delineate multis for the "multi" and "alt" command. [setMulti]
-20110211 Added self-contained rep watcher to avoid chat spamming. [nopredpass, roll] {checkRep, addRep}
-    Added "clear" command to erase superfluous data. [predicateFilter] {clearData}
-    Update multi command to keep characters synched. [setMulti, addMulti]
-20110212 Tell users what buffpacks they have defined. [userDetails]
-    Inform users when a pack is deleted. [delpack]
-    Fix acronym matching issue [train]
-    Add new train option: Rep-free [train, nopredpass]
-    Add rep filter to clear data function. [clearData]
-    Add "default" buffpacks. [predicateFilter]
-    Change rep filter behavior. [checkRep, roll, nopredpass]
-20110213 Change rep filter behavior -again-. [nopredpass]
-    Fix drastic resource sharing issue [login.ash]
-20110217 Added definition lookups google.define and google.urban [publicChat] {googleSearch}
-    Add $pmath and $smath [replyParser]
-20110218 Fix function to set multis. Fixed return message for initial multi set. [setMulti, addMulti]
-    When setting gender, all known multis update to match. [setGender]
-20110219 Genders (and nicknames!) now fully carry across multis, whether set before or after the multi link is established. [addMulti, publicChat]
-    New google method: spell [googleSearch]
-    Add preliminary support structure for chat games. [GLOBAL, main] {russianRoulette}
-20110227 Added Sigma function support for math. [fancyMath]
-20110301 Modify support structure for chat games. {games.ash} [GLOBAL, russianRoulette, main]
-20110310 Fix long-standing bug with how predicate-free messages are parsed. [publicChat]
-    Bring in mathlib to add more functionality to OB's math ability. [mathlib.ash] [isMath, fancyMath, publicChat]
-    Rely on googles dictionary rather than search engine for spell checker. Expand google expression options[googleSearch]
-    Simplify gender matcher. [GLOBAL, publicChat]
-20110312 Extend decodeChat to all HTML and add to googleSearch [decodeChat=decodeHTML, googleSearch]
-20110327 Extend market.ash to public chat via googleSearch [market.ash] [googleSearch]
-    New flag for users "inAssociateL" "inAssociateH" [GLOBAL]
-    Made flag setters/getters, will change as I find. {setUF, unSetUF, getUF}
-    Open OB to other clans! [buff, updateId]
-20110402 Change gender matching method to accomodate additional genders [GLOBAL, publicChat, setGender]
-20110403 Added special case to details for OB. [userDetails]
-20110430 Added special keyword for certain buffs. [classskills.txt, buff]
-20110504 Added some documentation to [buff] and modified buff limits.
-    Edit white/blacklist and clan control. [updateId, reviselist, mod]
-20110507 Added "pick" command. {pick} [publicChat]
-20110511 Disabled rep filter. [checkRep]
-20110512 Added Time's arrow [classskills.txt, buff]
-20110513 Fix issue with limited buffs. [buff]
-    Edit a few pronoun unspecific areas [setMulti, mod]
-    Add gender globals. [GLOBAL]
-    Fixed gooogle define method to work with google's dictionary. [googleSearch]
-20110525 Added function to comma delineate large numbers. {to_commad}    
+ for release notes prior to subversioning, please see r2.
 */
 
 string[int] to_array(boolean[string] data){
@@ -674,6 +627,93 @@ print("Players: "+count(game.players).to_string());
    break;
  }
  saveGame(game);
+}
+
+string wordshot(string sender, string guess){
+ gameData game=loadGame();
+ if(sender==game.host)return guess;
+ if(game.intervals==-1)return guess;
+ string word;
+ foreach k,v in game.players if (v==1) word=k;
+ if(guess.contains_text(" ")||(guess.length()!=word.length())){
+  return guess;
+ }
+ string wordList=visit_url("http://clubefl.gr/games/wordox/"+word.length().to_string()+".html");
+ if (!wordList.contains_text(guess.to_lower_case())) {
+  chat_private(sender,guess+" isn't a valid word.");
+  return "x";
+ }
+ if (guess==word){
+  game.players[sender]=2;
+  game.intervals=-1;
+  saveGame(game);
+  return "x";
+ }
+ int[string] breakW;
+ int[string] breakG;
+ for x from 1 to length(word) breakW[char_at(word,x-1)]+=1;
+ for x from 1 to length(word) breakG[char_at(guess,x-1)]+=1;
+ int m=0;
+ foreach k,v in breakW if (breakG contains k) m+=min(breakG[k],v);
+ chat_private(sender,m.to_string());
+ if (m>game.intervals) {
+  game.intervals=m;
+  chat_clan("We have a"+(m==8?"n ":" ")+m.to_string()+"!");
+ }
+ if (m==0){
+  if(game.roundOver==0) chat_clan("First 0!");
+  game.roundOver+=1;
+ }
+ saveGame(game);
+ return "x";
+}
+
+void startGame(string sender, string msg){
+ gameData game;
+ if (gameType()!=gameNone){
+  game=loadGame();
+  if((msg=="cancel")||(msg=="stop")){
+   if((sender==game.host)||getUF(sender,isAdmin)){
+    closeGame();
+    chat_private("Game canceled");
+    chat_clan("You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
+   }else chat_private(sender,"You don't have permission to do that.");
+  }else chat_private(sender,"A game is already in session by "+game.host+".");
+  return;
+ }
+ matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
+ if (!m.find()) return;
+ print("1");
+ string t=m.group(1);
+ string l="-";
+ if(m.group_count()>1) l=m.group(2);
+ print(t+": "+l);
+ switch(t){
+  case "wordshot":
+   startWordshot(l.to_int(),sender);
+   game=loadGame();
+   string w;
+   foreach k,v in game.players if(v==1) w=k;
+   if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
+    string list=visit_url("http://clubefl.gr/games/wordox/"+l.length().to_string()+".html");
+    if (list.contains_text(l.to_lower_case())){
+     remove game.players[w];
+     game.players[l]=1;
+     w=l;
+    }else{
+     closeGame();
+     chat_private(sender,"Word not found");
+     return;
+    }
+   }
+   chat_private(sender,"Game started, word is "+w);
+   chat_clan(w.length().to_string()+"-letter Wordshot! Send guesses to me!");
+   break;
+  case "rr":case "russianroulette":
+  case "russian roulette":
+   //startRussianRoulette;
+   break;
+ }
 }
 
 void pick(string options){
@@ -1413,6 +1453,9 @@ string predicateFilter(string sender, string message){
   case "details":
    userDetails(sender,oper);
    return "x";
+  case "host":
+   startGame(sender,oper);
+   return "x";
  }
  return message;
 }
@@ -1765,6 +1808,8 @@ void main(string sender, string message, string channel){
   if(length(message)>1) message=substring(message,1);
  }
  if(getUF(sender,noFlag)) errorMsg=false;
+ if(gameType()==gameWordshot) message=wordshot(sender,message);
+ if(message=="x")return;
  message=chatFilter(sender,message);
  if(message=="x")return;
  message=predicateFilter(sender,message);

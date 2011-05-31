@@ -1,20 +1,12 @@
-/* CHANGELOG:
-20110301 Initial creation {
- GLOBAL-
- startGame- create the initial data for a chat game and set the game Mode flag.
- loadGame- returns the game data for game specified (or current game by default)
- saveGame- saves game data to current running game slot
- gameType- returns the type of the current running game
- pauseGame- saves supplied game data, then returns to non-game mode
- resumeGame- pause a current game (if any) and resume gameplay to requested game, return data.
- closeGame- erase specified (or current) game and return control to non-game mode.
- closeAllGames- erase all game data}
+/*
+see r2
 */
 record gameData{
  int[string] players;
  boolean gameStarted;
  int roundOver;
  int intervals;
+ string host;
 };
 /*
  for gamesavedata[0], players holds the information for other games.
@@ -23,10 +15,11 @@ record gameData{
 */
 gameData[int] gamesavedata;
 file_to_map("gameMode.txt",gamesavedata);
+int gameNone=0;
 int gameRoulette=1;
 int gameWordshot=2;
 
-int startGame(int gType, int ivals, boolean started){
+int startGame(int gType, int ivals, boolean started, string host){
  file_to_map("gameMode.txt",gamesavedata);
  int gId=count(gamesavedata);
  int now=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
@@ -35,12 +28,13 @@ int startGame(int gType, int ivals, boolean started){
  gamesavedata[gId].intervals=ivals;
  gamesavedata[gId].roundOver=now+ivals;
  gamesavedata[gId].gameStarted=started;
+ gamesavedata[gId].host=host;
  gamesavedata[0].players["0"]=gId;
  map_to_file(gamesavedata,"gameMode.txt");
  return gId;
 }
 int startGame(int gType){
- return startGame(gType,3,false);
+ return startGame(gType,3,false,":SYSTEM");
 }
 
 gameData loadGame(int gId){
@@ -98,6 +92,7 @@ void closeGame(int gId){
  file_to_map("gameMode.txt",gamesavedata);
  if (gId==0) return;
  remove gamesavedata[gId];
+ remove gamesavedata[0].players[gId.to_string()];
  gamesavedata[0].players["0"]=0;
  map_to_file(gamesavedata,"gameMode.txt");
 }
@@ -111,4 +106,38 @@ void closeAllGames(){
  gamesavedata[0].gameStarted=false;
  gamesavedata[0].intervals=0;
  map_to_file(gamesavedata,"gameMode.txt");
+}
+
+int startWordshot(int l,string h){
+ gameData game=loadGame(startGame(gameWordshot,0,true,h));
+ if (l==0) l=random(2)+5;
+ l=min(max(5,l),7);
+ string list=visit_url("http://clubefl.gr/games/wordox/"+l.to_string()+".html");
+ matcher m;
+ switch (l){
+  case 5: m=create_matcher("</b>([\\w\\s\\r\\n]+)</p>",list);
+          break;
+  case 6:
+  case 7: m=create_matcher("<br>([\\w\\s\\r\\n]+)<br>[\\s\\r\\n]*<br>",list);
+          break;
+ }
+ if (m.find()){
+  list=m.group(1);
+  remove game.players["SYSTEM"];
+  string[int] bigList=split_string(list,"\\W");
+  l=count(bigList);
+  list="";
+  while(list=="") list=bigList[random(l)];
+  game.players[list]=1;
+  game.intervals=3;
+  game.roundOver=0;
+  saveGame(game);
+ }else{
+  closeGame();
+  return -1;
+ }
+ return gamesavedata[0].players["0"];
+}
+int startWordshot(string host){
+ return startWordshot(0,host);
 }
