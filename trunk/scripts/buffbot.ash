@@ -264,9 +264,7 @@ void updateDC(string list){
  s+="Over "+to_commad(served)+" casts served since 2011!\n";
  s+="Daily Avg: "+avg+"\n\n";
  s+="More information on buffs offered can be found on the following pages:\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Accordion_Thief\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Turtle_Tamer\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Sauceror\n\n\n";
+ s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n";
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
  s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
@@ -675,7 +673,7 @@ void startGame(string sender, string msg){
   if((msg=="cancel")||(msg=="stop")){
    if((sender==game.host)||getUF(sender,isAdmin)){
     closeGame();
-    chat_private("Game canceled");
+    chat_private(sender,"Game canceled");
     chat_clan("You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
    }else chat_private(sender,"You don't have permission to do that.");
   }else chat_private(sender,"A game is already in session by "+game.host+".");
