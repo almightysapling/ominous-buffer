@@ -200,10 +200,11 @@ void checkLotto(){
  }
  float perc;
  if (num>11){
-  perc=1.0+(num/2)*0.16;
+  perc=1.4+(num/2)*0.24;
  }else{
-  perc=num*2.0/(1.0+num);
+  perc=0.4+num*2.0/(1.0+num);
  }
+ if (perc>4) perc=4;
  int d=ceil((100/perc)*num);
  print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string());
  print(num.to_string()+"players: Rolling D"+d.to_string());

@@ -840,10 +840,10 @@ void fax(string message){
    message="slime1";
  }
  string nm=m[to_monster(message)];
- print("Requesting monster: "+message+" from FaxBot: "+nm);
  if (nm==""){
   nm=message;
  }
+ print("Requesting "+message+" ("+nm+") from FaxBot.");
  chat_private("FaxBot",nm);
 }
 

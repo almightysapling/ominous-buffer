@@ -1,17 +1,17 @@
-7-Foot Dwarf    miner
+7-Foot Dwarf	miner
 Alphabet Giant	alphabet
-Astronomer  astronomer
-Bailey's Beetle baileys
+Astronomer	astronomer
+Bailey's Beetle	baileys
 Baseball Bat	baseball
 Batwinged Gremlin	batwinged
 Big Creepy Spider	spider
-Blooper blooper
-Blur    blur
+Blooper	blooper
+Blur	blur
 Black Widow	black_widow
 Bob Racecar	bob
-Bolt-Cuttin' Elf    bolt_elf
+Bolt-Cuttin' Elf	bolt_elf
 Booze Giant	booze
-Brainsweepr brainsweeper
+Brainsweepr	brainsweeper
 C. H. U. M. Chieftain	chieftain
 Cement Cobbler Penguin	cement_penguin
 Claw-foot Bathtub	bathtub
@@ -24,55 +24,55 @@ Dirty Hippy Jewelry Maker   prewar_hippy
 Dirty Thieving Brigand	brigand
 Elf Hobo	bathroom_elf
 Erudite Gremlin	erudite
-Five Skeleton Invaders  skeleton_invaders
-Fruit Golem fruit_golem
+Five Skeleton Invaders	skeleton_invaders
+Fruit Golem	fruit_golem
 Furry Giant	furry
 Gang of Hobo Muggers	muggers
 Gaudy Pirate	gaudy
-Ghost   ghost
+Ghost	ghost
 Gnollish Crossdresser	crossdresser
 Gnollish Gearhead	gearhead
 Gnollish Tirejuggler	tirejuggler
 Goth Giant	goth
 Grungy Pirate	grungy
 Handsome Mariachi	handsomeness
-Harem Girl  harem_girl
-Hellion hellion
-Hellseal pup    hellpup
+Harem Girl	harem_girl
+Hellion	hellion
+Hellseal pup	hellpup
 Hobelf	hobo_elf
-Hung-Over Half-Orc Hobo half_orc
-Hustled Spectre hustled_spectre
+Hung-Over Half-Orc Hobo	half_orc
+Hustled Spectre	hustled_spectre
 Irate Mariachi	irate
 Knight (Snake)	knight
 Knob Goblin Elite Guard Captain	kge
 Knob Goblin Harem Girl	harem_girl
 Large Kobold	kobold
-Lobsterfrogman  lobsterfrogman
+Lobsterfrogman	lobsterfrogman
 Lemon-In-The-Box	lemonbox
 MagiMechTech MechaMech	mech
 Mariachi Calavera	calavera
 Mesmerizing Penguin	mesmerizing
-Mob Penguin Demolitionist   demolitionist
-Monkey Wrenchin' Elf    monkey_elf
-Neptune Flytrap neptune_flytrap
+Mob Penguin Demolitionist	demolitionist
+Monkey Wrenchin' Elf	monkey_elf
+Neptune Flytrap	neptune_flytrap
 Ninja Snowman Janitor	janitor
-Orcish Frat Boy Spy frat_spy
+Orcish Frat Boy Spy	frat_spy
 Plaque of Locusts	locust
 Propaganda-Spewin' Elf	prop_elf
-Protagonist protagonist
-Pygmy Assault Squad pygmy_assault
-Pygmy Blowgunner    blowgunner
+Protagonist	protagonist
+Pygmy Assault Squad	pygmy_assault
+Pygmy Blowgunner	blowgunner
 Quantum Mechanic	mechanic
 Quiet Healer	healer
 Rampaging Adding Machine	adding_machine
 Raver Giant	raver
 Scary Pirate	cursed
-Screambat   screambat
+Screambat	screambat
 Shaky Clown	shaky
 Skeletal Sommelier	wine
-Skinflute   skinflute
+Skinflute	skinflute
 Sleepy Mariachi	sleepy_mariachi
-Slime1  slime
+Slime1	slime
 Smarmy Pirate	smarmy
 Some Bad ASCII Art	ascii
 Some Zombie Waltzers	waltzers
@@ -82,17 +82,17 @@ Sub-Assistant Knob Mad Scientist	firecracker
 Swarm of Scarab Beatles	beatles
 The Angels of Avalon	avalon
 The Remains of a Jilted Mistress	jilted
-Toilet-papered Tree tp_tree
+Toilet-papered Tree	tp_tree
 Tomb Rat	tomb_rat
 Tomb Servant	tomb_servant
-Triffid triffid
-Undercover Penguin  undercover_penguin
+Triffid	triffid
+Undercover Penguin	undercover_penguin
 Unemployed Knob Goblin	beer_lens
-Unholy Diver    unholy_diver
+Unholy Diver	unholy_diver
 Vegetable Gremlin	vegetable
 W Imp	wimp
 War Hippy Fire Spinner	fire_spinner
-War Hippy Spy   war_hippy_spy
+War Hippy Spy	war_hippy_spy
 White Lion	white_lion
 Whitesnake	white_snake
 Writing Desk	writing_desk
@@ -105,4 +105,4 @@ reanimated demon skeleton	reanim_demon
 reanimated giant spider skeleton	reanim_spider
 reanimated serpent skeleton	reanim_serpent
 reanimated wyrm skeleton	reanim_wyrm
-rockfish    rockfish
+rockfish	rockfish
