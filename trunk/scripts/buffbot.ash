@@ -198,7 +198,7 @@ void logout(string sender, string message){
   chat_private(sender,"You do not have permission to use this command.");
   return;
  }
- saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;ducks;rolladv;rollmp;_limitBuffs;_currentDeals");
+ saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals");
  set_property("chatbotScript","off");
  cli_execute("exit");
 }
@@ -263,8 +263,8 @@ void updateDC(string list){
  string s="managecollection.php?action=changetext&pwd&newtext=";
  s+="Over "+to_commad(served)+" casts served since 2011!\n";
  s+="Daily Avg: "+avg+"\n\n";
- s+="More information on buffs offered can be found on the following pages:\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n";
+ s+="More information on buffs offered can be found on the following page:\n";
+ s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
  s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
