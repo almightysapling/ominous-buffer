@@ -36,7 +36,7 @@ int highAssociate=512;
 userinfo[string] userdata;
 
 string meatfarm_fam="leprechaun";
-string stasis_fam="star starfish";
+string stat_fam="hovering sombrero";
 int lastCheck=-255;
 
 int minutesToRollover(){
@@ -74,8 +74,8 @@ void updateDC(){
  string s="managecollection.php?action=changetext&pwd&newtext=";
  s+="Over "+to_commad(served)+" casts served since 2011!\n";
  s+="Daily Avg: "+avg+"\n\n";
- s+="More information on buffs offered can be found on the following pages:\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n";
+ s+="More information on buffs offered can be found on the following page:\n";
+ s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
  s+="Casts Remaining of limited skills listed below:\n";
  s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
  visit_url(s);
@@ -122,7 +122,6 @@ void checkapps(){
  int n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
  if (n>1200) n-=1440;
  if (n<lastCheck) return;
-// print("checking");
  lastCheck=n+5;
  boolean acceptall=true;
  matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
@@ -157,11 +156,7 @@ void sendMeat(string who, int amount){
 
 void gRR(){
  gameData game=loadGame();
- if (!game.gameStarted){
-  
- }else{
-
- }
+ if (!game.gameStarted){}else{}
 }
 
 void gWS(){
@@ -242,15 +237,15 @@ void burn(){
   int price_thing = mall_price($item[recording of The Ballad of Richie Thingfinder]);
   int price_chorale = mall_price($item[recording of Chorale of Companionship]);
   int price_inigo = mall_price($item[recording of Inigo's Incantation of Inspiration]);
-  int thing = 530;
-  int chorale = 533;
-  int inigo = 716;
+  int thing=530;
+  int chorale=533;
+  int inigo=716;
   int best;
   int next_best;
   int worst;
-  int bestmax = 10;
-  int nextmax = 10;
-  int worstmax = 10;
+  int bestmax=10;
+  int nextmax=10;
+  int worstmax=10;
   switch (max(max(price_thing,price_chorale),price_inigo)){
    case price_thing:
     best = thing;
@@ -374,136 +369,119 @@ void handleMeat(){
  map_to_file(books,"books.txt");
 }
 
+void cleanPC(){
+ int[string] lifetime;
+ file_to_map("OB_lifetime.txt",lifetime);
+ file_to_map("userdata.txt",userdata);
+ foreach name in userdata{
+  foreach skilln,amt in userdata[name].buffs lifetime[skilln.to_string()]+=amt;
+  clear(userdata[name].buffs);
+  userdata[name].lastTrigger="";
+ }
+ for i from 1 to 6 {remove userdata["*"].buffpacks[i.to_string()];}
+ map_to_file(userdata,"userdata.txt");
+ lifetime["*"]=0;
+ foreach skilln in lifetime if(skilln!="*") lifetime["*"]+=lifetime[skilln];
+ map_to_file(lifetime,"OB_lifetime.txt");
+ set_property("_thisBreakfast","1");
+}
+
+void dailyBreakfast(){
+ string rumpus=visit_url("clan_rumpus.php");
+ int camp_mp_gain;
+ int rollmp;
+ int rolladv=numeric_modifier("adventures");
+ camp_mp_gain=to_int(numeric_modifier("base resting mp")*(1+numeric_modifier("resting mp percent")/100));
+ if (contains_text(rumpus,"rump1_1.gif")||contains_text(rumpus,"rump1_2.gif")) rolladv+=3;
+ if (contains_text(rumpus,"rump2_3.gif")) rolladv+=5;
+ if (contains_text(rumpus,"rump4_3.gif")) rolladv+=1;
+ set_property("_isadventuring","yes");
+ handleMeat();
+ set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
+ set_property("rolladv",rolladv);
+ rollmp = my_maxmp()-1000;
+ set_property("rollmp",rollmp);
+ cli_execute("familiar "+stat_fam);
+ cli_execute("maximize exp, -1000combat");
+ print("Visiting clan rumpus room.", "blue");
+ if (contains_text(rumpus,"rump3_3.gif")){
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+ }
+ if (contains_text(rumpus,"rump3_1.gif")){
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+ }
+ if (contains_text(rumpus,"rump1_4.gif"))
+  visit_url("clan_rumpus.php?action=click&spot=1&furni=4");
+ if (contains_text(rumpus,"rump4_2.gif"))
+  visit_url("clan_rumpus.php?action=click&spot=4&furni=2");
+ if (contains_text(rumpus,"rump9_3.gif"))
+  visit_url("clan_rumpus.php?action=click&spot=9&furni=3");
+ if (contains_text(rumpus,"rump4_1.gif"))
+  visit_url("clan_rumpus.php?action=click&spot=4&furni=1");
+ if (contains_text(rumpus,"rump3_2.gif"))
+  visit_url("clan_rumpus.php?preaction=jukebox&whichsong=1");
+ if (contains_text(rumpus,"rump9_2.gif")){
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=1");
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=2");
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=3");
+ }
+ if (contains_text(rumpus,"ballpit.gif"))
+  visit_url("clan_rumpus.php?preaction=ballpit");
+ print ("Finishing other breakfast functions.", "blue");
+ if (get_property("sidequestOrchardCompleted") != "none")
+  visit_url("store.php?whichstore=h");
+ if (get_property("sidequestArenaCompleted") != "none")
+  visit_url("postwarisland.php?action=concert&option=2");
+ if (item_amount($item[Burrowgrub hive])>0)
+  use(1,$item[Burrowgrub hive]);
+ if (item_amount($item[Cheap toaster])>0)
+  for i from 1 to 3 use(1,$item[Cheap toaster]);
+ visit_url("volcanoisland.php?action=npc");
+ if (item_amount($item[fisherman's sack])>1) use(1,$item[Fisherman's sack]);
+ string bounty=visit_url("bhh.php");
+ if (index_of(bounty,"discarded pacifiers")>0)
+  visit_url("bhh.php?pwd="+my_hash()+"&action=takebounty&whichitem=2415");
+ for i from 1 to 5
+  (!hermit(1, $item[Ten-leaf clover]));
+ if(item_amount($item[supernova champagne])<6) retrieve_item(6,$item[supernova champagne]);
+ if(item_amount($item[can of swiller])<1) retrieve_item(1,$item[can of swiller]);
+ if (have_skill($skill[Lunch Break]))
+  (!use_skill(1,$skill[Lunch Break]));
+ cli_execute("uneffect cantata");
+ if (have_skill($skill[ode to booze]))
+  (!use_skill(1,$skill[ode to booze]));
+ drink(6,$item[supernova champagne]);
+ drink(1,$item[can of swiller]);
+ cli_execute("uneffect ode");
+ if (have_skill($skill[Sonata of Sneakiness]))
+  (!use_skill(1,$skill[Sonata of Sneakiness]));
+ if ((have_effect($effect[Dreams and Lights])<1)&&(have_effect($effect[Arcane in the Brain])<1)){
+  while(have_effect($effect[Dreams and Lights])<1) (!adventure(1,$location[Haunted Gallery]));
+  cli_execute("uneffect sonata");
+  retrieve_item(1,$item[llama lama gong]);
+  cli_execute("gong mole");
+  if (!adventure(8,$location[Mt. Molehill])){
+   print("Arcane in the Brain Error","red");
+  }
+ }
+ set_property("_breakfast", "1");
+}
+
 void main(){try{
  print("Starting Login...");
- if (get_property("_thisBreakfast")==""){
-  int[string] lifetime;
-  file_to_map("OB_lifetime.txt",lifetime);
-  file_to_map("userdata.txt",userdata);
-  foreach name in userdata{
-   foreach skilln,amt in userdata[name].buffs lifetime[skilln.to_string()]+=amt;
-   clear(userdata[name].buffs);
-   userdata[name].lastTrigger="";
-  }
-  for i from 1 to 6 {remove userdata["*"].buffpacks[i.to_string()];}
-  map_to_file(userdata,"userdata.txt");
-  lifetime["*"]=0;
-  foreach skilln in lifetime if(skilln!="*") lifetime["*"]+=lifetime[skilln];
-  map_to_file(lifetime,"OB_lifetime.txt");
-  set_property("_thisBreakfast","1");
- }//per-PC-breakfast
- loadSettings("_breakfast;_limitBuffs;nunsVisits;ducks;rolladv;rollmp;_currentDeals");
+ if (get_property("_thisBreakfast")=="") cleanPC();
+ loadSettings("_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals");
  processLimits();
  updateLimits();
  updateDC();
- if (get_property("chatbotScript")==""){
-  waitq (2);
- }
+ if (get_property("chatbotScript")=="") waitq (2);
  set_property("chatbotScript",chatbotScript);
  set_property("_isadventuring","");
- string rumpus = visit_url("clan_rumpus.php");
- int camp_mp_gain;
- int rollmp;
- int rolladv;
- camp_mp_gain=to_int(numeric_modifier("base resting mp")*(1+numeric_modifier("resting mp percent")/100));
- int clanadv = 0;
- if (contains_text(rumpus,"rump1_1.gif") || contains_text(rumpus,"rump1_2.gif"))
-  clanadv += 3;
- if (contains_text(rumpus,"rump2_3.gif"))
-  clanadv += 5;
- if (contains_text(rumpus,"rump4_3.gif"))
-  clanadv += 1;
-//BREAKFAST
- if (get_property("_breakfast") == ""){
-  set_property("_isadventuring","yes");
-  handleMeat();
-  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
-  int ducks;
-  switch (get_property("sidequestFarmCompleted")){
-   case "fratboy":
-    ducks=15;
-    break;
-   case "hippy":
-    ducks=10;
-    break;
-   default:
-    ducks=5;
-  }
-  set_property("ducks",ducks);
-  int rolladv = numeric_modifier("adventures");
-  set_property("rolladv",rolladv);
-  rollmp = my_maxmp()-1000;
-  set_property("rollmp",rollmp);
-  cli_execute("maximize exp, -1000combat");
-  print ("Visiting clan rumpus room.", "blue");
-  if (contains_text(rumpus,"rump3_3.gif")){
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-  }
-  if (contains_text(rumpus,"rump3_1.gif")){
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-  }
-  if (contains_text(rumpus,"rump1_4.gif"))
-   visit_url("clan_rumpus.php?action=click&spot=1&furni=4");
-  if (contains_text(rumpus,"rump4_2.gif"))
-   visit_url("clan_rumpus.php?action=click&spot=4&furni=2");
-  if (contains_text(rumpus,"rump9_3.gif"))
-   visit_url("clan_rumpus.php?action=click&spot=9&furni=3");
-  if (contains_text(rumpus,"rump4_1.gif"))
-   visit_url("clan_rumpus.php?action=click&spot=4&furni=1");
-  if (contains_text(rumpus,"rump3_2.gif"))
-   visit_url("clan_rumpus.php?preaction=jukebox&whichsong=1");
-  if (contains_text(rumpus,"rump9_2.gif")){
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=1");
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=2");
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=3");
-  }
-  if (contains_text(rumpus,"ballpit.gif"))
-   visit_url("clan_rumpus.php?preaction=ballpit");
-  print ("Finishing other breakfast functions.", "blue");
-  if (get_property("sidequestOrchardCompleted") != "none")
-   visit_url("store.php?whichstore=h");
-  if (get_property("sidequestArenaCompleted") != "none")
-   visit_url("postwarisland.php?action=concert&option=2");
-  if (item_amount($item[Burrowgrub hive])>0)
-   use(1,$item[Burrowgrub hive]);
-  if (item_amount($item[Cheap toaster])>0)
-   for i from 1 to 3 use(1,$item[Cheap toaster]);
-  visit_url("volcanoisland.php?action=npc");
-  if (item_amount($item[fisherman's sack])>1) use(1,$item[Fisherman's sack]);
-  string bounty=visit_url("bhh.php");
-  if (index_of(bounty,"discarded pacifiers")>0)
-   visit_url("bhh.php?pwd="+my_hash()+"&action=takebounty&whichitem=2415");
-  for i from 1 to 5
-   (!hermit(1, $item[Ten-leaf clover]));
-  if(item_amount($item[supernova champagne])<6) retrieve_item(6,$item[supernova champagne]);
-  if(item_amount($item[can of swiller])<1) retrieve_item(1,$item[can of swiller]);
-  if (have_skill($skill[Lunch Break]))
-   (!use_skill(1,$skill[Lunch Break]));
-  cli_execute("uneffect cantata");
-  if (have_skill($skill[ode to booze]))
-   (!use_skill(1,$skill[ode to booze]));
-  drink(6,$item[supernova champagne]);
-  drink(1,$item[can of swiller]);
-  cli_execute("uneffect ode");
-  if (have_skill($skill[Sonata of Sneakiness]))
-   (!use_skill(1,$skill[Sonata of Sneakiness]));
-  if ((have_effect($effect[Dreams and Lights])<1)&&(have_effect($effect[Arcane in the Brain])<1)){
-   while(have_effect($effect[Dreams and Lights])<1) (!adventure(1,$location[Haunted Gallery]));
-   cli_execute("uneffect sonata");
-   retrieve_item(1,$item[llama lama gong]);
-   cli_execute("gong mole");
-   if (!adventure(8,$location[Mt. Molehill])){
-    print("Arcane in the Brain Error","red");
-   }
-  }
-  set_property("_breakfast", "1");
- } //shared-breakfast
-
- cli_execute("familiar "+stasis_fam);
+ if (get_property("_breakfast") == "") dailyBreakfast();
  cli_execute("maximize mp");
  set_property("_isadventuring","");
  print("Entering wait cycle.","green");
@@ -517,7 +495,6 @@ void main(){try{
     gWS();
     break;
    default:
-    
     break;
   }
   checkLotto();
@@ -533,16 +510,16 @@ void main(){try{
  if (!adventure(1,$location[Mt. Molehill])){}
  visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
  burn();
- cli_execute("maximize meat, +1000combat, -tie");
  cli_execute("familiar "+meatfarm_fam);
- while (my_adventures()>(190-(40+to_int(get_property("rolladv"))+clanadv))){
+ cli_execute("maximize meat, +1000combat, -tie");
+ while (my_adventures()>(150-to_int(get_property("rolladv")))){
   if (adventure(1,$location[giant's castle])){}
   burn();
  }
  burn();
  updateDC();
  cli_execute("uneffect cantata");
- cli_execute("familiar "+stasis_fam);
+ cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
  set_property("_isadventuring","");
