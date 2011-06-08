@@ -704,7 +704,7 @@ void startGame(string sender, string msg){
      return;
     }
    }
-   chat_private(sender,"Game started, word is "+w);
+   chat_private(sender,"Game started.");
    chat_clan(w.length().to_string()+"-letter Wordshot! Send guesses to me!");
    break;
   case "rr":case "russianroulette":

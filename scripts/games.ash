@@ -58,6 +58,7 @@ boolean saveGame(gameData game){
 }
 
 int gameType(){
+ file_to_map("gameMode.txt",gamesavedata);
  int t=gamesavedata[0].players["0"];
  if (t==0) return 0;
  return gamesavedata[0].players[t.to_string()];
