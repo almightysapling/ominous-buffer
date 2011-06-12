@@ -334,14 +334,26 @@ void burn(){
  int casts_to_use = ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
  casts_to_use = max((casts_to_use/3),1);
  int currentmp = my_mp();
- while (my_mp() == currentmp)
+ int tryL=0;
+ while (my_mp() == currentmp){
   use_skill(casts_to_use,farmingbuff,"Ominous Tamer");
+  tryL+=1;
+  if (tryL>5) break;
+ }
+ tryL=0;
  currentmp = my_mp();
- while (my_mp() == currentmp)
+ while (my_mp() == currentmp){
   use_skill(casts_to_use,farmingbuff,"Ominous Sauceror");
+  tryL+=1;
+  if (tryL>5) break;
+ }
+ tryL=0;
  currentmp = my_mp();
- while (my_mp() == currentmp)
+ while (my_mp() == currentmp){
   use_skill(casts_to_use,farmingbuff);
+  tryL+=1;
+  if (tryL>5) break;
+ }
 }
 
 void handleMeat(){
@@ -512,9 +524,10 @@ void main(){try{
  burn();
  cli_execute("familiar "+meatfarm_fam);
  cli_execute("maximize meat, +1000combat, -tie");
- while (my_adventures()>(150-to_int(get_property("rolladv")))){
+ int burnTurns=150-to_int(get_property("rolladv"));
+ while (my_adventures()-burnTurns>0){
   if (adventure(1,$location[giant's castle])){}
-  burn();
+  if (my_adventures()-burnTurns>12) burn();
  }
  burn();
  updateDC();
