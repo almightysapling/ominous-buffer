@@ -1,5 +1,5 @@
 import <kmail.ash>
-import <questsave.ash>
+import <shared.ash>
 import <games.ash>
 
 string chatbotScript="buffbot.ash";
@@ -8,32 +8,6 @@ int burnMinutes=20;
 
 boolean prompted=false;
 int farmbuff=0;
-
-record userinfo{
- int userid;
- string nick;
- boolean[string] multis;
- int gender;//0:unregistered 1: third 2: unknown 3:androgynous 4:male 5:female 6:inanimate
- int flags;//see flag bits
- string[string] buffpacks;
- int[int] buffs;
- float lastMath;
- string lastTime;
- string lastTrigger;
-};
-//flag bits
-int noFlag=1;
-int isAdmin=2;
-int isBuffer=4;
-int noLimit=8;
-int blacklist=16;
-int whitelist=32;
-int inClan=64;
-int receivedCake=128;
-int inAssociate=256;
-int highAssociate=512;
-
-userinfo[string] userdata;
 
 string meatfarm_fam="leprechaun";
 string stat_fam="hovering sombrero";
@@ -54,58 +28,6 @@ int minutesToRollover(){
 int[item] gift;
 gift[$item[black forest cake]] = 1;
 gift[$item[bulky buddy box]] = 1;
-
-string to_commad(int i){
- string s=to_string(i);
- string c;
- for l from length(s) downto 1 {
-  if((l<length(s))&&((length(s)-l)%3==0))c=","+c;
-  c=s.char_at(l-1)+c;
- }
- return c;
-}
-
-void updateDC(){
- file_to_map("userdata.txt",userdata);
- int served=get_property('sauceCasts').to_int()+get_property('tamerCasts').to_int()+get_property('totalCastsEver').to_int();
- int days=get_property('totalDaysCasting').to_int();
- string avg=to_string(served*1.0/days);
- if (index_of(avg,'.')+3<length(avg)) avg=substring(avg,0,index_of(avg,'.')+3);
- string s="managecollection.php?action=changetext&pwd&newtext=";
- s+="Over "+to_commad(served)+" casts served since 2011!\n";
- s+="Daily Avg: "+avg+"\n\n";
- s+="More information on buffs offered can be found on the following page:\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
- s+="Casts Remaining of limited skills listed below:\n";
- s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
- visit_url(s);
-}
-
-void updateLimits(){
- file_to_map("userdata.txt",userdata);
- string s="managecollection.php?action=modifyshelves&pwd="+my_hash()+"&newname12=";
- s+=to_string(50-userdata["*"].buffs[6026]);
- buffer n;
- if((50-userdata["*"].buffs[6026])>10) n=visit_url(s);
- s="managecollectionshelves.php?pwd&action=arrange";
- if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(51-userdata["*"].buffs[6026]);
- s+="&whichshelf4503="+to_string(6-userdata["*"].buffs[6028]);
- s+="&whichshelf4497="+to_string(11-userdata["*"].buffs[6020]);
- s+="&whichshelf4498="+to_string(11-userdata["*"].buffs[6021]);
- s+="&whichshelf4499="+to_string(11-userdata["*"].buffs[6022]);
- s+="&whichshelf4500="+to_string(11-userdata["*"].buffs[6023]);
- s+="&whichshelf4501="+to_string(11-userdata["*"].buffs[6024]);
- n=visit_url(s);
- s="62:"+to_string(userdata["*"].buffs[62])+":";
- s+="6020:"+to_string(userdata["*"].buffs[6020])+":";
- s+="6021:"+to_string(userdata["*"].buffs[6021])+":";
- s+="6022:"+to_string(userdata["*"].buffs[6022])+":";
- s+="6023:"+to_string(userdata["*"].buffs[6023])+":";
- s+="6024:"+to_string(userdata["*"].buffs[6024])+":";
- s+="6026:"+to_string(userdata["*"].buffs[6026])+":";
- s+="6028:"+to_string(userdata["*"].buffs[6028])+":";
- set_property("_limitBuffs",s);
-}
 
 void processLimits(){
  file_to_map("userdata.txt",userdata);
@@ -209,9 +131,24 @@ void checkLotto(){
  waitq(20);
  chat_clan("/em rolls "+to_string(d+1)+".");
  waitq(7);
+ string endsentence="!";
  if (d<num){
   print("Winner:"+clannies[d]);
-  chat_clan("A winner!");
+  while (checkRep("A winner"+endsentence)!=-1) switch (endsentence){
+   case "!":
+    endsentence="!!";
+    break;
+   case "!!":
+    endsentence="!!!";
+    break;
+   case "!!!":
+    endsentence="...";
+    break;
+   default:
+    endsentence=".";
+    break;   
+  }
+  chat_clan("A winner"+endsentence);
   waitq(7);
   file_to_map("userdata.txt",userdata);
   for i from 5 downto 2 userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
@@ -226,7 +163,21 @@ void checkLotto(){
   books["nextLotto"]=1;
  }else{
   print("No winner.");
-  chat_clan("Sorry, folks, no winners today. Better luck next time. See you again soon!");
+  while (checkRep("Sorry, folks, no winners today. Better luck next time. See you again soon"+endsentence)!=-1)switch (endsentence){
+   case "!":
+    endsentence="!!";
+    break;
+   case "!!":
+    endsentence="!!!";
+    break;
+   case "!!!":
+    endsentence="...";
+    break;
+   default:
+    endsentence=".";
+    break;   
+  }
+  chat_clan("Sorry, folks, no winners today. Better luck next time. See you again soon"+endsentence);
  }
  map_to_file(books,"books.txt");
 }
