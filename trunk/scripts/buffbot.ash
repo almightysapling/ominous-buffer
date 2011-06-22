@@ -1,4 +1,4 @@
-import <questsave.ash>
+import <shared.ash>
 import <market.ash>
 import <games.ash>
 import <mathlib.ash>
@@ -29,33 +29,6 @@ int gRefl=2;
 int gPosPro=3;
 int gPosDet=4;
 
-record userinfo{
- int userid;
- string nick;
- boolean[string] multis;
- int gender;//see gengers[] definition comments
- int flags;//see flag bits
- string[string] buffpacks;
- int[int] buffs;
- float lastMath;
- string lastTime;
- string lastTrigger;
-};
-//flag bits
-int noFlag=1;//no "cake is a lie" message
-int isAdmin=2;
-int isBuffer=4;//no use, merely for OS/T
-int noLimit=8;
-int blacklist=16;
-int whitelist=32;//for OB-use, not clan
-int inClan=64;
-int receivedCake=128;//see login.ash
-int inAssociate=256;
-int highAssociate=512;
-
-userinfo[string] userdata;
-file_to_map("userdata.txt",userdata);
-
 record responses{
  string reply;
  int flags;
@@ -82,74 +55,11 @@ timestamp[int] ctimestemp;
 file_to_map("timefile.txt",ctimestemp);
 timestamp ctimes=ctimestemp[0];
 
-//Global variables
-string sauc_name="ominous sauceror";
-string turt_name="ominous tamer";
-int clanid=2046994401;//Black Mesa
-boolean[int] associates;//F: 400 limit; T:in-clan limits
-associates[2046987019]=false;//Not Dead Yet
-associates[2046991167]=false;//This One Time
-associates[2046983684]=false;//Clan of 14 Days
-associates[2046991423]=false;//Margaretting Tye
-associates[76566]=false;//Imitation Plastic Death Star
-
 boolean errorMsg=true;
 string someoneDefined="";
 string[string] chatVars;
 int TPC=25;
 string isadventuring = get_property("_isadventuring");
-
-void setUF(string user, int f){
- userdata[user].flags|=f;
-}
-
-void unSetUF(string user, int f){
- userdata[user].flags&=~f;
-}
-
-boolean getUF(string user, int f){
- return (userdata[user].flags&f)==f;
-}
-
-//check clan whitelist for user if not in clan
-boolean checkWhitelist(int id){
- string page=visit_url("clan_whitelist.php");
- matcher m=create_matcher("(?i)="+id.to_string()+"'",page);
- if (find(m)) return true;
- return false;
-}
-
-//request unknown user's id. if (add) then place them into the users file.
-int updateId(string user,boolean add){
- if (user=="") return 0;
- string searchstring=visit_url("searchplayer.php?searching=Yep.&searchstring="+user+"&hardcoreonly=0");
- matcher name_clan=create_matcher('(?i)(\\d*)">'+user+'</a></b> (?: \\(PvP\\))?(?:<br>\\(<a target=mainpane href="showclan\\.php\\?whichclan=(\\d*))?',searchstring);
- if(!find(name_clan)) return 0;
- if (!add) return group(name_clan,1).to_int();
- userdata[user].gender=2;
- userdata[user].userid=group(name_clan,1).to_int();
- unSetUF(user,inClan+inAssociate+highAssociate);
- if (group(name_clan,2).to_int()==clanid) setUF(user,inClan);
- else unSetUF(user,inClan);
- if (associates contains group(name_clan,2).to_int()){
-  setUF(user,inAssociate);
-  if (associates[group(name_clan,2).to_int()]==true) setUF(user,highAssociate);
- }
- if (!(getUF(user,inClan))){
-  boolean wl=checkWhitelist(userdata[user].userid);
-  if (wl) setUF(user,inClan);
- }
- map_to_file(userdata,"userdata.txt");
- return userdata[user].userid;
-}
-
-//return id for given username. If name not on file, request it.
-int getId(string sender){
- if (sender=="") return 0;
- int x=userdata[sender].userid;
- if(x==0)x=updateId(sender,false);
- return x;
-}
 
 boolean buffable(string sender){
  if (userdata[sender].userid==0) updateId(sender,true);
@@ -229,73 +139,6 @@ void delpack(string sender, string packname){
  map_to_file(userdata,"userdata.txt");
 }
 
-string to_commad(int i){
- string s=to_string(i);
- string c;
- for l from length(s) downto 1 {
-  if((l<length(s))&&((length(s)-l)%3==0))c=","+c;
-  c=s.char_at(l-1)+c;
- }
- return c;
-}
-
-void updateDC(string list){
- if (list=="useCurrent") list=get_property("_currentDeals");
- else set_property("_currentDeals",list);
- if (length(list)>1) list=substring(list,1);
- string deals="";
- matcher extra=create_matcher("\\s?,\\s?",list);
- list=replace_all(extra,",");
- string[int] names=split_string(list,",");
- foreach x in names deals+=names[x]+" (#"+getId(names[x]).to_int()+")\n";
- if (deals==" (#0)\n"){
-//  print("No deals for DC","green");
-  deals="";
- }else{
-  print("Deals in DC for the following players:","green");
-  print(deals,"olive");
-  deals="Current deals in mall:\n"+deals+"\n";
- } 
- int served=get_property('sauceCasts').to_int()+get_property('tamerCasts').to_int()+get_property('totalCastsEver').to_int();
- int days=get_property('totalDaysCasting').to_int()+1;
- string avg=to_string(served*1.0/days);
- if (index_of(avg,'.')+3<length(avg)) avg=substring(avg,0,index_of(avg,'.')+3);
- string s="managecollection.php?action=changetext&pwd&newtext=";
- s+="Over "+to_commad(served)+" casts served since 2011!\n";
- s+="Daily Avg: "+avg+"\n\n";
- s+="More information on buffs offered can be found on the following page:\n";
- s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
- s+=deals;
- s+="Casts Remaining of limited skills listed below:\n";
- s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
- visit_url(s);
-}
-
-void updateLimits(){
- string s="managecollection.php?action=modifyshelves&pwd="+my_hash()+"&newname12=";
- s+=to_string(50-userdata["*"].buffs[6026]);
- buffer n;
- if((50-userdata["*"].buffs[6026])>10) n=visit_url(s);
- s="managecollectionshelves.php?pwd&action=arrange";
- if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(51-userdata["*"].buffs[6026]);
- s+="&whichshelf4503="+to_string(6-userdata["*"].buffs[6028]);
- s+="&whichshelf4497="+to_string(11-userdata["*"].buffs[6020]);
- s+="&whichshelf4498="+to_string(11-userdata["*"].buffs[6021]);
- s+="&whichshelf4499="+to_string(11-userdata["*"].buffs[6022]);
- s+="&whichshelf4500="+to_string(11-userdata["*"].buffs[6023]);
- s+="&whichshelf4501="+to_string(11-userdata["*"].buffs[6024]);
- n=visit_url(s);
- s="62:"+to_string(userdata["*"].buffs[62])+":";
- s+="6020:"+to_string(userdata["*"].buffs[6020])+":";
- s+="6021:"+to_string(userdata["*"].buffs[6021])+":";
- s+="6022:"+to_string(userdata["*"].buffs[6022])+":";
- s+="6023:"+to_string(userdata["*"].buffs[6023])+":";
- s+="6024:"+to_string(userdata["*"].buffs[6024])+":";
- s+="6026:"+to_string(userdata["*"].buffs[6026])+":";
- s+="6028:"+to_string(userdata["*"].buffs[6028])+":";
- set_property("_limitBuffs",s);
-}
-
 void buff(string sender, string message, int numTurns, string ding){
  //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
  if ((to_lower_case(sender)==turt_name) || (to_lower_case(sender)==sauc_name)){
@@ -345,7 +188,12 @@ void buff(string sender, string message, int numTurns, string ding){
   skillnum-=9000;
   skillnum=(skillnum/100)*1000+skillnum-((skillnum/100)*100);
  }
- if (skillnum==7008) skillnum=6004;//Correct for Moxious Maneuver
+ switch (skillnum){
+  case 1:case 3:case 12:case 15:case 19:
+  case 46:case 47:case 48:case 58:case 59:case 60: return;
+  case 7008: skillnum=6004; break;//Correct for Moxious Maneuver
+  case 7040:case 7041: return;
+ }
  //Forward skill requests to relay bots when necessary
  if (getUF(ding,inAssociate)) max=400;
  if ((max==400)&&(getUF(ding,highAssociate))) max=700;
@@ -368,7 +216,7 @@ void buff(string sender, string message, int numTurns, string ding){
     return;
   }
  }
- if ((skillnum > 2000) && (skillnum < 3000)){
+ if ((skillnum>2000)&&(skillnum<3000)){
   mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+to_string(max);
   chat_private(turt_name,mout);
   return;
@@ -382,7 +230,7 @@ void buff(string sender, string message, int numTurns, string ding){
  if (skillnum==6014) numTurns=TPC;//Ode
  if (numTurns==0){
   if (skillnum==6026) numTurns=125;//Donho
-  else if (((skillnum > 6019) && (skillnum < 6025)) || (skillnum==6028)) numTurns=25;//Limited buffs
+  else if (((skillnum>6019)&&(skillnum<6025))||(skillnum==6028)) numTurns=25;//Limited buffs
   else if (skillnum!=6014) numTurns=200;//Else
  }
  casts=ceil(numTurns/(TPC*1.0));
@@ -485,22 +333,6 @@ void buff(string sender, string message, int numTurns, string ding){
  }
  map_to_file(userdata,"userdata.txt");
  set_property("_isadventuring","");
-}
-
-int checkRep(string check){
-//Disabled
- return -1;
- 
- for i from 6 to 0 if (userdata["*"].buffpacks[i.to_string()]==check) return i;
- return -1;
-}
-
-void addRep(string s){
- for i from 0 to 5{
-  userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i+1)];
- }
- userdata["*"].buffpacks["6"]=s;
- map_to_file(userdata,"userdata.txt");
 }
 
 string roll(string sender, string message, string method){
@@ -1476,7 +1308,7 @@ void nopredpass(string sender, string message, boolean addressed){
   print(":"+message+":");
   print(":"+testcase+":");
   */
-  if(((reply.flags&repFree)==0)&&(checkRep(testcase)>3))continue;
+  //if(((reply.flags&repFree)==0)&&(checkRep(testcase)>3))continue;
   if(((reply.flags&mustRefer)==mustRefer)&&(!referred))continue;
   if(((reply.flags&mustAddress)==mustAddress)&&(!addressed))continue;
   if(((reply.flags&fullText)==fullText)&&(message!=testcase))continue;
