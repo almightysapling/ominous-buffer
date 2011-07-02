@@ -40,7 +40,7 @@ void processLimits(){
  map_to_file(userdata,"userdata.txt");
 }
 
-void checkapps(){
+void checkApps(){
  int n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
  if (n>1200) n-=1440;
  if (n<lastCheck) return;
@@ -63,6 +63,17 @@ void checkapps(){
    userdata[group(applicants,2)].flags|=(inClan|receivedCake);
    map_to_file(userdata,"userdata.txt");
   }
+ }
+}
+
+void checkMail(){
+ message[int] mail=parseMail();
+ foreach i,m in mail{
+  if ((m.sender=="smashbot")||(m.sender=="smashbot")||(m.sender=="smashbot")){
+   deleteMail(m.id);
+   continue;
+  }
+  
  }
 }
 
@@ -449,7 +460,7 @@ void main(){try{
  set_property("_isadventuring","");
  print("Entering wait cycle.","green");
  while (MinutesToRollover()>(burnMinutes+3)){
-  checkapps();
+  checkApps();
   switch (gameType()){
    case gameRoulette:
     gRR();
@@ -461,6 +472,7 @@ void main(){try{
     break;
   }
   checkLotto();
+  checkMail();
   waitq(5);
  }
  if (MinutesToRollover()>burnMinutes) waitq(60);
@@ -499,7 +511,7 @@ void main(){try{
  cli_execute("maximize adv -tie");
  cli_execute("set chatbotScript=");
  saveSettings("totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts");
- checkapps();
+ checkApps();
  cli_execute("exit");
 }finally{
  print("Script Halted");
