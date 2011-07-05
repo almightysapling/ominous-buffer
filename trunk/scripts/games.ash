@@ -1,6 +1,3 @@
-/*
-see r2
-*/
 record gameData{
  int[string] players;
  string[int] data;

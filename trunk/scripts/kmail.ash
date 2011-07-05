@@ -76,7 +76,7 @@ string substring(string source, string start, string end){
 message[int] parseMail(){
  message[int] parsedmail;
  string temp=visit_url("messages.php");
- if (contains_text(temp,"There are no messages in this mailbox."))
+ if (index_of(temp,"checkbox name=\"")<0)
   return parsedmail;
  temp=substring(temp,index_of(temp,"checkbox name=\"")+15);
  string[int] km=split_string(temp,"checkbox name=\"");

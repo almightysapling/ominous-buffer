@@ -1,6 +1,5 @@
 import <kmail.ash>
 import <shared.ash>
-import <games.ash>
 
 string chatbotScript="buffbot.ash";
 int logMinutes=3;
@@ -11,7 +10,7 @@ int farmbuff=0;
 
 string meatfarm_fam="leprechaun";
 string stat_fam="hovering sombrero";
-int lastCheck=-255;
+int lastCheck=0;
 
 int minutesToRollover(){
  int GMT=to_int(now_to_string("HHmm"))-to_int(now_to_string("Z"));
@@ -41,10 +40,6 @@ void processLimits(){
 }
 
 void checkApps(){
- int n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
- if (n>1200) n-=1440;
- if (n<lastCheck) return;
- lastCheck=n+5;
  boolean acceptall=true;
  matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
  if ((appcheck.find()) && (acceptall)){
@@ -67,14 +62,68 @@ void checkApps(){
 }
 
 void checkMail(){
+ file_to_map("userdata.txt",userdata);
  message[int] mail=parseMail();
+ matcher mx;
+ string build;
  foreach i,m in mail{
-  if ((m.sender=="smashbot")||(m.sender=="smashbot")||(m.sender=="smashbot")){
+  if ((m.sender=="smashbot")||(m.sender=="ominous tamer")||(m.sender=="ominous sauceror")){
    deleteMail(m.id);
    continue;
   }
+  mx=create_matcher("(?i)donat(?:e|ation)",m.text);
+  if (mx.find()){
+   deleteMail(m.id);
+   userdata[m.sender].donated+=m.meat;
+   build="";
+   foreach it,amount in m.things if ((it.to_int()>4496)&&(it.to_int()<4504)) continue;
+    else build+=amount+" "+it+", ";
+   cli_execute("display put "+build);
+   print("Arranging items");
+   build="managecollectionshelves.php?pwd&action=arrange";
+   foreach it in m.things if ((it.to_int()>4496)&&(it.to_int()<4504)) continue;
+    else build+="&whichshelf"+it.to_int().to_string()+"=13";
+   visit_url(build);
+   print("Donation accepted.");
+   continue;
+  }
+  mx=create_matcher("(?i)raffle\\s?(start|stop|cancel|add|\\+)?",m.text);
+  if (mx.find()){
+   build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
+   file_to_map("gameMode.txt",gamesavedata);
+   switch (build){
+    case "start": if (gamesavedata contains "raffle"){
+      //RETURN ITEMS
+     }else{
+      //START RAFFLE
+     }
+     break;
+    case "stop": if (gamesavedata contains "raffle"){
+      //END RAFFLE
+     }else{
+      //DISREGARD
+     }
+     break;
+    case "cancel": if (gamesavedata contains "raffle"){
+      //CANCEL
+     }else{
+      //DISREGARD
+     }
+     break;
+    case "add":case "+": if (gamesavedata contains "raffle"){
+      //ADD ITEMS
+     }else{
+      //RETURN ITEMS
+     }
+     break;
+   }
+   map_to_file(gamesavedata,"gameMode.txt");
+   continue;
+  }
+  //MADE IT THIS FAR? assume purchase.
   
- }
+ } 
+ map_to_file(userdata,"userdata.txt");
 }
 
 void sendMeat(string who, int amount){
@@ -459,8 +508,8 @@ void main(){try{
  cli_execute("maximize mp");
  set_property("_isadventuring","");
  print("Entering wait cycle.","green");
+ int n;
  while (MinutesToRollover()>(burnMinutes+3)){
-  checkApps();
   switch (gameType()){
    case gameRoulette:
     gRR();
@@ -472,7 +521,14 @@ void main(){try{
     break;
   }
   checkLotto();
-  checkMail();
+  n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
+  if (n<15) n+=1440;
+  if (n>=(lastCheck+15)){
+   if (n>1439) n-=1440;
+   lastCheck=n+15;
+   checkApps();
+   checkMail();
+  }
   waitq(5);
  }
  if (MinutesToRollover()>burnMinutes) waitq(60);

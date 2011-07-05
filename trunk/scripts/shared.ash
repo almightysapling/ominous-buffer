@@ -1,3 +1,5 @@
+import <games.ash>
+
 record userinfo{
  int userid;
  string nick;
@@ -9,6 +11,8 @@ record userinfo{
  float lastMath;
  string lastTime;
  string lastTrigger;
+ int donated;
+ int wallet;
 };
 //flag bits
 int noFlag=1;//no "cake is a lie" message
