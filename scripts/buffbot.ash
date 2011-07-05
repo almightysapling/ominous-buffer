@@ -1,6 +1,5 @@
 import <shared.ash>
 import <market.ash>
-import <games.ash>
 import <mathlib.ash>
 /*
  for release notes prior to subversioning, please see r2.
@@ -1098,6 +1097,8 @@ void userDetails(string sender, string who){
    reply+="Buffpacks Defined:\n";
    foreach pack, innards in userdata[who].buffpacks reply+="-"+pack+": "+innards+".\n";
   }
+  if(userdata[who].donated>0) reply+="Donated: "+userdata[who].donated.to_string()+" meat.\n";
+  if(who==sender) reply+="Bank: "+userdata[who].wallet.to_string()+" meat.\n";
   cli_execute("csend to "+sender+"||"+reply);
  }else chat_private(sender,"No match found for "+who+".");
 }
