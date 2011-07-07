@@ -61,6 +61,17 @@ void checkApps(){
  }
 }
 
+void raffleAnnounce(gameData g){
+ string s="RAFFLE!\n";
+ s+=g.host+" is raffling away the following prizes!\n";
+ foreach i,a in g.players if (i.char_at(0)!=":") s+=i.to_string()+" ("+a.to_string()+")\n";
+ if (g.players[":meat"]>0) s+="And "+g.players[":meat"].to_commad()+" meat!\n";
+ s+="Tickets cost "+g.intervals.to_string()+" meat each and the raffle ends in ";
+ s+=g.players[":end"]+" day"+(g.players[":end"]==1?".\n":"s.\n");
+ s+=g.data[0];
+ announceClan(s);
+}
+
 void checkMail(){
  file_to_map("userdata.txt",userdata);
  message[int] mail=parseMail();
@@ -74,6 +85,11 @@ void checkMail(){
   mx=create_matcher("(?i)donat(?:e|ation)",m.text);
   if (mx.find()){
    deleteMail(m.id);
+   if (m.things[$item[dense meat stack]]>0) {
+    cli_execute("autosell "+m.things[$item[dense meat stack]].to_string()+" dense meat stack");
+    m.meat+=m.things[$item[dense meat stack]]*1000;
+    remove m.things[$item[dense meat stack]];
+   }
    userdata[m.sender].donated+=m.meat;
    build="";
    foreach it,amount in m.things if ((it.to_int()>4496)&&(it.to_int()<4504)) continue;
@@ -87,42 +103,92 @@ void checkMail(){
    print("Donation accepted.");
    continue;
   }
+  build="-";
   mx=create_matcher("(?i)raffle\\s?(start|stop|cancel|add|\\+)?",m.text);
   if (mx.find()){
    build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
+  }
+  mx=create_matcher("(?i)(start|stop|cancel|add|\\+)?\\s?raffle",m.text);
+  if (mx.find()){
+   build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
+  }
+  if (build!="-"){
+   deleteMail(m.id);
    file_to_map("gameMode.txt",gamesavedata);
-   switch (build){
-    case "start": if (gamesavedata contains "raffle"){
-      //RETURN ITEMS
-     }else{
-      //START RAFFLE
-     }
-     break;
-    case "stop": if (gamesavedata contains "raffle"){
+   gameData game;
+   if (gamesavedata contains "raffle"){
+    game=gamesavedata["raffle"];
+    switch (build){
+     case "start":
+      build="Sorry, but there is already a raffle in play. It ends in ";
+      build+=game.players[":end"].to_string()+(game.players[":end"]==1?" day.\n":" days.\n");
+      build+="Wait until the current raffle is over, or, if you'd like to add to the current raffle, send the items back with the message \"Raffle +\"";
+      kmail(m.sender,build,m.meat,m.things);
+      break;
+     case "stop":case "end":
       //END RAFFLE
-     }else{
-      //DISREGARD
-     }
-     break;
-    case "cancel": if (gamesavedata contains "raffle"){
-      //CANCEL
-     }else{
-      //DISREGARD
-     }
-     break;
-    case "add":case "+": if (gamesavedata contains "raffle"){
+      break;
+     case "cancel":
+      //CANCEL RAFFLE
+      break;
+     case "add":case "+":
       //ADD ITEMS
-     }else{
-      //RETURN ITEMS
-     }
-     break;
+      //place receipt in outbox for verification
+      break;
+     default:
+      //ASSUME PURCHASE
+      break;
+    }
+   }else{
+/*
+raffle gameData{
+ int[string] players; [item name]=amount for winner;
+                      [":end"]=days remaining;
+                      [":meat"]=meat portion of prize;
+ string[int] data; [ticketnumber]=playername
+ boolean gameStarted; UNUSED;
+ int roundOver; TICKETS SOLD
+ int intervals; COST
+ string host; HOST
+};
+*/
+    switch (build){
+     case "start":
+      game.host=m.sender;
+      game.roundOver=0;
+      mx=create_matcher("(?i)(?:price|cost):\\s?(\\d+)",m.text);
+      game.intervals=100;
+      if (mx.find()) game.intervals=min(max(floor(mx.group(1).to_int()/50)*50,50),5000);
+      mx=create_matcher("(?i)(?:time|duration|length):\\s?(\\d+)\\s?days?",m.text);
+      game.players[":end"]=7;
+      if (mx.find()) game.players[":end"]=min(max(mx.group(1).to_int(),2),14);
+      foreach thing,amt in m.things game.players[thing.to_string()]=amt;
+      game.players[":meat"]=m.meat;
+      mx=create_matcher("(?i)(?:message|text|quote):\\s\"(.+?)\"",m.text);
+      if (mx.find())game.data[0]=mx.group(1);
+/*      gamesavedata["raffle"]=game;
+      raffleAnnounce(game); LEAVE OUT UNTIL READY TO ROLL*/
+      break;
+     case "stop":case "end":
+      if (getUF(m.sender,isAdmin)) chat_private(m.sender,"There is no raffle in play.");
+      else chat_private(m.sender,"You don't have that privelage.");
+      break;
+     case "cancel":
+      if (getUF(m.sender,isAdmin)) chat_private(m.sender,"There is no raffle in play.");
+      else chat_private(m.sender,"You don't have that privelage.");
+      break;
+     case "add":case "+":
+      kmail(m.sender,"There is no raffle in play; therefore, you can't add to it.",m.meat,m.things);
+      break;
+     default:
+      if (m.meat>0) kmail(m.sender,"You sent me this?",m.meat);
+      break;
+    }
    }
    map_to_file(gamesavedata,"gameMode.txt");
    continue;
   }
-  //MADE IT THIS FAR? assume purchase.
-  
- } 
+ }
  map_to_file(userdata,"userdata.txt");
 }
 
@@ -419,6 +485,7 @@ void dailyBreakfast(){
  if (contains_text(rumpus,"rump2_3.gif")) rolladv+=5;
  if (contains_text(rumpus,"rump4_3.gif")) rolladv+=1;
  set_property("_isadventuring","yes");
+ checkMail();
  handleMeat();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
  set_property("rolladv",rolladv);

@@ -209,3 +209,15 @@ void saveSettings(string settings){
  submit="questlog.php?which=4&action=updatenotes&font=0&notes="+submit;
  visit_url(submit);
 }
+
+void deleteAnnouncement(){
+ string t=visit_url("clan_hall.php");
+ matcher m=create_matcher("(\\d+)\">delete</a>\\]<b><br>From: Ominous Buffer \\(",t);
+ if (m.find()) visit_url("clan_hall.php?action=delete&pwd&msgid="+m.group(1));
+}
+
+void announceClan(string message){
+ deleteAnnouncement();
+ string t="clan_board.php?action=postannounce&pwd&message="+message;
+ visit_url(t);
+}
