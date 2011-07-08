@@ -1,3 +1,4 @@
+import <kmail.ash>
 import <games.ash>
 
 record userinfo{

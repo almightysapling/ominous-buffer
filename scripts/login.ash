@@ -1,4 +1,3 @@
-import <kmail.ash>
 import <shared.ash>
 
 string chatbotScript="buffbot.ash";
@@ -25,8 +24,8 @@ int minutesToRollover(){
 }
 
 int[item] gift;
-gift[$item[black forest cake]] = 1;
-gift[$item[bulky buddy box]] = 1;
+gift[$item[black forest cake]]=1;
+gift[$item[bulky buddy box]]=1;
 
 void processLimits(){
  file_to_map("userdata.txt",userdata);
@@ -66,10 +65,55 @@ void raffleAnnounce(gameData g){
  s+=g.host+" is raffling away the following prizes!\n";
  foreach i,a in g.players if (i.char_at(0)!=":") s+=i.to_string()+" ("+a.to_string()+")\n";
  if (g.players[":meat"]>0) s+="And "+g.players[":meat"].to_commad()+" meat!\n";
- s+="Tickets cost "+g.intervals.to_string()+" meat each and the raffle ends in ";
- s+=g.players[":end"]+" day"+(g.players[":end"]==1?".\n":"s.\n");
+ s+="Tickets cost "+g.intervals.to_string()+" meat each and ";
+ if (g.players[":end"]==1) s+="today is your last day to buy!";
+  else s+="the raffle ends in "+g.players[":end"].to_string()+" days.";
  s+=g.data[0];
  announceClan(s);
+}
+
+void issueTickets(gameData g,string w,int amount){
+ int lastTicket=count(g.data);
+ for i from lastTicket+1 upto lastTicket+amount g.data[i]=w;
+ string r="Thank you for your interest in the raffle. You have purchased the following tickets:\n";
+ r+=to_string(lastTicket+1);
+ if(amount>1) r+="-"+to_string(lastTicket+amount);
+ r+="\nGood luck!";
+ kmail(w,r);
+ g.players[":meat"]+=(g.intervals/20)*amount;
+}
+
+void endRaffle(gameData g){
+ deleteAnnouncement();
+ file_to_map("userdata.txt",userdata);
+ chat_clan("A Raffle House is Us!");
+ int numtix=count(g.data);
+ wait(5);
+ chat_clan("We managed to sell "+numtix.to_commad()+" tickets for a total of "+to_commad(numtix*g.intervals)+" meat!");
+ chat_clan("And the winner is...");
+ if (numtix>1) numtix=random(numtix)+1;
+  else numtix=1;
+ wait(10);
+ chat_clan(g.data[numtix]+" with ticket number "+numtix.to_commad()+".");
+ chat_clan("Well, that's all folks, have fun and better luck next time!");
+ int[item] reward;
+ foreach it,amt in g.players if(it.char_at(0)!=":") reward[it.to_item()]=amt;
+ int toPull=ceil(g.players[":meat"]*1.0/1000);
+ cli_execute("closet take "+toPull.to_string()+" dense meat stack");
+ cli_execute("autosell * dense meat stack");
+ if (!kmail(g.data[numtix],"Congratulations, you've got the golden ticket!",g.players[":meat"],reward)){
+  g.players[":meat"]=max(0,g.players[":meat"]-50*count(reward));
+  string send;
+  foreach it,amt in reward {
+   send="town_sendgift.php?pwd="+my_hash()+"&towho="+g.data[numtix]+"&note=You won the Raffle!&insidenote=A winner is you! Collect your meat from OB's Wallet!&whichpackage=1&howmany1="+amt.to_string()+"&whichitem1="+it.to_int().to_string();
+   send+="&fromwhere=0&action=Yep.";
+   visit_url(send);
+  }
+  userdata[g.data[numtix]].wallet+=g.players[":meat"];
+ }
+ remove gamesavedata["raffle"];
+ map_to_file(gamesavedata,"gameMode.txt");
+ map_to_file(userdata,"userdata.txt");
 }
 
 void checkMail(){
@@ -77,6 +121,9 @@ void checkMail(){
  message[int] mail=parseMail();
  matcher mx;
  string build;
+ while (item_amount($item[plain brown wrapper])>0){
+  break;
+ }
  foreach i,m in mail{
   if ((m.sender=="smashbot")||(m.sender=="ominous tamer")||(m.sender=="ominous sauceror")){
    deleteMail(m.id);
@@ -126,17 +173,37 @@ void checkMail(){
       kmail(m.sender,build,m.meat,m.things);
       break;
      case "stop":case "end":
-      //END RAFFLE
+      game.endRaffle();
       break;
      case "cancel":
       //CANCEL RAFFLE
       break;
      case "add":case "+":
-      //ADD ITEMS
-      //place receipt in outbox for verification
+      build="Added the following items to "+game.host+"'s raffle:\n";
+      foreach it,amt in m.things{
+       game.players[it.to_string()]+=amt;
+       build+=it.to_string()+" ("+amt.to_string()+")\n";
+      }
+      game.players[":meat"]+=m.meat;
+      build+="meat ("+m.meat.to_string()+")\n";
+      kmail(m.sender,build);
       break;
      default:
-      //ASSUME PURCHASE
+      if (m.sender==game.host){
+       game.players[":meat"]+=m.meat;
+       build+="Meat added to raffle value. ("+m.meat.to_string()+")\n";
+       kmail(m.sender,build);
+       break;
+      }
+      if (m.things contains $item[plain brown wrapper])break;
+      if (m.meat==0)break;
+      int numt=m.meat/game.intervals;
+      m.meat=m.meat-(numt*game.intervals);
+      if (m.meat>0) if (!kmail(m.sender,"Considering the cost of tickets, this is what was left over.",m.meat)) {
+       userdata[m.sender].wallet+=m.meat;
+       kmail(m.sender,"Your refund failed to send, so I'll hold it for you for now: "+m.meat.to_string()+" meat.");
+      }
+      game.issueTickets(m.sender,numt);
       break;
     }
    }else{
@@ -158,7 +225,7 @@ raffle gameData{
       game.roundOver=0;
       mx=create_matcher("(?i)(?:price|cost):\\s?(\\d+)",m.text);
       game.intervals=100;
-      if (mx.find()) game.intervals=min(max(floor(mx.group(1).to_int()/50)*50,50),5000);
+      if (mx.find()) game.intervals=min(max(floor(mx.group(1).to_int()/100)*100,100),5000);
       mx=create_matcher("(?i)(?:time|duration|length):\\s?(\\d+)\\s?days?",m.text);
       game.players[":end"]=7;
       if (mx.find()) game.players[":end"]=min(max(mx.group(1).to_int(),2),14);
@@ -190,6 +257,21 @@ raffle gameData{
   }
  }
  map_to_file(userdata,"userdata.txt");
+}
+
+void checkRaffle(){
+ set_property("_checkedRaffle","y");
+ file_to_map("gameMode.txt",gamesavedata);
+ if (!(gamesavedata contains "raffle")) return;
+ gameData g=gamesavedata["raffle"];
+ g.players[":end"]-=1;
+ if (g.players[":end"]<1) {
+  g.endRaffle();
+  return;
+ }
+ g.raffleAnnounce();
+ gamesavedata["raffle"]=g;
+ map_to_file(gamesavedata,"gameMode.txt");
 }
 
 void sendMeat(string who, int amount){
@@ -242,7 +324,7 @@ void checkLotto(){
   return;
  }
  float perc;
- if (num>11){
+ if (num>7){
   perc=1.4+(num/2)*0.24;
  }else{
   perc=0.4+num*2.0/(1.0+num);
@@ -456,6 +538,60 @@ void handleMeat(){
  books["Event2"]=event2;
  books["Event3"]=event3;
  map_to_file(books,"books.txt");
+ string today=now_to_string("MMMM d, yyyy");
+ matcher mx=create_matcher("(\\w+) (\\d+), (\\d+)",today);
+ if (!mx.find()) return;
+ int month;
+ int day=mx.group(2).to_int();
+ int year=mx.group(3).to_int();
+ switch (mx.group(1)){
+  case "January": month=1; break;
+  case "February": month=2; break;
+  case "March": month=3; break;
+  case "April": month=4; break;
+  case "May": month=5; break;
+  case "June": month=6; break;
+  case "July": month=7; break;
+  case "August": month=8; break;
+  case "September": month=9; break;
+  case "October": month=10; break;
+  case "November": month=11; break;
+  case "December": month=12; break;
+ }
+ day-=1;
+ if(day==0){
+  month-=1;
+  if(month==0){
+   year-=1;
+   month=12;
+  }
+  boolean isleapyear=(year-4*(year/4))==0;
+  isleapyear=isleapyear&((year-100*(year/100))==0);
+  isleapyear=isleapyear|((year-400*(year/400))==0);
+  switch (month){
+   case 1:case 3:case 5:case 7:case 8:case 10:case 12: day=31; break;
+   case 2: if (isleapyear) day=29; else day=28; break;
+   default: day=30;
+  }
+ }
+ string yest=" "+day.to_string()+", "+year.to_string();
+ switch (month){
+  case 1: yest="January"+yest; break;
+  case 2: yest="February"+yest; break;
+  case 3: yest="March"+yest; break;
+  case 4: yest="April"+yest; break;
+  case 5: yest="May"+yest; break;
+  case 6: yest="June"+yest; break;
+  case 7: yest="July"+yest; break;
+  case 8: yest="August"+yest; break;
+  case 9: yest="September"+yest; break;
+  case 10: yest="October"+yest; break;
+  case 11: yest="November"+yest; break;
+  case 12: yest="December"+yest; break; 
+ }
+ file_to_map("userdata.txt",userdata);
+ foreach name,user in userdata if((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest))) user.wallet+=100;
+ map_to_file(userdata,"userdata.txt");
 }
 
 void cleanPC(){
@@ -571,9 +707,10 @@ void main(){try{
  if (get_property("chatbotScript")=="") waitq (2);
  set_property("chatbotScript",chatbotScript);
  set_property("_isadventuring","");
- if (get_property("_breakfast") == "") dailyBreakfast();
+ if (get_property("_breakfast")=="") dailyBreakfast();
  cli_execute("maximize mp");
  set_property("_isadventuring","");
+ if (get_property("_checkedRaffle")=="") checkRaffle();
  print("Entering wait cycle.","green");
  int n;
  while (MinutesToRollover()>(burnMinutes+3)){
