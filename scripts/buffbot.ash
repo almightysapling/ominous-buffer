@@ -17,10 +17,10 @@ string[int,int] genders;                //0        1      2        3            
 genders[count(genders)]=to_array($strings[genders, third, unknown, androgynous, male, female, inanimate]);
 genders[count(genders)]=to_array($strings[*]);//WHO I AM
 genders[count(genders)]=to_array($strings[he, him, himself, his, his]);
-genders[count(genders)]=to_array($strings[they, them, themselves, theirs, their, ANGROGYNOUS|PLURAL]);
+genders[count(genders)]=to_array($strings[they, them, themselves, theirs, their, ANGROGYNOUS|PLURAL|HERMAPHRODIT]);
 genders[count(genders)]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE]);
 genders[count(genders)]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE]);
-genders[count(genders)]=to_array($strings[it, it, itself, its, its, IT|INANIMATE]);
+genders[count(genders)]=to_array($strings[it, it, itself, its, its, IT|INANIMATE|NEUTRAL|GENDERLESS]);
 //Genders[] from index 2 and up are as follows: subjective, objective, reflexive, possessive pronoun, possessive determiner. Optionally: Match string text
 int gSub=0;
 int gObj=1;
