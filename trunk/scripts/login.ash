@@ -316,6 +316,7 @@ void checkLotto(){
  boolean[string] inClan=who_clan();
  remove inClan["Ominous Buffer"];
  remove inClan["MesaChat"];
+ remove inClan["Acoustic_shadow"];
  string[int] clannies;
  foreach name in inClan clannies[count(clannies)]=name;
  int num=count(clannies);
@@ -330,6 +331,7 @@ void checkLotto(){
   perc=0.4+num*2.0/(1.0+num);
  }
  if (perc>4) perc=4;
+ if (books["thisLotto"]>2500)perc=min(5,perc+2);
  int d=ceil((100/perc)*num);
  print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string());
  print(num.to_string()+"players: Rolling D"+d.to_string());
@@ -516,28 +518,6 @@ void burn(){
 }
 
 void handleMeat(){
- cli_execute("use 0 warm subject gift certificate");
- cli_execute("autosell 0 thin black candle, 0 heavy d, 0 original g, 0 disturbing fanfic, 0 furry fur, 0 awful poetry journal, 0 chaos butterfly, 0 plot hole, 0 probability potion, 0 procrastination potion, 0 angry farmer candy, 0 mick's icyvapohotness rub");
- cli_execute("csend 0 wolf mask, 0 rave whistle, 0 giant needle, 0 twinkly nugget to smashbot || wads");
- int totalDMS=floor(my_meat()/1000)-500;
- if (totalDMS>0){
-  string exe="make "+to_string(totalDMS)+" dense meat stack";
-  cli_execute(exe);
-  put_closet(item_amount($item[dense meat stack]),$item[dense meat stack]);
- }
- int[string] books;
- file_to_map("books.txt",books);
-// books["Meat"+now_to_string("yDDD")]=totalDMS-18;
- int eventTimeCap=minutesToRollover();
- int event1=random(eventTimeCap-35)+30;
- int event2=random(eventTimeCap-35)+30;
- int event3=random(eventTimeCap-35)+30;
- while ((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
- while (((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
- books["Event1"]=event1;
- books["Event2"]=event2;
- books["Event3"]=event3;
- map_to_file(books,"books.txt");
  string today=now_to_string("MMMM d, yyyy");
  matcher mx=create_matcher("(\\w+) (\\d+), (\\d+)",today);
  if (!mx.find()) return;
@@ -590,8 +570,36 @@ void handleMeat(){
   case 12: yest="December"+yest; break; 
  }
  file_to_map("userdata.txt",userdata);
- foreach name,user in userdata if((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest))) user.wallet+=100;
+ int totspent=0;
+ foreach name,user in userdata if( ((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest))) &&
+  ((name!="Ominous Buffer")&&(name!="Ominous Tamer")&&(name!="Ominous Sauceror")) ){
+  user.wallet+=100;
+  totspent+=100;
+ }
  map_to_file(userdata,"userdata.txt");
+ cli_execute("use 0 warm subject gift certificate");
+ cli_execute("autosell 0 thin black candle, 0 heavy d, 0 original g, 0 disturbing fanfic, 0 furry fur, 0 awful poetry journal, 0 chaos butterfly, 0 plot hole, 0 probability potion, 0 procrastination potion, 0 angry farmer candy, 0 mick's icyvapohotness rub");
+ cli_execute("csend 0 wolf mask, 0 rave whistle, 0 giant needle, 0 twinkly nugget to smashbot || wads");
+ int totalDMS=floor(my_meat()/1000)-500;
+ if (totalDMS>0){
+  string exe="make "+to_string(totalDMS)+" dense meat stack";
+  cli_execute(exe);
+  put_closet(item_amount($item[dense meat stack]),$item[dense meat stack]);
+ }
+ int[string] books;
+ file_to_map("books.txt",books);
+ books[now_to_string("yDDD")+"ear"]=totalDMS-18;
+ books[now_to_string("yDDD")+"div"]=totspent;
+ int eventTimeCap=minutesToRollover();
+ int event1=random(eventTimeCap-35)+30;
+ int event2=random(eventTimeCap-35)+30;
+ int event3=random(eventTimeCap-35)+30;
+ while ((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
+ while (((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
+ books["Event1"]=event1;
+ books["Event2"]=event2;
+ books["Event3"]=event3;
+ map_to_file(books,"books.txt");
 }
 
 void cleanPC(){
