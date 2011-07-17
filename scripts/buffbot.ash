@@ -498,7 +498,6 @@ print("Players: "+count(game.players).to_string());
 
 string wordshot(string sender, string guess){
  gameData game=loadGame();
- if(sender==game.host)return guess;
  if(game.intervals==-1)return guess;
  string word;
  foreach k,v in game.players if (v==1) word=k;
@@ -550,11 +549,9 @@ void startGame(string sender, string msg){
  }
  matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
  if (!m.find()) return;
- print("1");
  string t=m.group(1);
  string l="-";
  if(m.group_count()>1) l=m.group(2);
- print(t+": "+l);
  switch(t){
   case "wordshot":
    startWordshot(l.to_int(),sender);
@@ -566,6 +563,7 @@ void startGame(string sender, string msg){
     if (list.contains_text(l.to_lower_case())){
      remove game.players[w];
      game.players[l]=1;
+     print("Actually: "+l);
      w=l;
     }else{
      closeGame();
