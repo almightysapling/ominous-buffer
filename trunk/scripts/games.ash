@@ -129,18 +129,20 @@ string startWordshot(int l,string h){
  }
  if (m.find()){
   list=m.group(1);
-  remove game.players["SYSTEM"];
+  remove game.players[":SYSTEM"];
   string[int] bigList=split_string(list,"\\W");
   l=count(bigList);
   list="";
   while(list=="") list=bigList[random(l)];
   game.players[list]=1;
+  print("Word: "+list);
   game.intervals=3;
   game.roundOver=0;
   saveGame(game);
  }else{
+  print("No matches.");
   closeGame();
-  return -1;
+  return "e";
  }
  return gamesavedata["."].data[0];
 }
