@@ -1,3 +1,4 @@
+ascention	ascension*	0	say		
 BBT?	Big Bang Theory, $pnick.	3	say		
 CAB?	Combat Action Bar, $pnick.	3	say		
 definate	*definite	0	say		

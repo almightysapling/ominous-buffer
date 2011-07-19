@@ -27,6 +27,8 @@ int receivedCake=128;//see login.ash
 int inAssociate=256;
 int highAssociate=512;
 
+string[string] resources;
+
 userinfo[string] userdata;
 file_to_map("userdata.txt",userdata);
 
@@ -40,6 +42,43 @@ associates[2046991167]=false;//This One Time
 associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
+
+aggregate checkOut(string resourceName){
+ aggregate data;
+ file_to_map("resources.txt",resources);
+ while ((resources[resourceName]!="")&&(resources[resourceName]!=__FILE__)) waitq(1);
+ resources[resourceName]=__FILE__;
+ map_to_file(resources,"resources.txt");
+ file_to_map(resourceName,data);
+ return data;
+}
+
+aggregate update(string resourceName){
+ aggregate data;
+ file_to_map(resourceName,data);
+ return data;
+}
+
+string commit(aggregate data, string resourceName){
+ file_to_map("resources.txt",resources);
+ string owner=resources[resourceName];
+ if (owner==__FILE__){
+  map_to_file(data,resourceName);
+  resources[resourceName]="";
+  map_to_file(resources,"resources.txt");
+ }
+ return owner;
+}
+
+string commit(string resourceName){
+ file_to_map("resources.txt",resources);
+ string owner=resources[resourceName];
+ if (owner==__FILE__){
+  resources[resourceName]="";
+  map_to_file(resources,"resources.txt");
+ }
+ return owner;
+}
 
 void setUF(string user, int f){
  userdata[user].flags|=f;

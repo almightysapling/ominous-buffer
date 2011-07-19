@@ -361,8 +361,9 @@ void checkLotto(){
   chat_clan("A winner"+endsentence);
   waitq(7);
   file_to_map("userdata.txt",userdata);
-  for i from 5 downto 2 userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
+  for i from 5 downto 2 if (userdata["*"].buffpacks contains ("winner"+to_string(i-1))) userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
   userdata["*"].buffpacks["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
+  map_to_file(userdata,"userdata.txt");
   string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
   buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nLast Five Lotto Winners:";
   for i from 1 to 5 if (userdata["*"].buffpacks["winner"+i.to_string()]!="") buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
