@@ -28,14 +28,14 @@ gift[$item[black forest cake]]=1;
 gift[$item[bulky buddy box]]=1;
 
 void processLimits(){
- file_to_map("userdata.txt",userdata);
+ checkOut(userdata,"userdata.txt");
  string limits=get_property("_limitBuffs");
  if (limits=="")return;
  string[int] limit=split_string(limits,':');
  int y=count(limit)/2;
  if (y<1) return;
  for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void checkApps(){
@@ -46,16 +46,16 @@ void checkApps(){
   while (applicants.find()){
    print("Accepting "+applicants.group(2)+" into the clan.");
    visit_url("clan_applications.php?request"+applicants.group(1)+"=1&action=process");
-   visit_url("clan_members.php?pwd="+my_hash()+"&action=modify&level"+applicants.group(1)+"=7&title"+applicants.group(1)+"=Cake&pids[]="+applicants.group(1));
+   visit_url("clan_members.php?pwd="+my_hash()+"&action=m-odify&level"+applicants.group(1)+"=7&title"+applicants.group(1)+"=Cake&pids[]="+applicants.group(1));
    if ((userdata[group(applicants,2)].flags&receivedCake)==receivedCake) return;
    retrieve_item(1,$item[black forest cake]);
    retrieve_item(1,$item[bulky buddy box]);
    /**/kmail(applicants.group(1),"Welcome to Black Mesa! We'd really like to get to know you, so when you get a chance, please hop into chat to say \"hello.\" If you're new to the game and don't know how to do this, let me show you:\n\n Do you see the rightmost frame in your browser? At the top, there is a link that reads \"Enter the Chat.\" Click on that. Now you should have a small bar at the bottom of that frame that you can type into. To get to our clan's channel, simply enter \"/c clan\". And that's it! Now, if you have any questions, just ask in chat, and someone should be able to answer. Enjoy!\n\n P.S. I'm the clan's everything-bot. Primarily, I'm good for buffing. Ask around if you have questions.",0,gift);
    chat_clan("Everybody give a warm welcome to "+applicants.group(2)+", our newest member!");
-   file_to_map("userdata.txt",userdata);
+   checkOut(userdata,"userdata.txt");
    userdata[group(applicants,2)].userid=group(applicants,1).to_int();
    userdata[group(applicants,2)].flags|=(inClan|receivedCake);
-   map_to_file(userdata,"userdata.txt");
+   commit(userdata,"userdata.txt");
   }
  }
 }
@@ -85,7 +85,7 @@ void issueTickets(gameData g,string w,int amount){
 
 void endRaffle(gameData g){
  deleteAnnouncement();
- file_to_map("userdata.txt",userdata);
+ checkOut(userdata,"userdata.txt");
  chat_clan("A Raffle House is Us!");
  int numtix=count(g.data);
  wait(5);
@@ -112,12 +112,12 @@ void endRaffle(gameData g){
   userdata[g.data[numtix]].wallet+=g.players[":meat"];
  }
  remove gamesavedata["raffle"];
- map_to_file(gamesavedata,"gameMode.txt");
- map_to_file(userdata,"userdata.txt");
+ commit(gamesavedata,"gameMode.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void checkMail(){
- file_to_map("userdata.txt",userdata);
+ checkOut(userdata,"userdata.txt");
  message[int] mail=parseMail();
  matcher mx;
  string build;
@@ -161,7 +161,7 @@ void checkMail(){
   }
   if (build!="-"){
    deleteMail(m.id);
-   file_to_map("gameMode.txt",gamesavedata);
+   checkOut(gamesavedata,"gameMode.txt");
    gameData game;
    if (gamesavedata contains "raffle"){
     game=gamesavedata["raffle"];
@@ -252,26 +252,30 @@ raffle gameData{
       break;
     }
    }
-   map_to_file(gamesavedata,"gameMode.txt");
+   commit(gamesavedata,"gameMode.txt");
    continue;
   }
  }
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void checkRaffle(){
  set_property("_checkedRaffle","y");
- file_to_map("gameMode.txt",gamesavedata);
- if (!(gamesavedata contains "raffle")) return;
+ checkOut(gamesavedata,"gameMode.txt");
+ if (!(gamesavedata contains "raffle")){
+  commit("gameMode.txt");
+  return;
+ }
  gameData g=gamesavedata["raffle"];
  g.players[":end"]-=1;
  if (g.players[":end"]<1) {
   g.endRaffle();
+  commit("gameMode.txt");
   return;
  }
  g.raffleAnnounce();
  gamesavedata["raffle"]=g;
- map_to_file(gamesavedata,"gameMode.txt");
+ commit(gamesavedata,"gameMode.txt");
 }
 
 void sendMeat(string who, int amount){
@@ -303,13 +307,16 @@ void gWS(){
 
 void checkLotto(){
  int[string] books;
- file_to_map("books.txt",books);
+ checkOut(books,"books.txt");
  int event=0;
  int time=minutesToRollover();
  if (time<books["Event1"]) event=1;
  if (time<books["Event2"]) event=2;
  if (time<books["Event3"]) event=3;
- if (event<1) return;
+ if (event<1){
+  commit("books.txt");
+  return;
+ }
  books["Event"+event.to_string()]=0;
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
@@ -321,7 +328,7 @@ void checkLotto(){
  foreach name in inClan clannies[count(clannies)]=name;
  int num=count(clannies);
  if (num<1){
-  map_to_file(books,"books.txt");
+  commit(books,"books.txt");
   return;
  }
  float perc;
@@ -360,13 +367,13 @@ void checkLotto(){
   }
   chat_clan("A winner"+endsentence);
   waitq(7);
-  file_to_map("userdata.txt",userdata);
+  checkOut(userdata,"userdata.txt");
   for i from 5 downto 2 if (userdata["*"].buffpacks contains ("winner"+to_string(i-1))) userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
   userdata["*"].buffpacks["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
-  map_to_file(userdata,"userdata.txt");
+  commit(userdata,"userdata.txt");
   string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
   buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nLast Five Lotto Winners:";
-  for i from 1 to 5 if (userdata["*"].buffpacks["winner"+i.to_string()]!="") buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
+  for i from 1 to 5 if (userdata["*"].buffpacks contains ("winner"+i.to_string())) buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
   visit_url(buf);
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_string()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
@@ -390,11 +397,11 @@ void checkLotto(){
   }
   chat_clan("Sorry, folks, no winners today. Better luck next time. See you again soon"+endsentence);
  }
- map_to_file(books,"books.txt");
+ commit(books,"books.txt");
 }
 
 void burn(){
- file_to_map("userdata.txt",userdata);
+ update(userdata,"userdata.txt");
  if ((userdata["*"].buffs[6020]< 10) || (userdata["*"].buffs[6023]< 10) || (userdata["*"].buffs[6028]< 5)){
   int price_thing = mall_price($item[recording of The Ballad of Richie Thingfinder]);
   int price_chorale = mall_price($item[recording of Chorale of Companionship]);
@@ -570,14 +577,14 @@ void handleMeat(){
   case 11: yest="November"+yest; break;
   case 12: yest="December"+yest; break; 
  }
- file_to_map("userdata.txt",userdata);
+ checkOut(userdata,"userdata.txt");
  int totspent=0;
  foreach name,user in userdata if( ((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest))) &&
   ((name!="Ominous Buffer")&&(name!="Ominous Tamer")&&(name!="Ominous Sauceror")) ){
   user.wallet+=100;
   totspent+=100;
  }
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  cli_execute("use 0 warm subject gift certificate");
  cli_execute("autosell 0 thin black candle, 0 heavy d, 0 original g, 0 disturbing fanfic, 0 furry fur, 0 awful poetry journal, 0 chaos butterfly, 0 plot hole, 0 probability potion, 0 procrastination potion, 0 angry farmer candy, 0 mick's icyvapohotness rub");
  cli_execute("csend 0 wolf mask, 0 rave whistle, 0 giant needle, 0 twinkly nugget to smashbot || wads");
@@ -588,7 +595,7 @@ void handleMeat(){
   put_closet(item_amount($item[dense meat stack]),$item[dense meat stack]);
  }
  int[string] books;
- file_to_map("books.txt",books);
+ checkOut(books,"books.txt");
  books[now_to_string("yDDD")+"ear"]=totalDMS-18;
  books[now_to_string("yDDD")+"div"]=totspent;
  int eventTimeCap=minutesToRollover();
@@ -600,23 +607,24 @@ void handleMeat(){
  books["Event1"]=event1;
  books["Event2"]=event2;
  books["Event3"]=event3;
- map_to_file(books,"books.txt");
+ commit(books,"books.txt");
 }
 
 void cleanPC(){
+ cleanResources();
  int[string] lifetime;
- file_to_map("OB_lifetime.txt",lifetime);
- file_to_map("userdata.txt",userdata);
+ checkOut(lifetime,"OB_lifetime.txt");
+ checkOut(userdata,"userdata.txt");
  foreach name in userdata{
   foreach skilln,amt in userdata[name].buffs lifetime[skilln.to_string()]+=amt;
   clear(userdata[name].buffs);
   userdata[name].lastTrigger="";
  }
  for i from 1 to 6 {remove userdata["*"].buffpacks[i.to_string()];}
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  lifetime["*"]=0;
  foreach skilln in lifetime if(skilln!="*") lifetime["*"]+=lifetime[skilln];
- map_to_file(lifetime,"OB_lifetime.txt");
+ commit(lifetime,"OB_lifetime.txt");
  set_property("_thisBreakfast","1");
 }
 
@@ -745,7 +753,6 @@ void main(){try{
   waitq(5);
  }
  if (MinutesToRollover()>burnMinutes) waitq(60);
- file_to_map("userdata.txt",userdata);
  while(get_property("_isadventuring")=="yes") waitq(1);
  set_property("_isadventuring","yes");
  print("Using excess adventures before rollover.","red");
@@ -784,4 +791,5 @@ void main(){try{
  cli_execute("exit");
 }finally{
  print("Script Halted");
+ releaseResources();
 }}
