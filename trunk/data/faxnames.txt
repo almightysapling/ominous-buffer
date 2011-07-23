@@ -11,7 +11,7 @@ Black Widow	black_widow
 Bob Racecar	bob
 Bolt-Cuttin' Elf	bolt_elf
 Booze Giant	booze
-Brainsweepr	brainsweeper
+Brainsweeper	brainsweeper
 C. H. U. M. Chieftain	chieftain
 Cement Cobbler Penguin	cement_penguin
 Claw-foot Bathtub	bathtub
