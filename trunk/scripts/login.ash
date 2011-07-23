@@ -279,13 +279,12 @@ void checkRaffle(){
 }
 
 void sendMeat(string who, int amount){
- while(get_property("_isadventuring")!="") {waitq(1);}
- set_property("_isadventuring","1");
+ claimResource("adventuring");
  take_closet(amount,$item[dense meat stack]);
  string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
  sender+="&fromwhere=0&action=Yep.";
  visit_url(sender);
- set_property("_isadventuring","");
+ freeResource("adventuring");
 }
 
 void gRR(){
@@ -637,7 +636,6 @@ void dailyBreakfast(){
  if (contains_text(rumpus,"rump1_1.gif")||contains_text(rumpus,"rump1_2.gif")) rolladv+=3;
  if (contains_text(rumpus,"rump2_3.gif")) rolladv+=5;
  if (contains_text(rumpus,"rump4_3.gif")) rolladv+=1;
- set_property("_isadventuring","yes");
  checkMail();
  handleMeat();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
@@ -717,17 +715,17 @@ void dailyBreakfast(){
 void main(){try{
  print("Starting Login...");
  if (get_property("_thisBreakfast")=="") cleanPC();
+ claimResource("adventuring");
  loadSettings("_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals");
  processLimits();
  updateLimits();
  updateDC();
  if (get_property("chatbotScript")=="") waitq (2);
  set_property("chatbotScript",chatbotScript);
- set_property("_isadventuring","");
  if (get_property("_breakfast")=="") dailyBreakfast();
  cli_execute("maximize mp");
- set_property("_isadventuring","");
  if (get_property("_checkedRaffle")=="") checkRaffle();
+ freeResource("adventuring");
  print("Entering wait cycle.","green");
  int n;
  while (MinutesToRollover()>(burnMinutes+3)){
@@ -741,6 +739,7 @@ void main(){try{
    default:
     break;
   }
+  claimResource("adventuring");
   checkLotto();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if (n<15) n+=1440;
@@ -750,11 +749,11 @@ void main(){try{
    checkApps();
    checkMail();
   }
+  freeResource("adventuring");
   waitq(5);
  }
  if (MinutesToRollover()>burnMinutes) waitq(60);
- while(get_property("_isadventuring")=="yes") waitq(1);
- set_property("_isadventuring","yes");
+ claimResource("adventuring");
  print("Using excess adventures before rollover.","red");
  while (have_effect($effect[Shape of...Mole!])>0)
   (!adventure(1,$location[Mt. Molehill]));
@@ -774,7 +773,7 @@ void main(){try{
  cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
- set_property("_isadventuring","");
+ freeResource("adventuring");
  chat_private("Ominous Tamer","CASTRQ");
  chat_private("Ominous Sauceror","CASTRQ");
  checkapps();

@@ -1,9 +1,6 @@
 import <shared.ash>
 import <market.ash>
 import <mathlib.ash>
-/*
- for release notes prior to subversioning, please see r2.
-*/
 
 string[int] to_array(boolean[string] data){
  string[int] x;
@@ -21,7 +18,9 @@ genders[count(genders)]=to_array($strings[they, them, themselves, theirs, their,
 genders[count(genders)]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE]);
 genders[count(genders)]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE]);
 genders[count(genders)]=to_array($strings[it, it, itself, its, its, IT|INANIMATE|NEUTRAL|GENDERLESS]);
-//Genders[] from index 2 and up are as follows: subjective, objective, reflexive, possessive pronoun, possessive determiner. Optionally: Match string text
+//Genders[0] lists titles for Genders[]
+//Genders[1] is a place holder for third person.
+//Genders[2+] are as follows: subjective, objective, reflexive, possessive pronoun, possessive determiner. Optionally: Match string text
 int gSub=0;
 int gObj=1;
 int gRefl=2;
@@ -58,7 +57,6 @@ boolean errorMsg=true;
 string someoneDefined="";
 string[string] chatVars;
 int TPC=25;
-string isadventuring = get_property("_isadventuring");
 
 string genderPronoun(string who, int what, string type){
  boolean cap=false;
@@ -309,22 +307,18 @@ void buff(string sender, string msg, int numTurns, string ding){
   if (maxnum-userdata["*"].buffs[skillnum]<casts) casts=maxnum-userdata["*"].buffs[skillnum];
  }
  //This is the actual casting function.
- while (isadventuring=="yes"){
-  waitq(1);
-  isadventuring=get_property("_isadventuring");
- }
- set_property("_isadventuring","yes");
+ claimResource("adventuring");
  if (skillnum==6901){
   if (item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
   if (item_amount($item[time's arrow])<1){
    chat_private(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    print("Out of Time's Arrows.");
-   set_property("_isadventuring","");
+   freeResource("adventuring");
    return;
   }
   string t=visit_url("curse.php?action=use&pwd="+my_hash()+"&whichitem=4939&targetplayer="+sender);
   print("Throwing Time's Arrow at "+sender);
-  set_property("_isadventuring","");
+  freeResource("adventuring");
   userdata[ding].buffs[skillnum]+=1;
   map_to_file(userdata,"userdata.txt");
   return;
@@ -369,7 +363,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   use(1,$item[magical mystery juice]);
  }
  map_to_file(userdata,"userdata.txt");
- set_property("_isadventuring","");
+ freeResource("adventuring");
 }
 
 string roll(string sender, string msg, string method){
@@ -1189,6 +1183,7 @@ string predicateFilter(string sender, string msg){
   oper=group(first,2);
  }else return msg;
  switch (pred){
+  case "set":
   case "pack":
    string r=userdata[sender].buffpacks[oper];
    if((r=="")&&(!contains_text("0123456",oper))) r=userdata["*"].buffpacks[oper];
@@ -1268,6 +1263,7 @@ string predicateFilter(string sender, string msg){
   case "roll":
    roll(sender, oper, "pm");
    return "x";
+  case "get":
   case "fax":
    if (!getUF(sender,inClan)){
     chat_private(sender,"You must be in Black Mesa to utilize its faxing rights.");
@@ -1276,6 +1272,7 @@ string predicateFilter(string sender, string msg){
    set_property("_lastFax",sender);
    fax(sender,oper);
    return "x";
+  case "alias":
   case "createpack":
    createpack(sender,oper);
    return "x";
