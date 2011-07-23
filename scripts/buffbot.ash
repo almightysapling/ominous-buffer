@@ -675,7 +675,7 @@ void mod(string sender,string msg){
  map_to_file(userdata,"userdata.txt");
 }
 
-void fax(string msg){
+void fax(string sender, string msg){
  string[monster]m;
  file_to_map("faxnames.txt",m);
  switch (msg){
@@ -708,6 +708,7 @@ void fax(string msg){
  }
  string nm=m[to_monster(msg)];
  if (nm==""){
+  chat_private(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
   nm=msg;
  }
  print("Requesting "+msg+" ("+nm+") from FaxBot.");
@@ -1273,7 +1274,7 @@ string predicateFilter(string sender, string msg){
     return "x";
    }
    set_property("_lastFax",sender);
-   fax(oper);
+   fax(sender,oper);
    return "x";
   case "createpack":
    createpack(sender,oper);
