@@ -53,12 +53,32 @@ void releaseResources(){
  map_to_file(resources,"resources.txt");
 }
 
-aggregate checkOut(aggregate data, string resourceName){
+boolean claimResource(string resourceName){
  string[string] resources;
  file_to_map("resources.txt",resources);
  while ((resources[resourceName]!="")&&(resources[resourceName]!=__FILE__)) waitq(1);
  resources[resourceName]=__FILE__;
  map_to_file(resources,"resources.txt");
+ return true;
+}
+
+string freeResource(string resourceName){
+ string[string] resources;
+ file_to_map("resources.txt",resources);
+ string owner=resources[resourceName];
+ if (owner==__FILE__){
+  resources[resourceName]="";
+  map_to_file(resources,"resources.txt");
+ }
+ return owner;
+}
+
+string commit(string resourceName){
+ return freeResource(resourceName);
+}
+
+aggregate checkOut(aggregate data, string resourceName){
+ claimResource(resourceName);
  file_to_map(resourceName,data);
  return data;
 }
@@ -74,17 +94,6 @@ string commit(aggregate data, string resourceName){
  string owner=resources[resourceName];
  if (owner==__FILE__){
   map_to_file(data,resourceName);
-  resources[resourceName]="";
-  map_to_file(resources,"resources.txt");
- }
- return owner;
-}
-
-string commit(string resourceName){
- string[string] resources;
- file_to_map("resources.txt",resources);
- string owner=resources[resourceName];
- if (owner==__FILE__){
   resources[resourceName]="";
   map_to_file(resources,"resources.txt");
  }
