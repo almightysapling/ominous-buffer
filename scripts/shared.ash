@@ -198,12 +198,19 @@ void updateDC(){
 }
 
 void updateLimits(){
- string s="managecollection.php?action=modifyshelves&pwd="+my_hash()+"&newname12=";
- s+=to_string(50-userdata["*"].buffs[6026]);
+ string s;
  buffer n;
- if((50-userdata["*"].buffs[6026])>10) n=visit_url(s);
+ if((50-userdata["*"].buffs[6026])>10){
+  s="managecollection.php?action=modifyshelves&pwd&newname12=";
+  s+=to_string(50-userdata["*"].buffs[6026]);
+  n=visit_url(s);
+ }else{
+  s="managecollection.php?action=modifyshelves&pwd&newname12=50";
+  n=visit_url(s); 
+ }
  s="managecollectionshelves.php?pwd&action=arrange";
  if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(51-userdata["*"].buffs[6026]);
+ else s+="&whichshelf4502=12";
  s+="&whichshelf4503="+to_string(6-userdata["*"].buffs[6028]);
  s+="&whichshelf4497="+to_string(11-userdata["*"].buffs[6020]);
  s+="&whichshelf4498="+to_string(11-userdata["*"].buffs[6021]);
