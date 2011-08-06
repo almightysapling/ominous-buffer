@@ -5,9 +5,14 @@ The wiki function returns a link to a wiki page for a given function, like a hel
 
 = Usage =
 Private message OB the following:
+
 *wiki* _function name_
 
 = Example =
 *wiki* _wiki_
+
 Would return the following link:
-{{{http://code.google.com/p/ominous-buffer}}}
+
+{{{http://code.google.com/p/ominous-buffer/wiki/wiki}}}
+
+Which would direct you here.
