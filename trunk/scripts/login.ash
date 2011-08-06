@@ -339,6 +339,7 @@ void checkLotto(){
  if (perc>4) perc=4;
  if (books["thisLotto"]>2500)perc=min(5,perc+2);
  int d=ceil((100/perc)*num);
+ d=d+random(10)-random(10);
  print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string());
  print(num.to_string()+"players: Rolling D"+d.to_string());
  chat_clan("Time for the Lotto! Right now it's for "+books["thisLotto"].to_commad()+",000 meat! We have "+num.to_string()+(num!=1?" players":" player")+" now (d"+d.to_string()+"). Good luck!");
