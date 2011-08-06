@@ -7,9 +7,9 @@ However, in its rapid growth it has picked up quite a few other abilities.
 
 = Details =
 Currently OB is in charge of automating the following functions:
- *Accepting new members into clan.
- *Hosting a thrice daily [lottery] for the clan.
- *Hosting a variety of games on command in chat.
- *Responding to various cues in chat, for multiple purposes including, but not limited to, correcting spelling and answering questions.
+ * Accepting new members into clan.
+ * Hosting a thrice daily [lottery] for the clan.
+ * Hosting a variety of games on command in chat.
+ * Responding to various cues in chat, for multiple purposes including, but not limited to, correcting spelling and answering questions.
 
 He also performs a variety of other [functions], and merely has to be asked.
