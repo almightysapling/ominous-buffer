@@ -2,7 +2,7 @@
 
 = Introduction =
 
-On approximately July 2, 2010, the free kingdom-wide buffbot, kingdomofbuffing, went offline. This caused a lot of anguish for many players who depended on its free service. At the time, there were no other free buffbots (not to mention there were none which would work by PMs in chat), though there were many "philanthropic" bots which required a small amount of meat per buff request.
+On approximately July 2, 2010, the free kingdom-wide buffbot, kingdomofbuffing, went offline. This caused a lot of anguish for many players who depended on its free service. At the time, there were no other free buffbots (not to mention there were none which would work via PMs in chat), though there were many "philanthropic" bots which required a small amount of meat per buff request.
 
 In August of 2010, Sentrion decided to start playing around in KoLmafia's scripting language. He quickly learned the many conveniences of being able to create scripts for mafia, and decided to attempt to write a buffbot script which would not require kmails nor meat to run. On August 24, 2010, the very beginnings of this script were written. On August 26, OminousJackal's multi, Ominous Buffer, was given the script. This more or less constituted the beginning of the beta period for OB. Since then, OB has been online and accepting buff requests every day.
 
