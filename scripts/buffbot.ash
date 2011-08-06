@@ -1174,6 +1174,14 @@ void setMulti(string sender, string newaltlist){
  map_to_file(userdata,"userdata.txt");
 }
 
+void sendLink(string sender, string i){
+ string link="http://code.google.com/p/ominous-buffer/wiki/";
+ if (i=="") link+="Main_Page";
+ link+=i;
+ link+="?tm=6";
+ chat_private(sender,link);
+}
+
 string predicateFilter(string sender, string msg){
  matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
  string pred;
@@ -1310,6 +1318,9 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "host":
    startGame(sender,oper);
+   return "x";
+  case "wiki":
+   sendLink(sender,oper);
    return "x";
  }
  return msg;
