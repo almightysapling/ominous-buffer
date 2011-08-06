@@ -9,7 +9,8 @@ Private message OB the following:<br>
 
 = Example =
 *wiki* _wiki_<br>
-Would return the following link:{{{
-http://code.google.com/p/ominous-buffer/wiki/wiki
+Would return the following link:
+{{{
+http://code.google.com/p/ominous-buffer/wiki/wiki?tm=6
 }}}
 Which would direct you here.
