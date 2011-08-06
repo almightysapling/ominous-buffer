@@ -7,10 +7,7 @@ It is with KoLmafia and ASH that Ominous Buffer is possible.
 
 = External Links =
 
-*[http://kolmafia.sourceforge.net/ KoLmafia Main Page]
-
-*[http://builds.kolmafia.us/ Daily Builds]
-
-*[http://kolmafia.us/forum.php Forums]
-
-*[http://wiki.kolmafia.us/index.php?title=Main_Page Wiki]
+ *[http://kolmafia.sourceforge.net/ KoLmafia Main Page]
+ *[http://builds.kolmafia.us/ Daily Builds]
+ *[http://kolmafia.us/forum.php Forums]
+ *[http://wiki.kolmafia.us/index.php?title=Main_Page Wiki]
