@@ -4,8 +4,7 @@
 The wiki function returns a link to a wiki page for a given function, like a help command. *NOTE* This function has yet to be implemented.
 
 = Usage =
-Private message OB the following:
-
+Private message OB the following:<br>
 *wiki* _function name_
 
 = Example =
