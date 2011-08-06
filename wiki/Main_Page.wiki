@@ -1,7 +1,7 @@
 #summary Main Page for the OB wiki
 
 = Introduction =
-This is the wiki for Black Mesa's buffbot, [Ominous_Buffer Ominous Buffer].
+This is the wiki for Black Mesa's buffbot, [Ominous_Buffer?tm=6 Ominous Buffer].
 
 I am taking up lead to develop a comprehensive list of features and functions of OB to make him easier to use, and as a guide to answer any questions one might have of OB.
 
