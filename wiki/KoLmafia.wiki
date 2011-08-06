@@ -3,3 +3,10 @@
 = Introduction =
 KoLmafia is a Java powered front-end for Kingdom of Loathing. It allows users who are more familiar with the game to automate large sections of play to ameliorate the more tedious tasks. It also homes a rather fancy script interpreter named ASH.
 It is with KoLmafia and ASH that Ominous Buffer is possible.
+
+= External Links =
+
+[[http://kolmafia.sourceforge.net/|KoLmafia Main Page]]
+[[http://builds.kolmafia.us/|Daily Builds]]
+[[http://kolmafia.us/forum.php|Forums]]
+[[http://wiki.kolmafia.us/index.php?title=Main_Page|Wiki]]
