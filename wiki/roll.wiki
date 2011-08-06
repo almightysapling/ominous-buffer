@@ -1,0 +1,17 @@
+#summary roll function
+
+= roll =
+Rolls x amount of dice each with y sides.
+
+= Usage =
+In either a private message, or after addressing OB by name in chat:<br>
+*roll* _x_*d*_y_
+
+= Example =
+In public chat:
+ * Sentrion: OB, *roll* _2_*d*_6_
+ * Ominous Buffer: Rolling 2d6 for Sentrion gives 8.
+
+Or in private:
+ * *roll* _1_*d*_20_
+ * 14
