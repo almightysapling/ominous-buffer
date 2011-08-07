@@ -1181,6 +1181,20 @@ void sendLink(string sender, string i){
  chat_private(sender,link);
 }
 
+string performMath(string sender, string msg){
+ if("*+-^/".contains_text(msg.char_at(0))) msg=userdata[sender].lastMath.to_string()+msg;
+ matcher m=create_matcher("\\s*",msg);
+ msg=replace_all(m,"");
+ float[string] mathvars;
+ mathvars["last"]=userdata[sender].lastMath;
+ mathvars["ans"]=userdata["*"].lastMath;
+ userdata[sender].lastMath=mathlibeval(msg,mathvars);
+ msg=userdata[sender].lastMath.to_string();
+ map_to_file(userdata,"userdata.txt");
+ if (msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
+ return msg;
+}
+
 string predicateFilter(string sender, string msg){
  matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
  string pred;
@@ -1251,12 +1265,8 @@ string predicateFilter(string sender, string msg){
    chat_private(sender,"Reply from Ominous Buffer.");
    return "x";
   case "math":
-   matcher spaces=create_matcher("\\s*",oper);
-   oper=replace_all(spaces,"");
-   float ans=modifier_eval(oper);
-   userdata[sender].lastmath=ans;
-   map_to_file(userdata,"userdata.txt");
-   chat_private(sender,modifier_eval(oper).to_string());
+   oper=performMath(sender,oper);
+   chat_private(sender,oper);
    return "x";
   case "help":
   case "?":
@@ -1597,17 +1607,9 @@ void publicChat(string sender, string msg){
   return;
  }
  if (addressed&&isMath(msg)){
-  if("*+-^/".contains_text(msg.char_at(0))) msg=userdata[sender].lastMath.to_string()+msg;
-  m=create_matcher("\\s*",msg);
-  msg=replace_all(m,"");
-  float[string] mathvars;
-  mathvars["last"]=userdata[sender].lastMath;
-  mathvars["ans"]=userdata["*"].lastMath;
-  userdata[sender].lastMath=mathlibeval(msg,mathvars);
-  msg=userdata[sender].lastMath.to_string();
+  msg=performMath(sender,msg);
   userdata["*"].lastMath=userdata[sender].lastMath;
   map_to_file(userdata,"userdata.txt");
-  if (msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
   chat_clan(msg);
   return;
  }
