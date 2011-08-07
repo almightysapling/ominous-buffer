@@ -1175,10 +1175,9 @@ void setMulti(string sender, string newaltlist){
 }
 
 void sendLink(string sender, string i){
- string link="http://code.google.com/p/ominous-buffer/wiki/";
- if (i=="") link+="Main_Page";
- link+=i;
- link+="?tm=6";
+ string link="https://sites.google.com/site/kolclanmesa/ominous-buffer";
+ if (i!="") link+="/";
+ else link+=i;
  chat_private(sender,link);
 }
 
