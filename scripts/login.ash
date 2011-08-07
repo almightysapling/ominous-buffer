@@ -50,8 +50,8 @@ void checkApps(){
    if ((userdata[group(applicants,2)].flags&receivedCake)==receivedCake) return;
    retrieve_item(1,$item[black forest cake]);
    retrieve_item(1,$item[bulky buddy box]);
-   /**/kmail(applicants.group(1),"Welcome to Black Mesa! We'd really like to get to know you, so when you get a chance, please hop into chat to say \"hello.\" If you're new to the game and don't know how to do this, let me show you:\n\n Do you see the rightmost frame in your browser? At the top, there is a link that reads \"Enter the Chat.\" Click on that. Now you should have a small bar at the bottom of that frame that you can type into. To get to our clan's channel, simply enter \"/c clan\". And that's it! Now, if you have any questions, just ask in chat, and someone should be able to answer. Enjoy!\n\n P.S. I'm the clan's everything-bot. Primarily, I'm good for buffing. Ask around if you have questions.",0,gift);
-   chat_clan("Everybody give a warm welcome to "+applicants.group(2)+", our newest member!");
+   /**/kmail(applicants.group(1),"Welcome to Black Mesa! I'm the clan's multi-purpose bot. When you get a chance, please hop into chat to say \"hello.\" If you're new to the game and don't know how to do this, please send a message to Sentrion or Twinkertoes, and they will get back to you as quickly as possible. Otherwise, if you have any questions, just ask in chat, and someone should be able to answer. Enjoy!",0,gift);
+   chat_clan(applicants.group(2)+" has just been accepted into Black Mesa. If you see them around chat, be sure to give them a warm welcome!");
    checkOut(userdata,"userdata.txt");
    userdata[group(applicants,2)].userid=group(applicants,1).to_int();
    userdata[group(applicants,2)].flags|=(inClan|receivedCake);
