@@ -1174,11 +1174,39 @@ void setMulti(string sender, string newaltlist){
  map_to_file(userdata,"userdata.txt");
 }
 
+void setNick(string sender, string w){
+ print("Nick set for "+sender,"blue");
+ userdata[sender].nick=w;
+ foreach alt in userdata[sender].multis userdata[alt].nick=w;
+ map_to_file(userdata,"userdata.txt");
+}
+
 void sendLink(string sender, string i){
- string link="https://sites.google.com/site/kolclanmesa/ominous-buffer";
- if (i!="") link+="/functions/";
- else link+=i;
- chat_private(sender,link);
+ string base="https://sites.google.com/site/kolclanmesa/";
+ string bad="We're sorry, but we were unable to locate the page you requested."
+ string link;
+ string t;
+ if (i==""){
+  chat_private(sender,base+"ominous-buffer");
+  return;
+ }
+ link=base+"ominous-buffer/functions/"+i;
+ if(!visit_url(t).contains_text(bad)){
+  chat_private(sender,link);
+ }
+ link=base+"ominous-buffer/"+i;
+ if(!visit_url(t).contains_text(bad)){
+  chat_private(sender,link);
+ }
+ link=base+i;
+ if(!visit_url(t).contains_text(bad)){
+  chat_private(sender,link);
+ }
+ link=base+"mesachat/functions/"+i;
+ if(!visit_url(t).contains_text(bad)){
+  chat_private(sender,link);
+ }
+ chat_private(sender,base);
 }
 
 string performMath(string sender, string msg){
@@ -1319,6 +1347,15 @@ string predicateFilter(string sender, string msg){
   case "alt":
   case "multi":
    setMulti(sender,oper);
+   return "x";
+  case "nick":
+   first=create_matcher("([\\w ']*)",oper);
+   if (first.find()) oper=first.group(1);
+   else{
+    chat_private(sender,"Sorry, that's not a valid nickname.");
+    return "x";
+   }
+   setNick(sender,oper);
    return "x";
   case "details":
    userDetails(sender,oper);
@@ -1599,12 +1636,9 @@ void publicChat(string sender, string msg){
   setGender(sender,group(m,1));
   return;
  }
- m=create_matcher("(?i)(call me|am also known as|i go by)\\s([\\w ']*).?",msg);
+ m=create_matcher("(?i)(call me|am also known as|i go by)\\s([\\w ']*)",msg);
  if (find(m)&&(referred||addressed)){
-  print("Nick set for "+sender,"blue");
-  userdata[sender].nick=group(m,2);
-  foreach alt in userdata[sender].multis userdata[alt].nick=group(m,2);
-  map_to_file(userdata,"userdata.txt");
+  setNick(sender,group(m,2));
   return;
  }
  if (addressed&&isMath(msg)){
