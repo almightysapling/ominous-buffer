@@ -15,8 +15,8 @@ genders[count(genders)]=to_array($strings[genders, third, unknown, androgynous, 
 genders[count(genders)]=to_array($strings[*]);//WHO I AM
 genders[count(genders)]=to_array($strings[he, him, himself, his, his]);
 genders[count(genders)]=to_array($strings[they, them, themselves, theirs, their, ANGROGYNOUS|PLURAL|HERMAPHRODIT]);
-genders[count(genders)]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE]);
-genders[count(genders)]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE]);
+genders[count(genders)]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE|HE|HIM]);
+genders[count(genders)]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE|SHE|HER]);
 genders[count(genders)]=to_array($strings[it, it, itself, its, its, IT|INANIMATE|NEUTRAL|GENDERLESS]);
 //Genders[0] lists titles for Genders[]
 //Genders[1] is a place holder for third person.
@@ -94,6 +94,7 @@ void errorMessage(string who,string what,int g){
   what=mx.replace_first(genderPronoun(who,g,mx.group(1)));
   mx=mx.reset(what);
  }
+ if (getUF(who,noFlag))chat_private(who,what);
 }
 
 boolean buffable(string sender){
@@ -178,11 +179,10 @@ void buff(string sender, string msg, int numTurns, string ding){
  //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
  if ((to_lower_case(sender)==turt_name) || (to_lower_case(sender)==sauc_name)){
   string[int] failsplit = split_string(msg,"\\s");
-  if (index_of("ARLNS",failsplit[0])>-1) foreach name in userdata
-   if (userdata[name].userid==to_int(failsplit[1])){
-    sender=name;
-    break;
-   }
+  if (index_of("ARLNS",failsplit[0])>-1){
+   sender=to_playerName(failsplit[1].to_int());
+   ding=to_playerName(failsplit[2].to_int());
+  }
   switch (failsplit[0]){
    case "CASTRQ":
     if (sender==turt_name) set_property('tamerCasts',failsplit[1]);
@@ -204,7 +204,7 @@ void buff(string sender, string msg, int numTurns, string ding){
     errorMessage(failsplit[2],"The cake is a lie. So is that thing you asked for, since it wasn't a buff.");
     break;
    case "S":
-    userdata[failsplit[2]].buffs[failsplit[3].to_int()]+=1;
+    userdata[ding].buffs[failsplit[3].to_int()]+=1;
     userdata["*"].buffs[failsplit[3].to_int()]+=1;
     map_to_file(userdata,"userdata.txt");
     updateDC("useCurrent");
@@ -1176,12 +1176,13 @@ void setMulti(string sender, string newaltlist){
 
 void sendLink(string sender, string i){
  string link="https://sites.google.com/site/kolclanmesa/ominous-buffer";
- if (i!="") link+="/";
+ if (i!="") link+="/functions/";
  else link+=i;
  chat_private(sender,link);
 }
 
 string performMath(string sender, string msg){
+ if (msg=="") msg="0";
  if("*+-^/".contains_text(msg.char_at(0))) msg=userdata[sender].lastMath.to_string()+msg;
  matcher m=create_matcher("\\s*",msg);
  msg=replace_all(m,"");

@@ -16,14 +16,14 @@ record userinfo{
  int wallet;
 };
 //flag bits
-int noFlag=1;//no "cake is a lie" message
+int noFlag=1;//no error messages
 int isAdmin=2;
 int isBuffer=4;//no use, merely for OS/T
 int noLimit=8;
 int blacklist=16;
 int whitelist=32;//for OB-use, not clan
 int inClan=64;
-int receivedCake=128;//see login.ash
+int receivedCake=128;
 int inAssociate=256;
 int highAssociate=512;
 
@@ -118,6 +118,15 @@ boolean checkWhitelist(int id){
  matcher m=create_matcher("(?i)="+id.to_string()+"'",page);
  if (find(m)) return true;
  return false;
+}
+
+string to_playerName(int pId){
+ string v=visit_url("showplayer.php?who="+pId.to_string());
+ matcher m=create_matcher("<center><b>(.+?)</b>",v);
+ if (m.find()){
+  return m.group(1);
+ }
+ return ":NONE";
 }
 
 //request unknown user's id. if (add) then place them into the users file.
