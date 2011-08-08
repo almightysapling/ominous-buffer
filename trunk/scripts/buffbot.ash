@@ -1183,7 +1183,7 @@ void setNick(string sender, string w){
 
 void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
- string bad="We're sorry, but we were unable to locate the page you requested."
+ string bad="We're sorry, but we were unable to locate the page you requested.";
  string link;
  string t;
  if (i==""){
