@@ -1,3 +1,4 @@
+alot	a lot*	0	say		
 ascention	ascension*	0	say		
 BBT?	Big Bang Theory, $pnick.	3	say		
 CAB?	Combat Action Bar, $pnick.	3	say		
