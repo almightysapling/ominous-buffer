@@ -264,7 +264,7 @@ void loadSettings(string postRO){
  if (x==0) return;
  int day;
  for i from 0 to count(setting)-1 if(setting[i]=="!day") day=setting[i+1].to_int();
- if (day<gameday_to_int()){
+ if (day<now_to_string("yyyyDDD").to_int()){
   string[int] skipsplit=split_string(postRO,';');
   int[string] skip;
   foreach toskip in skipsplit skip[skipsplit[toskip]]=1;
@@ -281,7 +281,7 @@ void saveSettings(string settings){
  string[int] setting=split_string(settings,';');
  string submit="";
  foreach i in setting submit+=setting[i]+" = "+get_property(setting[i])+"\n";
- submit+="!day = "+gameday_to_int().to_string();
+ submit+="!day = "+now_to_string("yyyyDDD");
  submit="questlog.php?which=4&action=updatenotes&font=0&notes="+submit;
  visit_url(submit);
 }
