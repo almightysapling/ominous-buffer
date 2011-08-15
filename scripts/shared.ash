@@ -56,7 +56,10 @@ void releaseResources(){
 boolean claimResource(string resourceName){
  string[string] resources;
  file_to_map("resources.txt",resources);
- while ((resources[resourceName]!="")&&(resources[resourceName]!=__FILE__)) waitq(1);
+ while ((resources[resourceName]!="")&&(resources[resourceName]!=__FILE__)){
+  waitq(1);
+  file_to_map("resources.txt",resources);
+ }
  resources[resourceName]=__FILE__;
  map_to_file(resources,"resources.txt");
  return true;
@@ -88,16 +91,20 @@ aggregate update(aggregate data, string resourceName){
  return data;
 }
 
-string commit(aggregate data, string resourceName){
+string commit(aggregate data, string resourceName, boolean freeR){
  string[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName];
  if (owner==__FILE__){
   map_to_file(data,resourceName);
   resources[resourceName]="";
-  map_to_file(resources,"resources.txt");
+  if (freeR) map_to_file(resources,"resources.txt");
  }
  return owner;
+}
+
+string commit(aggregate data, string resourceName){
+ return commit(data, resourceName, true);
 }
 
 void setUF(string user, int f){
@@ -251,20 +258,28 @@ void addRep(string s){
  map_to_file(userdata,"userdata.txt");
 }
 
+int KoLday(){
+ int daysSince=(now_to_string("yyyy").to_int()-2004)*366;
+ int nowers=now_to_string("HH").to_int()*60;
+ return 0;
+}
+
 void saveSettings(){
  visit_url("questlog.php?which=4&action=updatenotes&font=0&notes="); 
 }
 
-void loadSettings(string postRO){
+boolean loadSettings(string postRO){
+ boolean rollpassed=false;
  string ls=visit_url("questlog.php?which=4");
  matcher notef=create_matcher(";'\\>([\\s\\S]*)\\</text",ls);
- if(!find(notef)) return;
+ if(!find(notef)) return false;
  string[int] setting=split_string(group(notef,1),'\\r?\\n|\\s=\\s');
  int x=count(setting)/2;
- if (x==0) return;
+ if (x==0) return false;
  int day;
  for i from 0 to count(setting)-1 if(setting[i]=="!day") day=setting[i+1].to_int();
- if (day<now_to_string("yyyyDDD").to_int()){
+ if (day!=gameday_to_int()){
+  rollpassed=true;
   string[int] skipsplit=split_string(postRO,';');
   int[string] skip;
   foreach toskip in skipsplit skip[skipsplit[toskip]]=1;
@@ -272,16 +287,17 @@ void loadSettings(string postRO){
  }else
   for i from 0 to x-1 set_property(setting[2*i],setting[2*i+1]);
  saveSettings();
+ return rollpassed;
 }
-void loadSettings(){
- loadSettings("");
+boolean loadSettings(){
+ return loadSettings("");
 }
 
 void saveSettings(string settings){
  string[int] setting=split_string(settings,';');
  string submit="";
  foreach i in setting submit+=setting[i]+" = "+get_property(setting[i])+"\n";
- submit+="!day = "+now_to_string("yyyyDDD");
+ submit+="!day = "+gameday_to_int();
  submit="questlog.php?which=4&action=updatenotes&font=0&notes="+submit;
  visit_url(submit);
 }

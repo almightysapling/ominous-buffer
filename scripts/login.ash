@@ -27,17 +27,6 @@ int[item] gift;
 gift[$item[black forest cake]]=1;
 gift[$item[bulky buddy box]]=1;
 
-void processLimits(){
- checkOut(userdata,"userdata.txt");
- string limits=get_property("_limitBuffs");
- if (limits=="")return;
- string[int] limit=split_string(limits,':');
- int y=count(limit)/2;
- if (y<1) return;
- for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
- commit(userdata,"userdata.txt");
-}
-
 void checkApps(){
  boolean acceptall=true;
  matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
@@ -327,6 +316,7 @@ void checkLotto(){
  foreach name in inClan clannies[count(clannies)]=name;
  int num=count(clannies);
  if (num<1){
+  set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
   commit(books,"books.txt");
   return;
  }
@@ -397,11 +387,12 @@ void checkLotto(){
   }
   chat_clan("Sorry, folks, no winners today. Better luck next time. See you again soon"+endsentence);
  }
+ set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
  commit(books,"books.txt");
 }
 
 void burn(){
- update(userdata,"userdata.txt");
+ checkOut(userdata,"userdata.txt");
  if ((userdata["*"].buffs[6020]< 10) || (userdata["*"].buffs[6023]< 10) || (userdata["*"].buffs[6028]< 5)){
   int price_thing = mall_price($item[recording of The Ballad of Richie Thingfinder]);
   int price_chorale = mall_price($item[recording of Chorale of Companionship]);
@@ -480,38 +471,38 @@ void burn(){
     userdata["*"].buffs[to_int(to_skill(to_effect(worst)))]+=1;
    }
    visit_url("choice.php?whichchoice=440&option=2&pwd="+my_hash());
-   map_to_file(userdata,"userdata.txt");
+   commit(userdata,"userdata.txt");
    updateLimits();
   }
  }
- int to_burn = my_mp()-800;
+ int to_burn=my_mp()-800;
  if(to_burn<0) return;
  skill farmingbuff = $skill[Polka of Plenty];
  switch (farmbuff){
   case 0:
-   farmingbuff = $skill[Fat Leon's Phat Loot Lyric];
+   farmingbuff=$skill[Fat Leon's Phat Loot Lyric];
    farmbuff+=1;
    break;
   case 1:
-   farmingbuff = $skill[Polka of Plenty];
+   farmingbuff=$skill[Polka of Plenty];
    farmbuff+=1;
    break;
   default:
-   farmingbuff = $skill[Cantata of Confrontation];
+   farmingbuff=$skill[Cantata of Confrontation];
    farmbuff=0;
  }
- int casts_to_use = ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
- casts_to_use = max((casts_to_use/3),1);
- int currentmp = my_mp();
+ int casts_to_use=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
+ casts_to_use=max((casts_to_use/3),1);
+ int currentmp=my_mp();
  int tryL=0;
- while (my_mp() == currentmp){
+ while (my_mp()==currentmp){
   use_skill(casts_to_use,farmingbuff,"Ominous Tamer");
   tryL+=1;
   if (tryL>5) break;
  }
  tryL=0;
- currentmp = my_mp();
- while (my_mp() == currentmp){
+ currentmp=my_mp();
+ while (my_mp()==currentmp){
   use_skill(casts_to_use,farmingbuff,"Ominous Sauceror");
   tryL+=1;
   if (tryL>5) break;
@@ -607,6 +598,7 @@ void handleMeat(){
  books["Event1"]=event1;
  books["Event2"]=event2;
  books["Event3"]=event3;
+ set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
  commit(books,"books.txt");
 }
 
@@ -626,6 +618,32 @@ void cleanPC(){
  foreach skilln in lifetime if(skilln!="*") lifetime["*"]+=lifetime[skilln];
  commit(lifetime,"OB_lifetime.txt");
  set_property("_thisBreakfast","1");
+}
+
+void processQuestData(boolean rp){
+ //Lotto
+ int[string] books;
+ checkOut(books,"books.txt");
+ matcher m=create_matcher("(\\d+)\\|(\\d+)\\|(\\d+)\\|(\\d+)\\|(\\d+)",get_property("books"));
+ if (m.find()){
+  if(!rp){
+   books["Event1"]=m.group(1).to_int();
+   books["Event2"]=m.group(2).to_int();
+   books["Event3"]=m.group(3).to_int();
+  }
+  books["nextLotto"]=m.group(4).to_int();
+  books["thisLotto"]=m.group(5).to_int();
+ }
+ commit(books,"books.txt");
+ //Limited Buffs
+ checkOut(userdata,"userdata.txt");
+ string limits=get_property("_limitBuffs");
+ if (limits!=""){
+  string[int] limit=split_string(limits,':');
+  int y=count(limit)/2;
+  if (y>0) for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
+ }
+ commit(userdata,"userdata.txt");
 }
 
 void dailyBreakfast(){
@@ -717,8 +735,7 @@ void main(){try{
  print("Starting Login...");
  if (get_property("_thisBreakfast")=="") cleanPC();
  claimResource("adventuring");
- loadSettings("_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals");
- processLimits();
+ processQuestData(loadSettings("_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals"));
  updateLimits();
  updateDC();
  if (get_property("chatbotScript")=="") waitq (2);
@@ -786,10 +803,11 @@ void main(){try{
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  cli_execute("set chatbotScript=");
- saveSettings("totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts");
+ saveSettings("totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books");
  checkApps();
  cli_execute("exit");
 }finally{
  print("Script Halted");
+ saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books");
  releaseResources();
 }}
