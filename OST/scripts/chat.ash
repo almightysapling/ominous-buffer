@@ -49,6 +49,7 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
  if (numTurns==0) numTurns=200;
 
  int[int,int] dailybuffs;
+ file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
  skill msgNew=to_skill(skillnum);
  int limit=maxTurns/settings["tpc"].to_int();
  int casts=min(ceil(numTurns/settings["tpc"].to_float()),limit);
@@ -84,7 +85,7 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
  }
  print("MP Remaining: ","green");
  print(my_mp(),"green");
- if (my_mp()<300) stabilize();
+ if (my_mp()<525) stabilize();
 }
 
 void main(string sender, string msg){
