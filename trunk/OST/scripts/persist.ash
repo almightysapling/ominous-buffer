@@ -66,6 +66,10 @@ void main(){try{
  string meatfarm_fam = "leprechaun";
 
  if (get_property("_breakfast")==""){
+  int[int,int] dailybuffs;
+  file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
+  clear(dailybuffs);
+  map_to_file(dailybuffs,"dailybuffs.txt");
   string rumpus = visit_url("clan_rumpus.php");
   int camp_mp_gain;
   int camp_mp;
