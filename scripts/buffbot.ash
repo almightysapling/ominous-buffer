@@ -1190,21 +1190,38 @@ void sendLink(string sender, string i){
   chat_private(sender,base+"ominous-buffer");
   return;
  }
+ t=visit_url(base+"ominous-buffer/functions");
+ matcher m=create_matcher("\\r?\\n([^ ](?:.|\\r?\\n(?! ))+?)"+i+"<(.+?)\\r?\\n ",t);
+/* if (m.find()){
+  print(m.group(0));
+  t=m.group(1)+i+"<"+m.group(2);
+  m=create_matcher("href=\"(.+?)\"",t);
+  if (m.find()){
+   //chat_private(sender,m.group(1));
+   print(m.group(1));
+   return;
+  }
+ }*/
+ /*remove next block once previous block works*/
  link=base+"ominous-buffer/functions/"+i;
- if(!visit_url(t).contains_text(bad)){
+ if(!visit_url(link).contains_text(bad)){
   chat_private(sender,link);
+  return;
  }
  link=base+"ominous-buffer/"+i;
- if(!visit_url(t).contains_text(bad)){
+ if(!visit_url(link).contains_text(bad)){
   chat_private(sender,link);
+  return;
  }
  link=base+i;
- if(!visit_url(t).contains_text(bad)){
+ if(!visit_url(link).contains_text(bad)){
   chat_private(sender,link);
+  return;
  }
  link=base+"mesachat/functions/"+i;
- if(!visit_url(t).contains_text(bad)){
+ if(!visit_url(link).contains_text(bad)){
   chat_private(sender,link);
+  return;
  }
  chat_private(sender,base);
 }
@@ -1543,60 +1560,54 @@ boolean mathSTP(string data){
  return true;
 }
 
-boolean googleSearch(string details){
- matcher methodm=create_matcher("(?:\\.|\\||\\s)(\\w+):\\s?(.*)",details);
- if(!find(methodm)) return false;
- string method=methodm.group(1);
- string data=methodm.group(2);
- string result;
+void searchDefine(string word){
+ return;
+ matcher m;
  matcher t;
- switch (method){
-  case "define":
-   result=visit_url("http://www.google.com/dictionary?aq=f&langpair=en|en&q="+data.url_encode(),false,true);
-   if (result.contains_text("No dictionary definitions")){
-    chat_clan("No definitions were found for "+data);
-    return true;
-   }
-   methodm=create_matcher("div\\s*class=\"dct-em\">\\r?\\n?<span class=\"dct-tt\">(.+?)</span>",result);
-   while(methodm.find()){
-    data=methodm.group(1).decodeHTML(false);
-    t=create_matcher("\".*\"",data);
-    if(find(t))data=replace_all(t,"");
-    chat_clan(data);
-   }
-   break;
-  case "spell":
-   result=visit_url("http://www.google.com/dictionary?aq=f&langpair=en|en&q="+data.url_encode(),false,true);
-   if (!result.contains_text("Did you mean:")){
-    chat_clan("Google seems to think "+data+" is correct.");
-    return true;
-   }
-   result=result.substring(result.index_of("Did you mean:"));
-   methodm=create_matcher("<b><i>(.+?)</i></b>",result);
-   if(!find(methodm)) return true;
-   result=methodm.group(1);
-   chat_clan("Google suggests \""+result+"\".");
-   break;
-  case "urban":
-   result=visit_url("http://www.urbandictionary.com/define.php?term="+data.url_encode(),false,true);
-   methodm=create_matcher("class=\"definition\">(.+?)</?[db]",result);
-   if(!find(methodm)){
-    chat_clan("No definitions were found for "+data);
-    return true;
-   }
-   result=methodm.group(1);
-   methodm=create_matcher("<a .+?>(.+?)</a>",result);
-   while (find(methodm)){
-    result=replace_all(methodm,methodm.group(1));
-    methodm=create_matcher("<a .+?>(.+?)</a>",result);   
-   }
-   chat_clan(result.decodeHTML(false));
-   break;
-   case "market":
-    analyze_md("!","link "+data);
-   break;
-  } 
- return true;
+ string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
+ if (result.contains_text("NO MATCH TEXT")){
+  chat_clan("No definitions were found for "+word);
+  return;
+ }
+ m=create_matcher("div\\s*class=\"dct-em\">\\r?\\n?<span class=\"dct-tt\">(.+?)</span>",result);
+ while(m.find()){
+  word=m.group(1).decodeHTML(false);
+  t=create_matcher("\".*\"",word);
+  if(t.find())word=replace_all(t,"");
+  chat_clan(word);
+ }
+}
+
+void searchSpell(string word){
+ return;
+ matcher m;
+ string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
+ if (!result.contains_text("NO MATCH TEXT")){
+  chat_clan("Dictionary seems to think "+word+" is correct.");
+  return;
+ }
+ result=result.substring(result.index_of("Did you mean:"));
+ m=create_matcher("<b><i>(.+?)</i></b>",result);
+ if(!find(m)) return;
+ result=m.group(1);
+ chat_clan("Dictionary suggests \""+result+"\".");
+}
+
+void searchUrban(string word){
+ matcher m;
+ string result=visit_url("http://www.urbandictionary.com/define.php?term="+word.url_encode(),false,true);
+ m=create_matcher("class=\"definition\">(.+?)</?[db]",result);
+ if(!find(m)){
+  chat_clan("No definitions were found for "+word);
+  return;
+ }
+ result=m.group(1);
+ m=create_matcher("<a .+?>(.+?)</a>",result);
+ while (find(m)){
+  result=replace_all(m,m.group(1));
+  m=create_matcher("<a .+?>(.+?)</a>",result);   
+ }
+ chat_clan(result.decodeHTML(false));
 }
 
 void publicChat(string sender, string msg){
@@ -1620,7 +1631,7 @@ void publicChat(string sender, string msg){
  }
  m=create_matcher("(?i)(ominous buffer|\\Wob\\W)",msg);
  if (find(m)) referred=true;
- m=create_matcher("([\\w\\d]*)\\s?(.*)",msg);
+ m=create_matcher("([\\w\\d]*):?\\s?(.*)",msg);
  string pred;
  string oper;
  if (find(m)){
@@ -1662,9 +1673,18 @@ void publicChat(string sender, string msg){
   case "sum":
    if (addressed) fancyMath(sender,oper);
    return;
-  case "google":
-   if (googleSearch(oper)) return;
-   break;
+  case "define":
+   searchDefine(oper);
+   return;
+  case "spell":
+   searchSpell(oper);
+   return;
+  case "urban":
+   searchUrban(oper);
+   return;
+  case "market":
+   analyze_md("!","link "+oper);
+   return;
   case "dot":
    if (mathDot(oper,false)) return;
    break;
