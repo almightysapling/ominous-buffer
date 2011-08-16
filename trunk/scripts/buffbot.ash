@@ -198,7 +198,7 @@ void buff(string sender, string msg, int numTurns, string ding){
     errorMessage(sender,"I can't buff you if you're in Hardcore or Ronin!");
     break;
    case "L":
-    errorMessage(failsplit[2],"I'm sorry, but you've reached your daily limit for that buff.");
+    errorMessage(failsplit[2],"I'm sorry, but you've reached your daily limit for "+failsplit[3].to_int().to_skill().to_string()+".");
     break;
    case "N":
     errorMessage(failsplit[2],"The cake is a lie. So is that thing you asked for, since it wasn't a buff.");

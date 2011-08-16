@@ -6,7 +6,6 @@ admin:ominous buffer	7
 admin:*	0
 turns	400
 tpc	20
-bufffile	turtbuffs.txt
 formalName	Ominous Tamer
 mainbot	Ominous Buffer
 burnMinutes	20
