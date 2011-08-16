@@ -48,19 +48,9 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
  }
  if (numTurns==0) numTurns=200;
 
- //Declarations
  int[int,int] dailybuffs;
  skill msgNew=to_skill(skillnum);
-
  int limit=maxTurns/settings["tpc"].to_int();
- //This resets the running tally of buffs at first login after rollover.
- file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
- if (get_property("_buffstoday") == ""){
-  clear(dailybuffs);
-  set_property("_buffstoday", "no");
-  map_to_file(dailybuffs,"dailybuffs.txt");
- }
-
  int casts=min(ceil(numTurns/settings["tpc"].to_float()),limit);
  if (casts>limit) casts=limit;
  if (dailybuffs[sender] contains skillnum){
