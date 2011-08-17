@@ -1183,43 +1183,60 @@ void setNick(string sender, string w){
 
 void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
- string bad="We're sorry, but we were unable to locate the page you requested.";
  string link;
  string t;
+ matcher m;
  if (i==""){
   chat_private(sender,base+"ominous-buffer");
   return;
  }
  t=visit_url(base+"ominous-buffer/functions");
- matcher m=create_matcher("\\r?\\n([^ ](?:.|\\r?\\n(?! ))+?)"+i+"<(.+?)\\r?\\n ",t);
-/* if (m.find()){
-  print(m.group(0));
-  t=m.group(1)+i+"<"+m.group(2);
-  m=create_matcher("href=\"(.+?)\"",t);
-  if (m.find()){
-   //chat_private(sender,m.group(1));
-   print(m.group(1));
-   return;
+ string[int] site=split_string(t,"\\r?\\n");
+ int cLine=1;
+ boolean found=false;
+ while ((!found)&&(cLine<count(site))){
+  cLine+=1;
+  if (site[cLine].contains_text("\"sites-page-title\"")) found=true;
+ }
+ found=false;
+ t="";
+ while ((!found)&&(cLine<count(site)-1)){
+  cLine+=1;
+  m=create_matcher("^(?:\\w|<a)",site[cLine]);
+  if(m.find()){
+   t+=site[cLine];
+   continue;
   }
- }*/
- /*remove next block once previous block works*/
+  m=create_matcher("(?:^|>)"+i+"<",t);
+  if(m.find()){
+   found=true;
+   break;
+  }
+  t="";
+  continue;
+ }
+ m=create_matcher("href=\"(.+?)\"",t);
+ if(m.find()){
+  chat_private(sender,m.group(1));
+  return;
+ }
  link=base+"ominous-buffer/functions/"+i;
- if(!visit_url(link).contains_text(bad)){
+ if(length(visit_url(link))!=0){
   chat_private(sender,link);
   return;
  }
  link=base+"ominous-buffer/"+i;
- if(!visit_url(link).contains_text(bad)){
+ if(length(visit_url(link))!=0){
   chat_private(sender,link);
   return;
  }
  link=base+i;
- if(!visit_url(link).contains_text(bad)){
+ if(length(visit_url(link))!=0){
   chat_private(sender,link);
   return;
  }
  link=base+"mesachat/functions/"+i;
- if(!visit_url(link).contains_text(bad)){
+ if(length(visit_url(link))!=0){
   chat_private(sender,link);
   return;
  }
