@@ -1,7 +1,7 @@
 import <shared.ash>
 import <market.ash>
 import <mathlib.ash>
-
+setName(__FILE__);
 string[int] to_array(boolean[string] data){
  string[int] x;
  foreach y in data
@@ -1185,7 +1185,8 @@ void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
  string t;
- matcher m;
+ matcher m=create_matcher("\\s",i);
+ i=m.replace_all("-");
  if (i==""){
   chat_private(sender,base+"ominous-buffer");
   return;
