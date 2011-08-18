@@ -1,6 +1,6 @@
 import <kmail.ash>
 import <games.ash>
-
+string NAME_=__FILE__;
 record userinfo{
  int userid;
  string nick;
@@ -41,6 +41,10 @@ associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
 
+string setName(string newname){
+ NAME_=newname;
+}
+
 void cleanResources(){
  string[string]blank;
  map_to_file(blank,"resources.txt");
@@ -49,18 +53,18 @@ void cleanResources(){
 void releaseResources(){
  string[string] resources;
  file_to_map("resources.txt",resources);
- foreach res,owner in resources if (owner==__FILE__) resources[res]="";
+ foreach res,owner in resources if (owner==NAME_) resources[res]="";
  map_to_file(resources,"resources.txt");
 }
 
 boolean claimResource(string resourceName){
  string[string] resources;
  file_to_map("resources.txt",resources);
- while ((resources[resourceName]!="")&&(resources[resourceName]!=__FILE__)){
+ while ((resources[resourceName]!="")&&(resources[resourceName]!=NAME_)){
   waitq(1);
   file_to_map("resources.txt",resources);
  }
- resources[resourceName]=__FILE__;
+ resources[resourceName]=NAME_;
  map_to_file(resources,"resources.txt");
  return true;
 }
@@ -69,7 +73,7 @@ string freeResource(string resourceName){
  string[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName];
- if (owner==__FILE__){
+ if (owner==NAME_){
   resources[resourceName]="";
   map_to_file(resources,"resources.txt");
  }
@@ -95,7 +99,7 @@ string commit(aggregate data, string resourceName, boolean freeR){
  string[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName];
- if (owner==__FILE__){
+ if (owner==NAME_){
   map_to_file(data,resourceName);
   resources[resourceName]="";
   if (freeR) map_to_file(resources,"resources.txt");

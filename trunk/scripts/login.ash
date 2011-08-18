@@ -1,5 +1,5 @@
 import <shared.ash>
-
+setName(__FILE__);
 string chatbotScript="buffbot.ash";
 int logMinutes=3;
 int burnMinutes=20;
