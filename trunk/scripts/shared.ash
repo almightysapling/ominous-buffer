@@ -41,7 +41,7 @@ associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
 
-string setName(string newname){
+void setName(string newname){
  NAME_=newname;
 }
 
