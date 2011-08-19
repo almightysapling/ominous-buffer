@@ -773,19 +773,23 @@ void main(){try{
  if (MinutesToRollover()>burnMinutes) waitq(60);
  claimResource("adventuring");
  print("Using excess adventures before rollover.","red");
- while (have_effect($effect[Shape of...Mole!])>0)
-  (!adventure(1,$location[Mt. Molehill]));
- if (!adventure(1,$location[Mt. Molehill])){}
- visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
- burn();
- cli_execute("familiar "+meatfarm_fam);
- cli_execute("maximize meat, +1000combat, -tie");
- int burnTurns=150-to_int(get_property("rolladv"));
- while (my_adventures()-burnTurns>0){
-  if (adventure(1,$location[giant's castle])){}
-  if (my_adventures()-burnTurns>12) burn();
+ if (have_effect($effect[Shape of...Mole!])>0){
+  while (have_effect($effect[Shape of...Mole!])>0)
+   (!adventure(1,$location[Mt. Molehill]));
+  if (!adventure(1,$location[Mt. Molehill])){}
+  visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
  }
- burn();
+ int burnTurns=150-to_int(get_property("rolladv"));
+ if((my_adventures()-burnTurns)>0){
+  burn();
+  cli_execute("familiar "+meatfarm_fam);
+  cli_execute("maximize meat, +1000combat, -tie");
+  while (my_adventures()-burnTurns>0){
+   if (adventure(1,$location[giant's castle])){}
+   if (my_adventures()-burnTurns>12) burn();
+  }
+  burn();
+ }
  updateDC();
  cli_execute("uneffect cantata");
  cli_execute("familiar "+stat_fam);

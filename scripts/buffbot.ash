@@ -1579,34 +1579,92 @@ boolean mathSTP(string data){
 }
 
 void searchDefine(string word){
- return;
- matcher m;
- matcher t;
+ matcher m=create_matcher("^([a-zA-Z ]+).?$",word);
+ if (!m.find()) return;
+ word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (result.contains_text("NO MATCH TEXT")){
-  chat_clan("No definitions were found for "+word);
+ if (result.contains_text("- no dictionary results")){
+  chat_clan("No definitions were found for "+word+".");
   return;
  }
- m=create_matcher("div\\s*class=\"dct-em\">\\r?\\n?<span class=\"dct-tt\">(.+?)</span>",result);
- while(m.find()){
-  word=m.group(1).decodeHTML(false);
-  t=create_matcher("\".*\"",word);
-  if(t.find())word=replace_all(t,"");
-  chat_clan(word);
+ matcher temp;
+ boolean[string] wts=$strings[noun,adjective,verb \\(used without object\\),verb \\(used with object\\),adverb,conjunction,preposition,pronoun];
+ string[string,int] defn;
+ foreach wordtype in wts{
+  m=create_matcher("<div class=\"pbk\"><span class=\"pg\">–?"+wordtype+" </span>[\\w\\W]+?</div></div>(</div>|<a class=\"less\">)",result);
+  if (!m.find())continue;
+  m=create_matcher("<div class=\"dndata\">(.+?)</div>",m.group(0));
+  while(m.find()){
+   temp=create_matcher("<div class=\"dndata\">(.+?)$",m.group(1));
+   if (temp.find()) defn[wordtype,count(defn[wordtype])+1]=temp.group(1);
+   else defn[wordtype,count(defn[wordtype])+1]=m.group(1);
+  }
  }
+ int totalitems=0;
+ string bigjar;
+ int c=0;
+ foreach wordtype in wts totalitems+=count(defn[wordtype]);
+ while (totalitems>5){
+  foreach wordtype in wts if (count(defn[wordtype])>=c){
+   c=count(defn[wordtype]);
+   bigjar=wordtype;
+  }
+  if(c==1)break;
+  remove defn[bigjar,count(defn[bigjar])];
+  c-=1;
+  totalitems-=1;
+ }
+ foreach t,n,d in defn {
+  m=create_matcher(": <span.+?</span>",d);
+  d=m.replace_all(".");
+  while(true){
+   m=create_matcher("<span class=\"ital-inline\">(.+?)</span>",d);
+   if(!m.find())break;
+   d=m.replace_first("\""+m.group(1)+"\"");
+  }
+  while(true){
+   m=create_matcher("<.+?>",d);
+   if(!m.find())break;
+   d=m.replace_first("");
+  }
+  m=create_matcher("^\\((.+?)\\)\\.?$",d);
+  if(m.find()) d=m.group(1)+".";
+  switch(t){
+   case "noun":d="n- "+d;
+    break;
+   case "adjective":d="adj- "+d;
+    break;
+   case "verb \\(used without object\\)":
+   case "verb \\(used with object\\)":d="v- "+d;
+    break;
+   case "adverb":d="adv- "+d;
+    break;
+   case "conjunction":d="conj- "+d;
+    break;
+   case "preposition":d="prep- "+d;
+    break;
+   case "pronoun":d="pro- "+d;
+  }
+  defn[t,n]=d;
+ }
+ foreach t,n,d in defn chat_clan(d);
+//foreach t,n,d in defn print(d);
 }
 
 void searchSpell(string word){
- return;
- matcher m;
+ matcher m=create_matcher("^([a-zA-Z ]+).?$",word);
+ if (!m.find()) return;
+ word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (!result.contains_text("NO MATCH TEXT")){
+ if (!result.contains_text("- no dictionary results")){
   chat_clan("Dictionary seems to think "+word+" is correct.");
   return;
  }
- result=result.substring(result.index_of("Did you mean:"));
- m=create_matcher("<b><i>(.+?)</i></b>",result);
- if(!find(m)) return;
+ m=create_matcher("Did you mean <a.+?>(.+?)</a>",result);
+ if(!m.find()) {
+  chat_clan("That's so far off, I don't even know what you're -trying- to spell.");
+  return;
+ }
  result=m.group(1);
  chat_clan("Dictionary suggests \""+result+"\".");
 }
@@ -1615,13 +1673,13 @@ void searchUrban(string word){
  matcher m;
  string result=visit_url("http://www.urbandictionary.com/define.php?term="+word.url_encode(),false,true);
  m=create_matcher("class=\"definition\">(.+?)</?[db]",result);
- if(!find(m)){
+ if(!m.find()){
   chat_clan("No definitions were found for "+word);
   return;
  }
  result=m.group(1);
  m=create_matcher("<a .+?>(.+?)</a>",result);
- while (find(m)){
+ while (m.find()){
   result=replace_all(m,m.group(1));
   m=create_matcher("<a .+?>(.+?)</a>",result);   
  }
