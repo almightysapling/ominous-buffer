@@ -40,6 +40,7 @@ associates[2046991167]=false;//This One Time
 associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
+int repValue=4;
 
 void setName(string newname){
  NAME_=newname;
@@ -250,15 +251,15 @@ void updateLimits(){
 }
 
 int checkRep(string check){
- for i from 6 to 0 if (userdata["*"].buffpacks[i.to_string()]==check) return i;
+ for i from 0 to repValue if (userdata["*"].buffpacks[i.to_string()]==check) return i;
  return -1;
 }
 
 void addRep(string s){
- for i from 0 to 5{
-  userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i+1)];
+ for i from 10 to 1{
+  userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i-1)];
  }
- userdata["*"].buffpacks["6"]=s;
+ userdata["*"].buffpacks["0"]=s;
  map_to_file(userdata,"userdata.txt");
 }
 
