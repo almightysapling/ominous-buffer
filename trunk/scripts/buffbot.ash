@@ -376,6 +376,7 @@ string roll(string sender, string msg, string method){
  }
  for die from 1 to to_int(rolling[0])
   running+=(1+random(to_int(rolling[1])));
+/* BLOCKED OUT, because the rep filter currently doesn't exist.
  //The following is to try to avoid the repetition filter, in case that becomes an issue.
  string endsentence=".";
  boolean good=false;
@@ -405,7 +406,14 @@ string roll(string sender, string msg, string method){
  switch (method) {
   case "public":
    chat_clan("Rolling "+rolling[0]+"d"+rolling[1]+" for "+sender+" gives "+running+endsentence);
-   addRep("roll"+endsentence);
+   break;
+  case "pm":
+   chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
+   break;
+ }*/
+ switch (method){
+  case "public":
+   chat_clan("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
    break;
   case "pm":
    chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
@@ -1426,7 +1434,7 @@ void nopredpass(string sender, string msg, boolean addressed){
   print(":"+msg+":");
   print(":"+testcase+":");
   */
-  //if(((reply.flags&repFree)==0)&&(checkRep(testcase)>3))continue;
+  if(((reply.flags&repFree)==0)&&(checkRep(testcase)<3)&&(checkRep(testcase)>-1))continue;
   if(((reply.flags&mustRefer)==mustRefer)&&(!referred))continue;
   if(((reply.flags&mustAddress)==mustAddress)&&(!addressed))continue;
   if(((reply.flags&fullText)==fullText)&&(msg!=testcase))continue;
@@ -1444,7 +1452,7 @@ void nopredpass(string sender, string msg, boolean addressed){
   userdata[sender].lastTrigger=th;
   userdata["*"].lastTrigger=th;
   addRep(th);
-  map_to_file(userdata,"userdata.txt");
+/*WHAT?*/  map_to_file(userdata,"userdata.txt");
   switch (the_one.method){
    case "say":chat_clan(replyParser(sender,the_one.reply));
     break;
@@ -1583,7 +1591,7 @@ void searchDefine(string word){
  if (!m.find()) return;
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (result.contains_text("- no dictionary results")){
+ if (result.contains_text("- no dictionary results")||result.contains_text("because there's not a match on Dictionary.com")){
   chat_clan("No definitions were found for "+word+".");
   return;
  }
@@ -1603,8 +1611,9 @@ void searchDefine(string word){
  int totalitems=0;
  string bigjar;
  int c=0;
+ int maxn=min(max(3,count(defn)),6);
  foreach wordtype in wts totalitems+=count(defn[wordtype]);
- while (totalitems>5){
+ while (totalitems>maxn){
   foreach wordtype in wts if (count(defn[wordtype])>=c){
    c=count(defn[wordtype]);
    bigjar=wordtype;
@@ -1627,6 +1636,8 @@ void searchDefine(string word){
    if(!m.find())break;
    d=m.replace_first("");
   }
+  m=create_matcher("[“”]",d);
+  d=m.replace_all("\"");
   m=create_matcher("^\\((.+?)\\)\\.?$",d);
   if(m.find()) d=m.group(1)+".";
   switch(t){
@@ -1656,7 +1667,7 @@ void searchSpell(string word){
  if (!m.find()) return;
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (!result.contains_text("- no dictionary results")){
+ if (!(result.contains_text("- no dictionary results"))||(result.contains_text("because there's not a match on Dictionary.com"))){
   chat_clan("Dictionary seems to think "+word+" is correct.");
   return;
  }
@@ -1700,7 +1711,7 @@ void publicChat(string sender, string msg){
  chatVars["time"]=now_to_string("HH:mm:ss z");
  boolean addressed=false;
  boolean referred=false;
- m=create_matcher("(?i)(ominous buffer|ob)[:,]\\s?",msg);
+ m=create_matcher("(?i)(^|\\. ?)(ominous buffer|ob)[:,]\\s?",msg);
  if (find(m)){
   addressed=true;
   msg=substring(msg,end(m));
@@ -1741,6 +1752,8 @@ void publicChat(string sender, string msg){
    return;
   case "pick":
   case "choose":
+   if (checkRep(pred+oper)>-1) return;
+   addRep(pred+oper);
    if (addressed) pick(oper);
    return;
   case "echo":
@@ -1750,12 +1763,18 @@ void publicChat(string sender, string msg){
    if (addressed) fancyMath(sender,oper);
    return;
   case "define":
+   if (checkRep(pred+oper)>-1) return;
+   addRep(pred+oper);
    searchDefine(oper);
    return;
   case "spell":
+   if (checkRep(pred+oper)>-1) return;
+   addRep(pred+oper);
    searchSpell(oper);
    return;
   case "urban":
+   if (checkRep(pred+oper)>-1) return;
+   addRep(pred+oper);
    searchUrban(oper);
    return;
   case "market":
