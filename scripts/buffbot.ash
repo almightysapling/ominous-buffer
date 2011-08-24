@@ -351,7 +351,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
  }
  if (((my_maxmp()-my_mp())>=300)&&(!to_boolean(get_property("oscusSodaUsed")))) use(1,$item[oscus's neverending soda]);
- if (((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")!=3)) cli_execute("nuns");
+ if (((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")<3)) cli_execute("nuns");
  if ((my_mp()<900)&&(my_fullness()<15)){
   retrieve_item(1,$item[Jumbo Dr. Lucifer]);
   eatsilent(1,$item[Jumbo Dr. Lucifer]);
