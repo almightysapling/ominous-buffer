@@ -281,7 +281,7 @@ boolean loadSettings(string postRO){
  string[int] setting=split_string(group(notef,1),'\\r?\\n|\\s=\\s');
  int x=count(setting)/2;
  if (x==0) return false;
- int day;
+ int day=-1;
  for i from 0 to count(setting)-1 if(setting[i]=="!day") day=setting[i+1].to_int();
  if (day!=gameday_to_int()){
   rollpassed=true;

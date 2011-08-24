@@ -617,6 +617,12 @@ void cleanPC(){
  lifetime["*"]=0;
  foreach skilln in lifetime if(skilln!="*") lifetime["*"]+=lifetime[skilln];
  commit(lifetime,"OB_lifetime.txt");
+ int[string]books;
+ checkOut(books,"books.txt");
+ books["Event1"]=0;
+ books["Event2"]=0;
+ books["Event3"]=0;
+ commit(books,"books.txt");
  set_property("_thisBreakfast","1");
 }
 
