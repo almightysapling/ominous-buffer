@@ -33,6 +33,9 @@ file_to_map("userdata.txt",userdata);
 //Global variables
 string sauc_name="ominous sauceror";
 string turt_name="ominous tamer";
+string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
+string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books;winners";
+string ignorePile="_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals";
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
 associates[2046987019]=false;//Not Dead Yet
