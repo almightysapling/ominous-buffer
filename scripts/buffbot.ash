@@ -144,7 +144,7 @@ void logout(string sender, string msg){
   chat_private(sender,"You do not have permission to use this command.");
   return;
  }
- saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books");
+ saveSettings(earlySave);
  set_property("chatbotScript","off");
  cli_execute("exit");
 }

@@ -363,7 +363,12 @@ void checkLotto(){
   commit(userdata,"userdata.txt");
   string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
   buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nLast Five Lotto Winners:";
-  for i from 1 to 5 if (userdata["*"].buffpacks contains ("winner"+i.to_string())) buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
+  string wintext="";
+  for i from 1 to 5 if (userdata["*"].buffpacks contains ("winner"+i.to_string())){
+   buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
+   wintext+=i.to_string()+" "+userdata["*"].buffpacks["winner"+i.to_string()]+"::";
+  }
+  set_property("winners",wintext);
   visit_url(buf);
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_string()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
@@ -649,6 +654,8 @@ void processQuestData(boolean rp){
   int y=count(limit)/2;
   if (y>0) for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
  }
+ string[int] wintext=split_string(get_property("winners"),"::");
+ foreach i,s in wintext if (length(s)>1) userdata["*"].buffpacks["winner"+s.char_at(0)]=s.substring(2);
  commit(userdata,"userdata.txt");
 }
 
@@ -741,7 +748,7 @@ void main(){try{
  print("Starting Login...");
  if (get_property("_thisBreakfast")=="") cleanPC();
  claimResource("adventuring");
- processQuestData(loadSettings("_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals"));
+ processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
  if (get_property("chatbotScript")=="") waitq (2);
@@ -813,11 +820,11 @@ void main(){try{
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  cli_execute("set chatbotScript=");
- saveSettings("totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books");
+ saveSettings(nightlySave);
  checkApps();
  cli_execute("exit");
 }finally{
  print("Script Halted");
- saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books");
+ saveSettings(earlySave);
  releaseResources();
 }}
