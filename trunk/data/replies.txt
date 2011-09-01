@@ -12,6 +12,7 @@ OB?	is OB, $pnick.	3	do
 om nom nom	Much better, thank you.	0	say	$ptrigger	omnomnom
 omnomnom	Chew a bit slower, $pnick.	0	say		
 seperate	*separate	0	say		
+sewer.status	There are $grates grate(s) opened and $valves valve(s) turned.	18	say		
 SLUTS	$player is a slut!	1	say		
 stat day?	Today is $statday and tomorrow is $statdaytomorrow.	0	say		
 thanks	You're welcome!	8	say		

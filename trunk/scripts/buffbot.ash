@@ -717,9 +717,27 @@ void fax(string sender, string msg){
  chat_private("FaxBot",nm);
 }
 
+void updateGrates(){
+ string v=visit_url("clan_raidlogs.php");
+ matcher mx=create_matcher("opened (a|\\d+) sewer grate",v);
+ int turned=0;
+ while(mx.find()) if (mx.group(1)=="a") turned+=1;
+ else turned+=mx.group(1).to_int();
+ set_property("sewerGrates",turned);
+}
+
+void updateValves(){
+ string v=visit_url("clan_raidlogs.php");
+ matcher mx=create_matcher("lowered the water level .+?\\((\\d+) turn",v);
+ int turned=0;
+ while(mx.find()) turned+=mx.group(1).to_int();
+ set_property("sewerValves",turned);
+}
+
 string replyParser(string sender,string msg){
  string temp;
  string someone=sender;
+ string createOnce="";
  matcher variable=create_matcher("(?i)\\$s",msg);
  if(find(variable)&&(someoneDefined=="")){
   boolean[string] inClan=who_clan();
@@ -882,6 +900,20 @@ string replyParser(string sender,string msg){
     foreach it in $items[] allItems[count(allItems)]=it;
     temp=allItems[random(count(allItems))].to_string();
     msg=replace_first(variable,temp);
+    break;
+   case "grates":
+    if(!createOnce.contains_text(".grates")){
+     updateGrates();
+     createOnce+=".grates";
+    }
+    msg=replace_first(variable,get_property("sewerGrates"));
+    break;
+   case "valves":
+    if(!createOnce.contains_text(".valves")){
+     updateValves();
+     createOnce+=".valves";
+    }
+    msg=replace_first(variable,get_property("sewerValves"));
     break;
    default:
     if(chatVars contains group(variable,1)) msg=replace_first(variable,chatVars[group(variable,1)]);
