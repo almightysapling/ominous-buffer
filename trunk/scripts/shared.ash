@@ -14,6 +14,7 @@ record userinfo{
  string lastTrigger;
  int donated;
  int wallet;
+ string gHobopPassword;
 };
 //flag bits
 int noFlag=1;//no error messages

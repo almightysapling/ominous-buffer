@@ -1286,14 +1286,20 @@ void sendLink(string sender, string i){
 
 string performMath(string sender, string msg){
  if (msg=="") msg="0";
- if("*+-^/".contains_text(msg.char_at(0))) msg=userdata[sender].lastMath.to_string()+msg;
  matcher m=create_matcher("\\s*",msg);
  msg=replace_all(m,"");
+ string[int] chunks=split_string(msg,",");
+ float last=userdata[sender].lastMath;
  float[string] mathvars;
- mathvars["last"]=userdata[sender].lastMath;
- mathvars["ans"]=userdata["*"].lastMath;
- userdata[sender].lastMath=mathlibeval(msg,mathvars);
- msg=userdata[sender].lastMath.to_string();
+ foreach i,chunk in chunks{
+  if (chunk=="")continue;
+  if("*+-^/".contains_text(chunk.char_at(0))) chunk=last.to_string()+chunk;
+  mathvars["last"]=userdata[sender].lastMath;
+  mathvars["ans"]=userdata["*"].lastMath;
+  last=mathlibeval(chunk,mathvars);
+ }
+ userdata[sender].lastMath=last;
+ msg=last.to_string();
  map_to_file(userdata,"userdata.txt");
  if (msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
  return msg;
@@ -1559,7 +1565,7 @@ int timeSinceLastChat(string who){
 boolean isMath(string m){
  matcher fix=create_matcher("(?i)(last|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)",m);
  m=replace_all(fix,"+");
- fix=create_matcher("[^\\d\\s*+/.^,\\-\\(\\)\\[\\]\\$]",m);
+ fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
  if (find(fix)) return false;
  return true;
 }
