@@ -50,19 +50,19 @@ void setName(string newname){
  NAME_=newname;
 }
 
-void cleanResources(){
+void cleanResources(){ //Remove all holds
  string[string]blank;
  map_to_file(blank,"resources.txt");
 }
 
-void releaseResources(){
+void releaseResources(){ //Remove all holds of a certain script
  string[string] resources;
  file_to_map("resources.txt",resources);
  foreach res,owner in resources if (owner==NAME_) resources[res]="";
  map_to_file(resources,"resources.txt");
 }
 
-boolean claimResource(string resourceName){
+boolean claimResource(string resourceName){ //Lock a symbol
  string[string] resources;
  file_to_map("resources.txt",resources);
  while ((resources[resourceName]!="")&&(resources[resourceName]!=NAME_)){
@@ -74,7 +74,7 @@ boolean claimResource(string resourceName){
  return true;
 }
 
-string freeResource(string resourceName){
+string freeResource(string resourceName){ //Free a symbol without saving
  string[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName];
@@ -85,22 +85,22 @@ string freeResource(string resourceName){
  return owner;
 }
 
-string commit(string resourceName){
+string commit(string resourceName){ //Free a symbol without saving
  return freeResource(resourceName);
 }
 
-aggregate checkOut(aggregate data, string resourceName){
+aggregate checkOut(aggregate data, string resourceName){ //Lock a symbol and load its contents
  claimResource(resourceName);
  file_to_map(resourceName,data);
  return data;
 }
 
-aggregate update(aggregate data, string resourceName){
+aggregate update(aggregate data, string resourceName){ //Load a symbol, but don't get permission to save
  file_to_map(resourceName,data);
  return data;
 }
 
-string commit(aggregate data, string resourceName, boolean freeR){
+string commit(aggregate data, string resourceName, boolean freeR){ //Save data to a symbol, optionally free the symbol
  string[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName];
@@ -112,7 +112,7 @@ string commit(aggregate data, string resourceName, boolean freeR){
  return owner;
 }
 
-string commit(aggregate data, string resourceName){
+string commit(aggregate data, string resourceName){ //Save data to a symbol and free it
  return commit(data, resourceName, true);
 }
 
