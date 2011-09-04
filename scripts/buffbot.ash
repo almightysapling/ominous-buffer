@@ -422,120 +422,6 @@ string roll(string sender, string msg, string method){
  return running.to_string();
 }
 
-void russianRoulette(string sender, string msg){
-print("RR");
- matcher m;
- int now=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
- gameData game=loadGame();
- int v=-1;
- if (!game.gameStarted&&(sender!=":SYSTEM")){//Get contestants, until time is up.
-  m=create_matcher("(?i)(i am|\\Win\\W|i'll play)",msg);
-  if((!find(m))||(game.roundOver<now))return;
-  game.players[sender]=0;
-  saveGame(game);
- }else if(sender!=":SYSTEM"){
-  m=create_matcher("(\\d+)",msg);
-  if(find(m)) v=group(m,1).to_int();
-  foreach p,val in game.players if(val==v){
-   chat_clan(p+" has "+val+".");
-   return;
-  }
- }
-print("Players: "+count(game.players).to_string());
- if(!(game.players contains sender))return;
- if((sender!=":SYSTEM")&&(v>0)&&(v<=(count(game.players)-1))&&(game.players[sender]==0)) game.players[sender]=v;
- if(sender!=":SYSTEM"){
-  saveGame(game);
-  return;
- }
- v=count(game.players)-1;
- switch(msg){
-  case "START":
-   chat_clan("Okay, looks like we are starting with "+v.to_string()+" players.");
-   wait(5);
-   chat_clan("Everybody: 1-"+v.to_string()+"!");
-   game.gameStarted=true;
-   game.roundOver=now+game.intervals+1;
-   foreach p in game.players game.players[p]=0;
-   saveGame(game);
-   break;
-  case "MORE":
-   if (game.gameStarted) chat_clan("1 more minute guys. Make your choices.");
-   else chat_clan("Anybody else?");
-   game.roundOver=now+2;
-   saveGame(game);
-   break;
-  case "MOVE":
-   chat_clan("Okay, times up.");
-   string t;
-   int nextn=1;
-   boolean f;
-   foreach pn,num in game.players if (num==0) {
-    f=false;
-    while (!f){
-     f=true;
-     foreach pn2,num2 in game.players if (num2==nextn) f=false;
-     if (!f) nextn+=1;
-    }
-    game.players[pn]=nextn;
-    chat_clan(pn+" is "+nextn.to_int()+".");
-   } //fall through
-  case "NEXT":
-   chat_clan("Let's roll...");
-   wait(3);
-   int l=random(v)+1;
-   string loser;
-   foreach pn,num in game.players if (num==v) loser=pn;
-   chat_clan("Rolling 1d"+v.to_string()+" for myself gives "+l.to_string()+". "+loser+" is out!");
-   remove game.players[loser];
-   foreach pn in game.players game.players[pn]=0;
-   saveGame(game);
-   break;
-  default:
-   
-   break;
- }
- saveGame(game);
-}
-
-string wordshot(string sender, string guess){
- gameData game=loadGame();
- if(game.intervals==-1)return guess;
- string word;
- foreach k,v in game.players if (v==1) word=k;
- if(guess.contains_text(" ")||(guess.length()!=word.length())){
-  return guess;
- }
- string wordList=visit_url("http://clubefl.gr/games/wordox/"+word.length().to_string()+".html");
- if (!wordList.contains_text(guess.to_lower_case())) {
-  chat_private(sender,guess+" isn't a valid word.");
-  return "x";
- }
- if (guess==word){
-  game.players[sender]=2;
-  game.intervals=-1;
-  saveGame(game);
-  return "x";
- }
- int[string] breakW;
- int[string] breakG;
- for x from 1 to length(word) breakW[char_at(word,x-1)]+=1;
- for x from 1 to length(word) breakG[char_at(guess,x-1)]+=1;
- int m=0;
- foreach k,v in breakW if (breakG contains k) m+=min(breakG[k],v);
- chat_private(sender,m.to_string());
- if (m>game.intervals) {
-  game.intervals=m;
-  chat_clan("We have a"+(m==8?"n ":" ")+m.to_string()+"!");
- }
- if (m==0){
-  if(game.roundOver==0) chat_clan("First 0!");
-  game.roundOver+=1;
- }
- saveGame(game);
- return "x";
-}
-
 void startGame(string sender, string msg){
  gameData game;
  if (gameType()!=gameNone){
@@ -562,7 +448,9 @@ void startGame(string sender, string msg){
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
     string list=visit_url("http://clubefl.gr/games/wordox/"+l.length().to_string()+".html");
-    if (list.contains_text(l.to_lower_case())){
+    string[int] koldict;
+    update(koldict,"koldict.txt");
+    if ((list.contains_text(l.to_lower_case()))||(koldict contains l)){
      remove game.players[w];
      game.players[l]=1;
      print("Actually: "+l);

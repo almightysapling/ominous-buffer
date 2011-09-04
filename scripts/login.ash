@@ -276,23 +276,6 @@ void sendMeat(string who, int amount){
  freeResource("adventuring");
 }
 
-void gRR(){
- gameData game=loadGame();
- if (!game.gameStarted){}else{}
-}
-
-void gWS(){
- gameData game=loadGame();
- if(game.intervals==-1){
-  string winner;
-  string word;
-  foreach k,v in game.players if(v==2) winner=k; else word=k;
-  chat_clan("Winner! "+winner+" won with '"+word+"'!");
-  chat_private(game.host,"Winner of wordshot: "+winner);
- }
- closeGame();
-}
-
 void checkLotto(){
  int[string] books;
  checkOut(books,"books.txt");
@@ -760,16 +743,7 @@ void main(){try{
  print("Entering wait cycle.","green");
  int n;
  while (MinutesToRollover()>(burnMinutes+3)){
-  switch (gameType()){
-   case gameRoulette:
-    gRR();
-    break;
-   case gameWordshot:
-    gWS();
-    break;
-   default:
-    break;
-  }
+  coreGameCycle();
   claimResource("adventuring");
   checkLotto();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
