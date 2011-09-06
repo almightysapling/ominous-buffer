@@ -453,13 +453,14 @@ void startGame(string sender, string msg){
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
     string list=visit_url("http://clubefl.gr/games/wordox/"+l.length().to_string()+".html");
-    string[int] koldict;
+    int[string] koldict;
     update(koldict,"koldict.txt");
     if ((list.contains_text(l.to_lower_case()))||(koldict contains l)){
      remove game.players[w];
      game.players[l]=1;
      print("Actually: "+l);
      w=l;
+     saveGame(game);
     }else{
      closeGame();
      chat_private(sender,"Word not found");

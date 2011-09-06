@@ -12,7 +12,6 @@ About gamesavedata["."]:
  gamesavedata["."].players[gameId] contains the gameType of the gameId.
 */
 gameData[string] gamesavedata;
-file_to_map("gameMode.txt",gamesavedata);
 int gameNone=0;
 int gameRoulette=1;
 int gameWordshot=2;
@@ -21,6 +20,7 @@ int gameLotto=4;
 string startGame(int gType, int ivals, boolean started, string host){
  file_to_map("gameMode.txt",gamesavedata);
  string gId=count(gamesavedata).to_string();
+ while(gamesavedata contains gId) gId=to_string(gId.to_int()+1);
  int now=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
  gamesavedata["."].players[gId]=gType;
  gamesavedata[gId].players[":SYSTEM"]=0;
@@ -38,6 +38,7 @@ string startGame(int gType){
 
 gameData loadGame(string gId){
  gameData tmp;
+ file_to_map("gameMode.txt",gamesavedata);
  if (gamesavedata contains gId) return gamesavedata[gId];
  return tmp;
 }
@@ -95,6 +96,7 @@ void closeGame(string gId){
  map_to_file(gamesavedata,"gameMode.txt");
 }
 void closeGame(){
+ file_to_map("gameMode.txt",gamesavedata);
  closeGame(gamesavedata["."].data[0]);
 }
 
@@ -113,7 +115,7 @@ string startWordshot(int l,string h){
  string list=visit_url("http://clubefl.gr/games/wordox/"+l.to_string()+".html");
  matcher m;
  switch (l){
-  case 4: m=create_matcher("</b>([\\w\\s\\r\\n]+)</br>",list);
+  case 4: m=create_matcher("</b>([\\w\\s\\r\\n]+)<br>",list);
           break;
   case 5: m=create_matcher("</b>([\\w\\s\\r\\n]+)</p>",list);
           break;
@@ -236,7 +238,7 @@ string wordshot(string sender, string guess){
   return guess;
  }
  string wordList=visit_url("http://clubefl.gr/games/wordox/"+word.length().to_string()+".html");
- string[int] koldict;
+ int[string] koldict;
  file_to_map("koldict.txt",koldict);
  if ((!wordList.contains_text(guess.to_lower_case()))&&(!(koldict contains guess))){
   chat_private(sender,guess+" isn't a valid word.");
@@ -280,8 +282,8 @@ void gWS(){
   foreach k,v in game.players if(v==2) winner=k; else word=k;
   chat_clan("Winner! "+winner+" won with '"+word+"'!");
   chat_private(game.host,"Winner of wordshot: "+winner);
+  closeGame();
  }
- closeGame();
 }
 
 void coreGameCycle(){
