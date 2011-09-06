@@ -54,9 +54,14 @@ file_to_map("timefile.txt",ctimestemp);
 timestamp ctimes=ctimestemp[0];
 
 boolean errorMsg=true;
+string prefix="";
 string someoneDefined="";
 string[string] chatVars;
 int TPC=25;
+
+void chat(string msg){
+ chat_clan(prefix+msg);
+}
 
 string genderPronoun(string who, int what, string type){
  boolean cap=false;
@@ -405,7 +410,7 @@ string roll(string sender, string msg, string method){
  }
  switch (method) {
   case "public":
-   chat_clan("Rolling "+rolling[0]+"d"+rolling[1]+" for "+sender+" gives "+running+endsentence);
+   chat("Rolling "+rolling[0]+"d"+rolling[1]+" for "+sender+" gives "+running+endsentence);
    break;
   case "pm":
    chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
@@ -413,7 +418,7 @@ string roll(string sender, string msg, string method){
  }*/
  switch (method){
   case "public":
-   chat_clan("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
+   chat("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
    break;
   case "pm":
    chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
@@ -430,7 +435,7 @@ void startGame(string sender, string msg){
    if((sender==game.host)||getUF(sender,isAdmin)){
     closeGame();
     chat_private(sender,"Game canceled");
-    chat_clan("You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
+    chat("You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
    }else chat_private(sender,"You don't have permission to do that.");
   }else chat_private(sender,"A game is already in session by "+game.host+".");
   return;
@@ -462,7 +467,7 @@ void startGame(string sender, string msg){
     }
    }
    chat_private(sender,"Game started.");
-   chat_clan(w.length().to_string()+"-letter Wordshot! Send guesses to me!");
+   chat(w.length().to_string()+"-letter Wordshot! Send guesses to me!");
    break;
   case "rr":case "russianroulette":
   case "russian roulette":
@@ -475,7 +480,7 @@ void pick(string options){
  string[int] list=split_string(options,"(\\s?,\\s?or\\s|,\\s?|\\sor\\s)");
  if (count(list)<2) return;
  int d=random(count(list));
- chat_clan("/em picks "+list[d]+".");
+ chat("/em picks "+list[d]+".");
 }
 
 void reviselist(string sender, string msg, string command){
@@ -1380,9 +1385,9 @@ void nopredpass(string sender, string msg, boolean addressed){
   addRep(th);
 /*WHAT?*/  map_to_file(userdata,"userdata.txt");
   switch (the_one.method){
-   case "say":chat_clan(replyParser(sender,the_one.reply));
+   case "say":chat(replyParser(sender,the_one.reply));
     break;
-   case "do":chat_clan("/em "+replyParser(sender,the_one.reply));
+   case "do":chat("/em "+replyParser(sender,the_one.reply));
     break;
   }
  }
@@ -1480,7 +1485,7 @@ boolean fancyMath(string sender,string equation){
  userdata[sender].lastMath=tmp;
  userdata["*"].lastMath=tmp;
  map_to_file(userdata,"userdata.txt");
- chat_clan(tmp.to_string());
+ chat(tmp.to_string());
  return true;
 }
 
@@ -1494,7 +1499,7 @@ boolean mathDot(string data, boolean cross){
  string x;
  if (cross) x=to_string(u.cross(v));
  else x=to_string(u.dot(v));
- chat_clan(x);
+ chat(x);
  return true;
 }
 
@@ -1508,7 +1513,7 @@ boolean mathSTP(string data){
  b=m.group(2).to_vector();
  c=m.group(3).to_vector();
  string x=a.dot(b.cross(c)).to_string();
- chat_clan(x);
+ chat(x);
  return true;
 }
 
@@ -1518,7 +1523,7 @@ void searchDefine(string word){
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
  if (result.contains_text("- no dictionary results")||result.contains_text("because there's not a match on Dictionary.com")){
-  chat_clan("No definitions were found for "+word+".");
+  chat("No definitions were found for "+word+".");
   return;
  }
  matcher temp;
@@ -1584,7 +1589,7 @@ void searchDefine(string word){
   }
   defn[t,n]=d;
  }
- foreach t,n,d in defn chat_clan(d);
+ foreach t,n,d in defn chat(d);
 //foreach t,n,d in defn print(d);
 }
 
@@ -1594,16 +1599,16 @@ void searchSpell(string word){
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
  if (!(result.contains_text("- no dictionary results"))||(result.contains_text("because there's not a match on Dictionary.com"))){
-  chat_clan("Dictionary seems to think "+word+" is correct.");
+  chat("Dictionary seems to think "+word+" is correct.");
   return;
  }
  m=create_matcher("Did you mean <a.+?>(.+?)</a>",result);
  if(!m.find()) {
-  chat_clan("That's so far off, I don't even know what you're -trying- to spell.");
+  chat("That's so far off, I don't even know what you're -trying- to spell.");
   return;
  }
  result=m.group(1);
- chat_clan("Dictionary suggests \""+result+"\".");
+ chat("Dictionary suggests \""+result+"\".");
 }
 
 void searchUrban(string word){
@@ -1611,7 +1616,7 @@ void searchUrban(string word){
  string result=visit_url("http://www.urbandictionary.com/define.php?term="+word.url_encode(),false,true);
  m=create_matcher("class=\"definition\">(.+?)</?[db]",result);
  if(!m.find()){
-  chat_clan("No definitions were found for "+word);
+  chat("No definitions were found for "+word);
   return;
  }
  result=m.group(1);
@@ -1620,7 +1625,7 @@ void searchUrban(string word){
   result=replace_all(m,m.group(1));
   m=create_matcher("<a .+?>(.+?)</a>",result);   
  }
- chat_clan(result.decodeHTML(false));
+ chat(result.decodeHTML(false));
 }
 
 void publicChat(string sender, string msg){
@@ -1669,7 +1674,7 @@ void publicChat(string sender, string msg){
   msg=performMath(sender,msg);
   userdata["*"].lastMath=userdata[sender].lastMath;
   map_to_file(userdata,"userdata.txt");
-  chat_clan(msg);
+  chat(msg);
   return;
  }
  switch (pred){
@@ -1683,7 +1688,7 @@ void publicChat(string sender, string msg){
    if (addressed) pick(oper);
    return;
   case "echo":
-   if (addressed) chat_clan(replyParser(sender,oper));
+   if (addressed) chat(replyParser(sender,oper));
    return;
   case "sum":
    if (addressed) fancyMath(sender,oper);
@@ -1720,6 +1725,18 @@ void publicChat(string sender, string msg){
  return;
 }
 
+void clanSlimetube(string sender, string msg){
+ if (sender=="Dungeon") return;
+ prefix="/slimetube ";
+ publicChat(sender,msg);
+}
+
+void clanHobopolis(string sender, string msg){
+ if (sender=="Dungeon") return;
+ prefix="/hobo ";
+ publicChat(sender,msg);
+}
+
 void main(string sender, string msg, string channel){
  if (sender=="faxbot") {
   if (msg.contains_text("help")) chat_private(get_property("_lastFax"),"Faxbot doesn't have that monster.");
@@ -1744,6 +1761,14 @@ void main(string sender, string msg, string channel){
     publicChat(sender,msg);
     return;
   }  
+ }
+ if (channel=="/slimetube"){
+  clanSlimetube(sender,msg);
+  return;
+ }
+ if (channel=="/hobopolis"){
+  clanHobopolis(sender,msg);
+  return;
  }
  if (!buffable(sender)) return;
  if(msg.char_at(0)=="!"){
