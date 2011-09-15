@@ -1,8 +1,8 @@
-import <buffbot.ash>
+import <shared.ash>
 
 void main(){
- saveSettings("nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books");
+ saveSettings(earlySave);
+ set_property("chatbotScript","off");
  chat_private("ominous tamer","logout");
  chat_private("ominous sauceror","logout");
- logout("almighty sapling","logout");
 }
