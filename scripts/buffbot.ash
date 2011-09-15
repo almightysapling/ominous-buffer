@@ -55,17 +55,36 @@ timestamp ctimes=ctimestemp[0];
 
 boolean errorMsg=true;
 string prefix="";
+string response="";
 string someoneDefined="";
 string[string] chatVars;
 int TPC=25;
 
+void chat(){
+ if((prefix=="")||(prefix.char_at(0)=="/")){
+  chat_clan(prefix+response);
+  return;
+ }
+ if(prefix.char_at(0)==":"){
+  print("Something fuckered up.");
+  return;
+ }
+ if(prefix.char_at(0)=="!")return;
+ chat_private(prefix,response);
+}
 void chat(string msg){
- chat_clan(prefix+msg);
+ response=msg;
+ chat();
+}
+void chat(string u,string m){
+ prefix=u;
+ response=m;
+ chat();
 }
 
 string genderPronoun(string who, int what, string type){
  boolean cap=false;
- if (type.contains_text("P")||type.contains_text("S")) cap=true;
+ if(type.contains_text("P")||type.contains_text("S"))cap=true;
  type=substring(type,1);
  int t=5;
  string reply;
@@ -76,10 +95,10 @@ string genderPronoun(string who, int what, string type){
   case "pos":t=3;break;
   case "det":t=4;break;
  }
- if (what!=1) reply=genders[what,t];
- else if (t<3) reply=who;
+ if(what!=1)reply=genders[what,t];
+ else if(t<3)reply=who;
  else reply=who+"'s";
- if (cap) reply=reply.char_at(0).to_upper_case()+reply.substring(1);
+ if(cap)reply=reply.char_at(0).to_upper_case()+reply.substring(1);
  return reply;
 }
 
@@ -95,20 +114,20 @@ void errorMessage(string who,string what){
 
 void errorMessage(string who,string what,int g){
  matcher mx=create_matcher("(?i)(\\$psub|\\$pobj|\\$pref|\\$ppos|\\&pdet)",what);
- while (mx.find()){
+ while(mx.find()){
   what=mx.replace_first(genderPronoun(who,g,mx.group(1)));
   mx=mx.reset(what);
  }
- if (getUF(who,noFlag))chat_private(who,what);
+ if(getUF(who,noFlag))chat_private(who,what);
 }
 
 boolean buffable(string sender){
- if (userdata[sender].userid==0) updateId(sender,true);
- if (getUF(sender,blacklist)){
+ if(userdata[sender].userid==0)updateId(sender,true);
+ if(getUF(sender,blacklist)){
   chat_private(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
   return false;
  }
- if (getUF(sender,inClan)||getUF(sender,whitelist)||getUF(sender,inAssociate)){
+ if(getUF(sender,inClan)||getUF(sender,whitelist)||getUF(sender,inAssociate)){
   return true;
  }else{
   chat_private(sender,"We do what we must because we can. For the good of all of us. Except the ones who are not in Black Mesa.");
@@ -118,9 +137,9 @@ boolean buffable(string sender){
 
 string decodeHTML(string msg,boolean chat){
  matcher i;
- if (chat){
+ if(chat){
   i=create_matcher("<a style.+?>(.+?)</a>",msg);
-  while (i.find()){
+  while(i.find()){
    msg=replace_first(i,i.group(1));
    i=create_matcher("<a style.+?>(.+?)</a>",msg);
   }
@@ -144,8 +163,8 @@ string decodeHTML(string msg,boolean chat){
  return msg;
 }
 
-void logout(string sender, string msg){
- if ((userdata[sender].flags&isAdmin)!=isAdmin){
+void logout(string sender){
+ if((userdata[sender].flags&isAdmin)!=isAdmin){
   chat_private(sender,"You do not have permission to use this command.");
   return;
  }
@@ -158,14 +177,14 @@ void createpack(string sender, string msg){
  matcher namem=create_matcher("(\\S*)\\s?(.*)",msg);
  string packname;
  string packdata;
- if (find(namem)){
+ if(namem.find()){
   packname=group(namem,1);
   packdata=group(namem,2);
  }else{
   chat_private(sender,"You must supply the appropriate data for us to save that.");
   return;
  }
- if ((count(userdata[sender].buffpacks)>9)&&(!(userdata[sender].buffpacks contains packname))){
+ if((count(userdata[sender].buffpacks)>9)&&(!(userdata[sender].buffpacks contains packname))){
   chat_private(sender,"You already have 10 buffpacks, to have more would be ridiculous; not even funny.");
   return;
  }
@@ -182,16 +201,16 @@ void delpack(string sender, string packname){
 
 void buff(string sender, string msg, int numTurns, string ding){
  //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
- if ((to_lower_case(sender)==turt_name) || (to_lower_case(sender)==sauc_name)){
+ if((to_lower_case(sender)==turt_name) || (to_lower_case(sender)==sauc_name)){
   string[int] failsplit = split_string(msg,"\\s");
-  if (index_of("ARLNS",failsplit[0])>-1){
+  if(index_of("ARLNS",failsplit[0])>-1){
    sender=to_playerName(failsplit[1].to_int());
    ding=to_playerName(failsplit[2].to_int());
   }
   switch (failsplit[0]){
    case "CASTRQ":
-    if (sender==turt_name) set_property('tamerCasts',failsplit[1]);
-    if (sender==sauc_name) set_property('sauceCasts',failsplit[1]);
+    if(sender==turt_name) set_property('tamerCasts',failsplit[1]);
+    if(sender==sauc_name) set_property('sauceCasts',failsplit[1]);
     break;
    case "FUNDS":
     chat_private("Almighty Sapling","low funds on "+sender+".");
@@ -224,7 +243,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  int casts;
  int max;
  int skillnum=to_int(messageNew);
- if (skillnum>9000){
+ if(skillnum>9000){
   skillnum-=9000;
   skillnum=(skillnum/100)*1000+skillnum-((skillnum/100)*100);
  }
@@ -235,12 +254,12 @@ void buff(string sender, string msg, int numTurns, string ding){
   case 7040:case 7041: return;
  }
  //Forward skill requests to relay bots when necessary
- if (getUF(ding,inAssociate)) max=400;
- if ((max==400)&&(getUF(ding,highAssociate))) max=700;
- if (getUF(ding,inClan)||getUF(ding,whitelist)) max=700;
+ if(getUF(ding,inAssociate)) max=400;
+ if((max==400)&&(getUF(ding,highAssociate))) max=700;
+ if(getUF(ding,inClan)||getUF(ding,whitelist)) max=700;
  int senderid=getId(sender);
  string mout;
- if (skillnum==62){
+ if(skillnum==62){
   numTurns=TPC;
   switch (userdata["*"].buffs[skillnum]){
    case 1:
@@ -256,66 +275,66 @@ void buff(string sender, string msg, int numTurns, string ding){
     return;
   }
  }
- if ((skillnum>2000)&&(skillnum<3000)){
+ if((skillnum>2000)&&(skillnum<3000)){
   mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+to_string(max);
   chat_private(turt_name,mout);
   return;
  }
- if ((skillnum>4000)&&(skillnum<5000)){
+ if((skillnum>4000)&&(skillnum<5000)){
   mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+to_string(max);
   chat_private(sauc_name,mout);
   return;
  }
  //Assign default values if turns isn't specified.
- if (skillnum==6014) numTurns=TPC;//Ode
- if (numTurns==0){
-  if (skillnum==6026) numTurns=125;//Donho
-  else if (((skillnum>6019)&&(skillnum<6025))||(skillnum==6028)) numTurns=25;//Limited buffs
-  else if (skillnum!=6014) numTurns=200;//Else
+ if(skillnum==6014) numTurns=TPC;//Ode
+ if(numTurns==0){
+  if(skillnum==6026) numTurns=125;//Donho
+  else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028)) numTurns=25;//Limited buffs
+  else if(skillnum!=6014) numTurns=200;//Else
  }
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
  if(getUF(ding,inClan)||getUF(ding,whitelist)||(getUF(ding,inAssociate)&&getUF(ding,highAssociate))){
-  if (((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;//Limited buffs
-  else if (skillnum==6014) max=5;//Ode
-  else if (skillnum==6026) max=20;//Donho
-  else if (skillnum==6901) max=1;//Time's Arrow
+  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;//Limited buffs
+  else if(skillnum==6014) max=5;//Ode
+  else if(skillnum==6026) max=20;//Donho
+  else if(skillnum==6901) max=1;//Time's Arrow
   else max=28;//Else
- }else if (getUF(ding,inAssociate)){
-  if (((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;
-  else if (skillnum==6014) max=3;
-  else if (skillnum==6026) max=10;
-  else if (skillnum==6901) max=0;
+ }else if(getUF(ding,inAssociate)){
+  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;
+  else if(skillnum==6014) max=3;
+  else if(skillnum==6026) max=10;
+  else if(skillnum==6901) max=0;
   else max=16;
  }
  casts=min(casts,max);
  //Adjust casts to be within limits
- if (((userdata[sender].flags&noLimit)!=noLimit)&&(userdata[ding].buffs contains skillnum)){
-  if ((casts+userdata[ding].buffs[skillnum])>max) casts=max-userdata[ding].buffs[skillnum];
+ if(((userdata[sender].flags&noLimit)!=noLimit)&&(userdata[ding].buffs contains skillnum)){
+  if((casts+userdata[ding].buffs[skillnum])>max) casts=max-userdata[ding].buffs[skillnum];
  }
 
- if (casts==0){
+ if(casts==0){
   errorMessage(ding,"I'm sorry, but you've reached your daily limit for that buff.");
   return;
  }
 
  //Quick check to see if limited buffs still available
  int maxnum = 999999;
- if ((skillnum>6019)&&(skillnum<6025)) maxnum=10;
- else if (skillnum==6026) maxnum=50;
- else if (skillnum==6028) maxnum=5;
- if ((skillnum>6019)&&(skillnum<6029)){
-  if (maxnum-userdata["*"].buffs[skillnum]<1){
+ if((skillnum>6019)&&(skillnum<6025)) maxnum=10;
+ else if(skillnum==6026) maxnum=50;
+ else if(skillnum==6028) maxnum=5;
+ if((skillnum>6019)&&(skillnum<6029)){
+  if(maxnum-userdata["*"].buffs[skillnum]<1){
    errorMessage(ding,"I'm sorry, but I'm all out of "+messageNew+" for today.");
    return;
   }//balance if not enough to meet request
-  if (maxnum-userdata["*"].buffs[skillnum]<casts) casts=maxnum-userdata["*"].buffs[skillnum];
+  if(maxnum-userdata["*"].buffs[skillnum]<casts) casts=maxnum-userdata["*"].buffs[skillnum];
  }
  //This is the actual casting function.
  claimResource("adventuring");
- if (skillnum==6901){
-  if (item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
-  if (item_amount($item[time's arrow])<1){
+ if(skillnum==6901){
+  if(item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
+  if(item_amount($item[time's arrow])<1){
    chat_private(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    print("Out of Time's Arrows.");
    freeResource("adventuring");
@@ -328,18 +347,18 @@ void buff(string sender, string msg, int numTurns, string ding){
   map_to_file(userdata,"userdata.txt");
   return;
  }
- if (have_skill(to_skill(skillnum))){
-  if (use_skill(casts,to_skill(skillnum),sender)){
+ if(have_skill(to_skill(skillnum))){
+  if(use_skill(casts,to_skill(skillnum),sender)){
    int totCastsE=get_property('totalCastsEver').to_int()+casts;
    set_property('totalCastsEver',totCastsE.to_string());
    userdata[ding].buffs[skillnum]+=casts;
    userdata["*"].buffs[skillnum]+=casts;
    map_to_file(userdata,"userdata.txt");
-   if (((skillnum>6019)&&(skillnum<6029)) || (skillnum==62)){
+   if(((skillnum>6019)&&(skillnum<6029))||(skillnum==62)){
     updateDC("useCurrent");
     updateLimits();
    }
-  }else switch (last_skill_message()){
+  }else switch(last_skill_message()){
    case "Selected target is too low level.":
     errorMessage(sender,"You have to be level 15 to receive that buff.");
     break;
@@ -355,39 +374,38 @@ void buff(string sender, string msg, int numTurns, string ding){
  }else{
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
  }
- if (((my_maxmp()-my_mp())>=300)&&(!to_boolean(get_property("oscusSodaUsed")))) use(1,$item[oscus's neverending soda]);
- if (((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")<3)) cli_execute("nuns");
- if ((my_mp()<900)&&(my_fullness()<15)){
+ if(((my_maxmp()-my_mp())>=300)&&(!to_boolean(get_property("oscusSodaUsed"))))use(1,$item[oscus's neverending soda]);
+ if(((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")<3))cli_execute("nuns");
+ if((my_mp()<900)&&(my_fullness()<15)){
   retrieve_item(1,$item[Jumbo Dr. Lucifer]);
   eatsilent(1,$item[Jumbo Dr. Lucifer]);
   retrieve_item(1,$item[scroll of drastic healing]);
   use(1,$item[scroll of drastic healing]);
  }
  while(my_mp()<952){
-  if (item_amount($item[magical mystery juice])<1) retrieve_item(1,$item[magical mystery juice]);
+  if(item_amount($item[magical mystery juice])<1) retrieve_item(1,$item[magical mystery juice]);
   use(1,$item[magical mystery juice]);
  }
  map_to_file(userdata,"userdata.txt");
  freeResource("adventuring");
 }
 
-string roll(string sender, string msg, string method){
+string roll(string sender, string msg){
  string[int] rolling;
  int running;
  rolling=split_string(msg,"d|D");
- if ((to_int(rolling[0])<1) || (to_int(rolling[0])>1000000) || (to_int(rolling[1])<2) || (to_int(rolling[1])>1000000)){
+ if((to_int(rolling[0])<1)||(to_int(rolling[0])>1000000)||(to_int(rolling[1])<2)||(to_int(rolling[1])>1000000)){
   errorMessage(sender,"That's an invalid range.");
   return "";
  }
- for die from 1 to to_int(rolling[0])
-  running+=(1+random(to_int(rolling[1])));
+ for die from 1 to to_int(rolling[0]) running+=(1+random(to_int(rolling[1])));
 /* BLOCKED OUT, because the rep filter currently doesn't exist.
  //The following is to try to avoid the repetition filter, in case that becomes an issue.
  string endsentence=".";
  boolean good=false;
  while (!good){
   good=(checkRep("roll"+endsentence)==-1);
-  if (!good) switch (endsentence){
+  if(!good) switch (endsentence){
    case ".":
     endsentence="!";
     break;
@@ -416,20 +434,14 @@ string roll(string sender, string msg, string method){
    chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
    break;
  }*/
- switch (method){
-  case "public":
-   chat("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
-   break;
-  case "pm":
-   chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
-   break;
- }
+ if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
+ else chat("Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
  return running.to_string();
 }
 
 void startGame(string sender, string msg){
  gameData game;
- if (gameType()!=gameNone){
+ if(gameType()!=gameNone){
   game=loadGame();
   if((msg=="cancel")||(msg=="stop")){
    if((sender==game.host)||getUF(sender,isAdmin)){
@@ -441,10 +453,10 @@ void startGame(string sender, string msg){
   return;
  }
  matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
- if (!m.find()) return;
+ if(!m.find())return;
  string t=m.group(1);
  string l="-";
- if(m.group_count()>1) l=m.group(2);
+ if(m.group_count()>1)l=m.group(2);
  switch(t){
   case "wordshot":
    startWordshot(l.to_int(),sender);
@@ -455,7 +467,7 @@ void startGame(string sender, string msg){
     string list=visit_url("http://clubefl.gr/games/wordox/"+l.length().to_string()+".html");
     int[string] koldict;
     update(koldict,"koldict.txt");
-    if ((list.contains_text(l.to_lower_case()))||(koldict contains l)){
+    if((list.contains_text(l.to_lower_case()))||(koldict contains l)){
      remove game.players[w];
      game.players[l]=1;
      print("Actually: "+l);
@@ -479,7 +491,7 @@ void startGame(string sender, string msg){
 
 void pick(string options){
  string[int] list=split_string(options,"(\\s?,\\s?or\\s|,\\s?|\\sor\\s)");
- if (count(list)<2) return;
+ if(count(list)<2)return;
  int d=random(count(list));
  chat("/em picks "+list[d]+".");
 }
@@ -496,7 +508,7 @@ void reviselist(string sender, string msg, string command){
    chat_private(sender,msg+" has been whitelisted.");
    break;
   case "blacklist":
-   if (getUF(msg,isAdmin)) return;
+   if(getUF(msg,isAdmin)) return;
    setUF(msg,blacklist);
    chat_private(sender,msg+" has been blacklisted.");
    break;
@@ -514,11 +526,11 @@ void mod(string sender,string msg){
  matcher m=create_matcher("(.*)[., ;]*\\|\\|\\s*(.*)",msg);
  string cmdlist=msg;
  string user=sender;
- if (find(m)){
+ if(m.find()){
   cmdlist=group(m,1);
   user=group(m,2);
  }
- if (!adminonly) user=sender;
+ if(!adminonly) user=sender;
  m=create_matcher("[., ;]+",cmdlist);
  cmdlist=replace_all(m," ");
  string[int]cmds=split_string(cmdlist," ");
@@ -603,7 +615,7 @@ void fax(string sender, string msg){
    msg="slime1";
  }
  string nm=m[to_monster(msg)];
- if (nm==""){
+ if(nm==""){
   chat_private(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
   nm=msg;
  }
@@ -615,7 +627,7 @@ void updateGrates(){
  string v=visit_url("clan_raidlogs.php");
  matcher mx=create_matcher("opened (a|\\d+) sewer grate",v);
  int turned=0;
- while(mx.find()) if (mx.group(1)=="a") turned+=1;
+ while(mx.find()) if(mx.group(1)=="a") turned+=1;
  else turned+=mx.group(1).to_int();
  set_property("sewerGrates",turned);
 }
@@ -633,41 +645,41 @@ string replyParser(string sender,string msg){
  string someone=sender;
  string createOnce="";
  matcher variable=create_matcher("(?i)\\$s",msg);
- if(find(variable)&&(someoneDefined=="")){
+ if(variable.find()&&(someoneDefined=="")){
   boolean[string] inClan=who_clan();
   int rng=0;
   if(count(inClan)>2) rng=random(count(inClan)-1);
   int c=0;
   foreach clannie in inClan{
-   if (clannie==sender) continue;
+   if(clannie==sender) continue;
    someoneDefined=clannie;
    c+=1;
-   if (c>rng) break;
+   if(c>rng) break;
   }
  }
  if(someoneDefined!="")someone=someoneDefined;
- if (userdata[someone].userid==0) updateId(someone,true);
- if (userdata[sender].userid==0) updateId(sender,true);
- if (userdata[someone].gender==0) userdata[someone].gender=2;
- if (userdata[sender].gender==0) userdata[sender].gender=2;
+ if(userdata[someone].userid==0) updateId(someone,true);
+ if(userdata[sender].userid==0) updateId(sender,true);
+ if(userdata[someone].gender==0) userdata[someone].gender=2;
+ if(userdata[sender].gender==0) userdata[sender].gender=2;
  map_to_file(userdata,"userdata.txt");
  userinfo randplayer=userdata[someone];
  userinfo thesender=userdata[sender];
  string pclass;
  string sclass;
  variable=create_matcher("(?i)class",msg);
- if(find(variable)){
+ if(variable.find()){
   temp=visit_url("showplayer.php?who="+randplayer.userid.to_string());
   variable=create_matcher("Class:</b></td><td>(.+?)<",temp);
-  if(find(variable))sclass=group(variable,1);
+  if(variable.find())sclass=group(variable,1);
   temp=visit_url("showplayer.php?who="+thesender.userid.to_string());
   variable=create_matcher("Class:</b></td><td>(.+?)<",temp);
-  if(find(variable))pclass=group(variable,1);
+  if(variable.find())pclass=group(variable,1);
  }
- if (thesender.nick=="") thesender.nick=sender;
- if (randplayer.nick=="") randplayer.nick=someone;
+ if(thesender.nick=="") thesender.nick=sender;
+ if(randplayer.nick=="") randplayer.nick=someone;
  variable=create_matcher("(?<!\\\\)\\$(\\w*)",msg);
- while (find(variable)){
+ while (variable.find()){
   switch (group(variable,1)) {
    case "someone":
    case "sname":
@@ -765,12 +777,12 @@ string replyParser(string sender,string msg){
     break;
    case "statday":
     temp=stat_bonus_today().to_string();
-    if (temp=="none")temp="nothing";
+    if(temp=="none")temp="nothing";
     msg=replace_first(variable,temp);
     break;
    case "statdaytomorrow":
     temp=stat_bonus_tomorrow().to_string();
-    if (temp=="none")temp="nothing";
+    if(temp=="none")temp="nothing";
     msg=replace_first(variable,temp);
     break;
    case "math":
@@ -822,7 +834,7 @@ string replyParser(string sender,string msg){
 }
 
 string chatFilter(string sender, string msg){
- if (msg.contains_text("fuck")){
+ if(msg.contains_text("fuck")){
   chat_private(sender,"Try again, fuckwad.");
   return "x";
  }
@@ -839,23 +851,23 @@ void train(string trainer,string msg){
  newr.flags=mustAddress;
  string trig;
  matcher ff=create_matcher("(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
- if (find(ff)){
-  if (group(ff,1).contains_text("r")) newr.flags=mustRefer;
-  if (group(ff,1).contains_text("c")) newr.flags|=caseSensitive;
-  if (group(ff,1).contains_text("n")) newr.flags&=~mustAddress;
-  if (group(ff,1).contains_text("o")) newr.flags|=fullText;
-  if (group(ff,1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
-  if ((group(ff,1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
+ if(ff.find()){
+  if(group(ff,1).contains_text("r")) newr.flags=mustRefer;
+  if(group(ff,1).contains_text("c")) newr.flags|=caseSensitive;
+  if(group(ff,1).contains_text("n")) newr.flags&=~mustAddress;
+  if(group(ff,1).contains_text("o")) newr.flags|=fullText;
+  if(group(ff,1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
+  if((group(ff,1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
   msg=replace_first(ff,"");
  }
  ff=create_matcher("(?<!\\\\)::(.+?)=(.+?)::",msg);
- if (find(ff)){
+ if(ff.find()){
   newr.cond1=group(ff,1);
   newr.cond2=group(ff,2);
   msg=replace_first(ff,"");
  }
  ff=create_matcher("(.*)\\s?(?<!\\\\)<(\\w*?)(?<!\\\\)>\\s?(.*)",msg);
- if (find(ff)){
+ if(ff.find()){
   newr.reply=group(ff,3);
   newr.method=group(ff,2).to_lower_case();
   trig=group(ff,1);
@@ -865,7 +877,7 @@ void train(string trainer,string msg){
    case "do":
     knownmethod=true;
   }
-  if (!knownmethod){
+  if(!knownmethod){
    errorMessage(trainer,"Training failed: Unknown method: "+newr.method);
    return;
   }
@@ -896,7 +908,7 @@ void train(string trainer,string msg){
   t=replace_all(ff,"::");
   ff=create_matcher(" $",t);
   t=replace_all(ff,"");
-  if ((newr.flags&caseSensitive)==0)botdata[t.to_lower_case()]=newr;
+  if((newr.flags&caseSensitive)==0)botdata[t.to_lower_case()]=newr;
   else botdata[t]=newr;
  }
  chat_private(trainer,"Training complete: "+newr.reply);
@@ -944,7 +956,7 @@ void search(string sender, string msg){
   }
  }
  string send=trigm+"\n"+replm;
- if (send=="\n")send="No matches found for "+msg;
+ if(send=="\n")send="No matches found for "+msg;
  cli_execute("csend to "+sender+"||"+send);
 }
 
@@ -969,7 +981,7 @@ void lookup(string sender, string who){
  int yetfound=0;
  foreach user in userdata{
   yetfound=0;
-  if (userdata[user].nick.to_lower_case().contains_text(who)){
+  if(userdata[user].nick.to_lower_case().contains_text(who)){
    yetfound=2;
    reply+=user+"goes by "+userdata[user].nick;
   }
@@ -988,8 +1000,8 @@ void lookup(string sender, string who){
   }
   if(yetfound>0)reply+=". ";
  }
- if (reply=="") reply="No matches found for "+who;
- if (length(reply)<151) chat_private(sender,reply);
+ if(reply=="") reply="No matches found for "+who;
+ if(length(reply)<151) chat_private(sender,reply);
  else{
   matcher m=create_matcher("\\. ",reply);
   reply=replace_all(m,".\n");
@@ -999,21 +1011,21 @@ void lookup(string sender, string who){
 
 void multilookup(string sender, string who){
  string reply="";
- if (userdata contains who) {
+ if(userdata contains who) {
   reply=who+" is a known multi of the following users: ";
   foreach name in userdata[who].multis
    reply+=name+", ";
-  if (count(userdata[who].multis)<1) reply="No known multis for "+who+"...";
+  if(count(userdata[who].multis)<1) reply="No known multis for "+who+"...";
  }else reply="No matches found for "+who+"...";
  reply=substring(reply,0,length(reply)-2);
- if (length(reply)<151) chat_private(sender,reply);
+ if(length(reply)<151) chat_private(sender,reply);
  else cli_execute("csend to "+sender+"||"+reply);
 }
 
 void userDetails(string sender, string who){
- if (who=="")who=sender;
+ if(who=="")who=sender;
  string reply;
- if ((who=="ob")||(who=="ominous buffer")){
+ if((who=="ob")||(who=="ominous buffer")){
   reply="User: Ominous Buffer\n";
   reply+="Known Multis: Ominous Tamer, Ominous Sauceror\nGoes by: OB\n";
   reply+="Gender neutral.\n\n";
@@ -1022,14 +1034,14 @@ void userDetails(string sender, string who){
   cli_execute("csend to "+sender+"||"+reply);
   return;
  }
- if (userdata contains who){
+ if(userdata contains who){
   reply="User "+who+":\n";
-  if (count(userdata[who].multis)>0){
+  if(count(userdata[who].multis)>0){
    reply+="Known Multis: ";
    foreach name in userdata[who].multis reply+=name+", ";
    reply=substring(reply,0,length(reply)-2)+".\n";
   }
-  if ((userdata[who].nick!=who)&&(userdata[who].nick!="")) reply+="Goes by: "+userdata[who].nick+"\n";
+  if((userdata[who].nick!=who)&&(userdata[who].nick!="")) reply+="Goes by: "+userdata[who].nick+"\n";
   reply+="Gender: "+genderString(userdata[who])+"\n";
   if(userdata[who].lastTime!="") reply+="Last Time Spoken: "+userdata[who].lastTime+"\n";
   if((who==sender)&&(count(userdata[who].buffpacks)>0)){
@@ -1043,11 +1055,11 @@ void userDetails(string sender, string who){
 }
 
 void userAccountEmpty(string w){
- if (userdata[w].wallet<1){
+ if(userdata[w].wallet<1){
   errorMessage(w,"You don't have sufficient funds to withdraw.");
   return;
  }
- if (!kmail(w,"Your balance in full.",userdata[w].wallet)){
+ if(!kmail(w,"Your balance in full.",userdata[w].wallet)){
   errorMessage(w,"Error sending meat, try again later, preferably out of ronin/HC.");
   return;
  }
@@ -1066,14 +1078,14 @@ string addMulti(string n1,string n2){
  biglist[n1]=true;
  biglist[n2]=true;
  foreach name in biglist{
-  if (userdata[name].gender!=0) gencarry=userdata[name].gender;
-  if (userdata[name].nick!="") ncarry=userdata[name].nick;
+  if(userdata[name].gender!=0) gencarry=userdata[name].gender;
+  if(userdata[name].nick!="") ncarry=userdata[name].nick;
  }
  boolean[string] cpy=biglist;
  foreach mult in biglist{
-  if (userdata[mult].nick=="") userdata[mult].nick=ncarry;
-  if (userdata[mult].gender==0) userdata[mult].gender=gencarry;
-  foreach mult2 in cpy if (mult2!=mult) userdata[mult].multis[mult2]=true;
+  if(userdata[mult].nick=="") userdata[mult].nick=ncarry;
+  if(userdata[mult].gender==0) userdata[mult].gender=gencarry;
+  foreach mult2 in cpy if(mult2!=mult) userdata[mult].multis[mult2]=true;
  }
  string s=n1;
  foreach name in biglist if(name!=n1) s+=", "+name;
@@ -1090,8 +1102,8 @@ void setMulti(string sender, string newaltlist){
  string tmatch="";
  foreach i, alt in alts{
   foreach name1,name2 in mlist{
-   if (now_to_string("yDDDHH").to_int()<now) remove mlist[name1,name2];
-   if ((name1==alt)&&(name2==sender)){
+   if(now_to_string("yDDDHH").to_int()<now) remove mlist[name1,name2];
+   if((name1==alt)&&(name2==sender)){
     tmatch=addMulti(sender,alt);
     remove mlist[name1,name2];
    }
@@ -1101,7 +1113,7 @@ void setMulti(string sender, string newaltlist){
    mlist[sender,alt]=now+100;
   }else if(length(matchtxt)<length(tmatch)) matchtxt=tmatch;
  }
- if (matchtxt=="") chat_private(sender,"Reminder sent to other accounts, you have 24 hours to register them.");
+ if(matchtxt=="") chat_private(sender,"Reminder sent to other accounts, you have 24 hours to register them.");
  else if(length(matchtxt)<111) chat_private(sender,"Multi properly registered for accounts:"+matchtxt);
  else cli_execute("csend to "+sender+"||Multi properly registered for accounts:"+matchtxt);
  map_to_file(mlist,"tempMultis.txt");
@@ -1121,7 +1133,7 @@ void sendLink(string sender, string i){
  string t;
  matcher m=create_matcher("\\s",i);
  i=m.replace_all("-");
- if (i==""){
+ if(i==""){
   chat_private(sender,base+"ominous-buffer");
   return;
  }
@@ -1131,7 +1143,7 @@ void sendLink(string sender, string i){
  boolean found=false;
  while ((!found)&&(cLine<count(site))){
   cLine+=1;
-  if (site[cLine].contains_text("\"sites-page-title\"")) found=true;
+  if(site[cLine].contains_text("\"sites-page-title\"")) found=true;
  }
  found=false;
  t="";
@@ -1179,14 +1191,14 @@ void sendLink(string sender, string i){
 }
 
 string performMath(string sender, string msg){
- if (msg=="") msg="0";
+ if(msg=="") msg="0";
  matcher m=create_matcher("\\s*",msg);
  msg=replace_all(m,"");
  string[int] chunks=split_string(msg,",");
  float last=userdata[sender].lastMath;
  float[string] mathvars;
  foreach i,chunk in chunks{
-  if (chunk=="")continue;
+  if(chunk=="")continue;
   if("*+-^/".contains_text(chunk.char_at(0))) chunk=last.to_string()+chunk;
   mathvars["last"]=userdata[sender].lastMath;
   mathvars["ans"]=userdata["*"].lastMath;
@@ -1195,7 +1207,7 @@ string performMath(string sender, string msg){
  userdata[sender].lastMath=last;
  msg=last.to_string();
  map_to_file(userdata,"userdata.txt");
- if (msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
+ if(msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
  return msg;
 }
 
@@ -1203,7 +1215,7 @@ string predicateFilter(string sender, string msg){
  matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
  string pred;
  string oper;
- if (find(first)){
+ if(first.find()){
   pred=group(first,1);
   oper=group(first,2);
  }else return msg;
@@ -1222,22 +1234,22 @@ string predicateFilter(string sender, string msg){
    mod(sender,oper);
    return "x";
   case "market":
-   if (!analyze_md(sender,oper)) errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
+   if(!analyze_md(sender,oper)) errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
    return "x";
   case "logout":
-   logout(sender,msg);
+   logout(sender);
    return "x";
   case "wang":
-   if (oper=="")oper=sender;
-   if (is_online("wangbot")){
+   if(oper=="")oper=sender;
+   if(is_online("wangbot")){
     chat_private("wangbot","target "+oper);
    }else{
-    if (item_amount($item["WANG"])<1) cli_execute("stash take wang");
+    if(item_amount($item["WANG"])<1) cli_execute("stash take wang");
     string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
    }
    return "x";
   case "clear":
-   if (oper=="")return "x";
+   if(oper=="")return "x";
    if((userdata[sender].flags&isAdmin)!=isAdmin){
     errorMessage(sender,"No, don't do that!");
     return "x";
@@ -1245,13 +1257,13 @@ string predicateFilter(string sender, string msg){
    clearData(oper);
    return "x";
   case "count":
-   if (oper=="")return "x";
+   if(oper=="")return "x";
    if((userdata[sender].flags&isAdmin)!=isAdmin){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
    item whitem=to_item(oper);
-   if (oper=="meat"){
+   if(oper=="meat"){
     string r="Meat: "+to_string(my_meat()+my_closet_meat())+". DMS:";
     r+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
     chat_private(sender,r);
@@ -1261,12 +1273,12 @@ string predicateFilter(string sender, string msg){
    }
    return "x";
   case "deals":
-   if ((userdata[sender].flags&isAdmin)==isAdmin) updateDC(oper);
+   if((userdata[sender].flags&isAdmin)==isAdmin) updateDC(oper);
    return "x";
   case "ping":
-   chat_private(turt_name,"PING "+sender);
-   chat_private(sauc_name,"PING "+sender);
-   chat_private(sender,"Reply from Ominous Buffer.");
+   chat(turt_name,"PING "+sender);
+   chat(sauc_name,"PING "+sender);
+   chat("Reply from Ominous Buffer.");
    return "x";
   case "math":
    oper=performMath(sender,oper);
@@ -1282,11 +1294,11 @@ string predicateFilter(string sender, string msg){
    reviselist(sender,oper,pred);
    return "x";
   case "roll":
-   roll(sender, oper, "pm");
+   roll(sender,oper);
    return "x";
   case "get":
   case "fax":
-   if (!getUF(sender,inClan)){
+   if(!getUF(sender,inClan)){
     chat_private(sender,"You must be in Black Mesa to utilize its faxing rights.");
     return "x";
    }
@@ -1325,7 +1337,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "nick":
    first=create_matcher("([\\w ']*)",oper);
-   if (first.find()) oper=first.group(1);
+   if(first.find()) oper=first.group(1);
    else{
     chat_private(sender,"Sorry, that's not a valid nickname.");
     return "x";
@@ -1355,7 +1367,7 @@ void nopredpass(string sender, string msg, boolean addressed){
  boolean foundmatch=false;
  boolean referred=addressed;
  matcher ref=create_matcher("(?i)(\\WOB\\W|\\WOminous Buffer\\W)",msg);
- if (find(ref)) referred=true;
+ if(ref.find()) referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
  responses the_one;
@@ -1373,7 +1385,7 @@ void nopredpass(string sender, string msg, boolean addressed){
   if(((reply.flags&caseSensitive)==caseSensitive)&&(!msg.contains_text(testcase)))continue;
   if(!msg.to_lower_case().contains_text(testcase.to_lower_case()))continue;
   foundmatch=true;
-  if (replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
+  if(replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
    foundmatch=false;
    continue;
   }
@@ -1397,12 +1409,12 @@ void nopredpass(string sender, string msg, boolean addressed){
 void setGender(string sender,string gender){
  int gval=2;
  matcher g=create_matcher("(?i)(WHO I AM|ME)",gender);
- if (g.find()) gval=1;
+ if(g.find()) gval=1;
  int tc=2;
  while(gval==2){
   tc+=1;
-  if (tc>=count(genders)) break;
-  if (!(genders[tc] contains 5)) continue;
+  if(tc>=count(genders)) break;
+  if(!(genders[tc] contains 5)) continue;
   g=create_matcher("(?i)("+genders[tc,5]+")",gender);
   if(g.find()) gval=tc;
  }
@@ -1414,7 +1426,7 @@ void setGender(string sender,string gender){
 int timeSinceLastChat(string who){
  boolean useA=true;
  string lastSpeaker;
- if ((ctimes.lastCA==who)||(ctimes.lastCB==who)){
+ if((ctimes.lastCA==who)||(ctimes.lastCB==who)){
   if(ctimes.lastCB==who) useA=false;
   ctimes.lastChatterA=~useA;
  }else{
@@ -1435,7 +1447,7 @@ int timeSinceLastChat(string who){
  int nowH=now_to_string("HH").to_int();
  int nowM=now_to_string("mm").to_int();
  ctimes.lastChatterA=useA;
- if (ctimes.lastChatterA){
+ if(ctimes.lastChatterA){
   ctimes.lastAh=nowH;
   ctimes.lastAm=nowM;
   ctimes.lastCA=who;
@@ -1451,8 +1463,8 @@ int timeSinceLastChat(string who){
  lastM=lastM+lastH*60;
  nowM=nowM+nowH*60;
  nowM-=lastM;
- if (nowM<0) nowM+=1440;
- if (nowM==1) return 0;
+ if(nowM<0) nowM+=1440;
+ if(nowM==1) return 0;
  return nowM;
 }
 
@@ -1460,19 +1472,19 @@ boolean isMath(string m){
  matcher fix=create_matcher("(?i)(last|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)",m);
  m=replace_all(fix,"+");
  fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
- if (find(fix)) return false;
+ if(fix.find()) return false;
  return true;
 }
 
 boolean fancyMath(string sender,string equation){
  matcher dm=create_matcher("\\[(\\d*),(\\d*)\\]\\s?(.*)",equation);
- if (!find(dm)) return false;
+ if(!dm.find()) return false;
  float tmp=0;
  string mod;
  int low=group(dm,1).to_int();
  int high=group(dm,2).to_int();
  equation=group(dm,3);
- if (low>high){
+ if(low>high){
   tmp=low;
   low=high;
   high=tmp.to_int();
@@ -1494,11 +1506,11 @@ boolean mathDot(string data, boolean cross){
  vector u;
  vector v;
  matcher m=create_matcher("<(.+?)>\\s?<(.+?)>",data);
- if (!m.find()) return false;
+ if(!m.find()) return false;
  u=m.group(1).to_vector();
  v=m.group(2).to_vector();
  string x;
- if (cross) x=to_string(u.cross(v));
+ if(cross) x=to_string(u.cross(v));
  else x=to_string(u.dot(v));
  chat(x);
  return true;
@@ -1509,7 +1521,7 @@ boolean mathSTP(string data){
  vector b;
  vector c;
  matcher m=create_matcher("<(.+?)>\\s?<(.+?)>\\s?<(.+?)>",data);
- if (!m.find()) return false;
+ if(!m.find()) return false;
  a=m.group(1).to_vector();
  b=m.group(2).to_vector();
  c=m.group(3).to_vector();
@@ -1520,10 +1532,10 @@ boolean mathSTP(string data){
 
 void searchDefine(string word){
  matcher m=create_matcher("^([a-zA-Z ]+).?$",word);
- if (!m.find()) return;
+ if(!m.find())return;
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (result.contains_text("- no dictionary results")||result.contains_text("because there's not a match on Dictionary.com")){
+ if(result.contains_text("- no dictionary results")||result.contains_text("because there's not a match on Dictionary.com")){
   chat("No definitions were found for "+word+".");
   return;
  }
@@ -1532,11 +1544,11 @@ void searchDefine(string word){
  string[string,int] defn;
  foreach wordtype in wts{
   m=create_matcher("<div class=\"pbk\"><span class=\"pg\">–?"+wordtype+" </span>[\\w\\W]+?</div></div>(</div>|<a class=\"less\">)",result);
-  if (!m.find())continue;
+  if(!m.find())continue;
   m=create_matcher("<div class=\"dndata\">(.+?)</div>",m.group(0));
   while(m.find()){
    temp=create_matcher("<div class=\"dndata\">(.+?)$",m.group(1));
-   if (temp.find()) defn[wordtype,count(defn[wordtype])+1]=temp.group(1);
+   if(temp.find()) defn[wordtype,count(defn[wordtype])+1]=temp.group(1);
    else defn[wordtype,count(defn[wordtype])+1]=m.group(1);
   }
  }
@@ -1545,8 +1557,8 @@ void searchDefine(string word){
  int c=0;
  int maxn=min(max(3,count(defn)),6);
  foreach wordtype in wts totalitems+=count(defn[wordtype]);
- while (totalitems>maxn){
-  foreach wordtype in wts if (count(defn[wordtype])>=c){
+ while(totalitems>maxn){
+  foreach wordtype in wts if(count(defn[wordtype])>=c){
    c=count(defn[wordtype]);
    bigjar=wordtype;
   }
@@ -1571,7 +1583,7 @@ void searchDefine(string word){
   m=create_matcher("[“”]",d);
   d=m.replace_all("\"");
   m=create_matcher("^\\((.+?)\\)\\.?$",d);
-  if(m.find()) d=m.group(1)+".";
+  if(m.find())d=m.group(1)+".";
   switch(t){
    case "noun":d="n- "+d;
     break;
@@ -1596,15 +1608,15 @@ void searchDefine(string word){
 
 void searchSpell(string word){
  matcher m=create_matcher("^([a-zA-Z ]+).?$",word);
- if (!m.find()) return;
+ if(!m.find())return;
  word=m.group(1);
  string result=visit_url("http://dictionary.reference.com/browse/"+word.url_encode(),false,true);
- if (!(result.contains_text("- no dictionary results"))||(result.contains_text("because there's not a match on Dictionary.com"))){
+ if(!(result.contains_text("- no dictionary results"))||(result.contains_text("because there's not a match on Dictionary.com"))){
   chat("Dictionary seems to think "+word+" is correct.");
   return;
  }
  m=create_matcher("Did you mean <a.+?>(.+?)</a>",result);
- if(!m.find()) {
+ if(!m.find()){
   chat("That's so far off, I don't even know what you're -trying- to spell.");
   return;
  }
@@ -1622,7 +1634,7 @@ void searchUrban(string word){
  }
  result=m.group(1);
  m=create_matcher("<a .+?>(.+?)</a>",result);
- while (m.find()){
+ while(m.find()){
   result=replace_all(m,m.group(1));
   m=create_matcher("<a .+?>(.+?)</a>",result);   
  }
@@ -1631,47 +1643,40 @@ void searchUrban(string word){
 
 void publicChat(string sender, string msg){
  matcher m;
- if (sender=="mesachat"){
-  m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
-  if (find(m)){
-   sender=group(m,1);
-   msg=group(m,2);
-  }else return;
- }
  string original=msg;
  chatVars["timedif"]=timeSinceLastChat(sender).to_string();
  chatVars["time"]=now_to_string("HH:mm:ss z");
  boolean addressed=false;
  boolean referred=false;
  m=create_matcher("(?i)(^|\\. ?)(ominous buffer|ob)[:,]\\s?",msg);
- if (find(m)){
+ if(m.find()){
   addressed=true;
   msg=substring(msg,end(m));
  }
  m=create_matcher("(?i)(ominous buffer|\\Wob\\W)",msg);
- if (find(m)) referred=true;
+ if(m.find())referred=true;
  m=create_matcher("([\\w\\d]*):?\\s?(.*)",msg);
  string pred;
  string oper;
- if (find(m)){
+ if(m.find()){
   pred=group(m,1);
   oper=group(m,2);
  }
- for i from 2 upto count(genders)-1 if (genders[i] contains 5) genderMatcherString+="|"+genders[i,5];
+ for i from 2 upto count(genders)-1 if(genders[i] contains 5) genderMatcherString+="|"+genders[i,5];
  genderMatcherString+=")";
- if (!addressed) m=create_matcher(genderMatcherString,msg);
+ if(!addressed) m=create_matcher(genderMatcherString,msg);
  else m=create_matcher("(?i)"+genderMatcherString,msg);
- if (find(m)){
+ if(m.find()){
   print("Gender set for "+sender,"blue");
   setGender(sender,group(m,1));
   return;
  }
  m=create_matcher("(?i)(call me|am also known as|i go by)\\s([\\w ']*)",msg);
- if (find(m)&&(referred||addressed)){
+ if(m.find()&&(referred||addressed)){
   setNick(sender,group(m,2));
   return;
  }
- if (addressed&&isMath(msg)){
+ if(addressed&&isMath(msg)){
   msg=performMath(sender,msg);
   userdata["*"].lastMath=userdata[sender].lastMath;
   map_to_file(userdata,"userdata.txt");
@@ -1680,32 +1685,32 @@ void publicChat(string sender, string msg){
  }
  switch (pred){
   case "roll":
-   if (addressed) roll(sender,oper,"public");
+   if(addressed)roll(sender,oper);
    return;
   case "pick":
   case "choose":
-   if (checkRep(pred+oper)>-1) return;
+   if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
-   if (addressed) pick(oper);
+   if(addressed) pick(oper);
    return;
   case "echo":
-   if (addressed) chat(replyParser(sender,oper));
+   if(addressed)chat(replyParser(sender,oper));
    return;
   case "sum":
-   if (addressed) fancyMath(sender,oper);
+   if(addressed) fancyMath(sender,oper);
    return;
   case "define":
-   if (checkRep(pred+oper)>-1) return;
+   if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    searchDefine(oper);
    return;
   case "spell":
-   if (checkRep(pred+oper)>-1) return;
+   if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    searchSpell(oper);
    return;
   case "urban":
-   if (checkRep(pred+oper)>-1) return;
+   if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    searchUrban(oper);
    return;
@@ -1713,100 +1718,128 @@ void publicChat(string sender, string msg){
    analyze_md("!","link "+oper);
    return;
   case "dot":
-   if (mathDot(oper,false)) return;
+   if(mathDot(oper,false))return;
    break;
   case "cross":
-   if (mathDot(oper,true)) return;
+   if(mathDot(oper,true))return;
    break;
   case "stp":
-   if (mathSTP(oper)) return;
+   if(mathSTP(oper))return;
    break;
  }
  nopredpass(sender,original,addressed);
  return;
 }
 
-void clanSlimetube(string sender, string msg){
- if (sender=="Dungeon") return;
+void systemHandler(string msg){
+ prefix=":";
+}
+
+void clanHandler(string sender, string msg){
+ prefix="";
+ switch(gameType()){
+  case gameRoulette:
+   russianRoulette(sender,msg);
+   return;
+  default:
+   publicChat(sender,msg);
+   return;
+ }
+}
+
+void slimetubeHandler(string sender, string msg){
+ if(sender=="Dungeon")return;
  prefix="/slimetube ";
  publicChat(sender,msg);
 }
 
-void clanHobopolis(string sender, string msg){
- if (sender=="Dungeon") return;
+void hobopolisHandler(string sender, string msg){
+ if(sender=="Dungeon")return;
  prefix="/hobo ";
  publicChat(sender,msg);
 }
 
-void main(string sender, string msg, string channel){
- if (sender=="faxbot") {
-  if (msg.contains_text("help")) chat_private(get_property("_lastFax"),"Faxbot doesn't have that monster.");
-  else chat_private(get_property("_lastFax"),msg);
+void privateHandler(string sender, string msg){
+ if((channel=="")&&(sender=="Ominous Buffer"))systemHandler(msg);
+ if(sender=="MesaChat"){
+  matcher m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
+  if(m.find()){
+   sender=group(m,1);
+   msg=group(m,2);
+   clanHandler(sender,msg);
+  }
   return;
  }
- if (sender=="wangbot") return;
- msg=decodeHTML(msg,true);
- if ((channel=="")&&(sender=="Ominous Buffer")){
-  channel="/clan";
-  sender=":SYSTEM";
- }
- if ((channel=="/clan")&&(sender=="MesaChat")) return;
- if (sender=="MesaChat") channel="/clan";
- if (channel=="/clan"){
-  switch (gameType()){
-   case gameRoulette:
-    russianRoulette(sender,msg);
-    return;
-   default:
-    if (sender==":SYSTEM") return;
-    publicChat(sender,msg);
-    return;
-  }  
- }
- if (channel=="/slimetube"){
-  clanSlimetube(sender,msg);
-  return;
- }
- if (channel=="/hobopolis"){
-  clanHobopolis(sender,msg);
-  return;
- }
- if (!buffable(sender)) return;
+ if(!buffable(sender))return;
+ prefix=sender;
  if(msg.char_at(0)=="!"){
   errorMsg=false;
-  if(length(msg)>1) msg=substring(msg,1);
+  if(length(msg)>1)msg=substring(msg,1);
  }
- if(getUF(sender,noFlag)) errorMsg=false;
- if(gameType()==gameWordshot) msg=wordshot(sender,msg);
+ if(getUF(sender,noFlag))errorMsg=false;
+ if(gameType()==gameWordshot)msg=wordshot(sender,msg);
  if(msg=="x")return;
  msg=chatFilter(sender,msg);
  if(msg=="x")return;
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if ((sender==turt_name) || (sender==sauc_name)){
-  buff(sender, msg, 0, sender);
+ if((sender==turt_name)||(sender==sauc_name)){
+  buff(sender,msg,0,sender);
   return;
  }
- if ((sender=="chatbot")||(sender==my_name())) return;
+ if((sender=="chatbot")||(sender==my_name()))return;
  matcher m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
- if (find(m)){
+ if(m.find()){
   sender=group(m,1);
   msg=group(m,2);
  }
  int turnR=0;
  m=create_matcher("[\;,]+",msg);
  msg=replace_all(m,"\;");
- string[int] messages = split_string(msg,"\;");
+ string[int] messages=split_string(msg,"\;");
  foreach i in messages{
   turnR=0;
   m=create_matcher("(\\d+)",messages[i]);
-  if (find(m)){
-   if(to_float(group(m,1))>1000) turnR=1000;
+  if(m.find()){
+   if(to_float(group(m,1))>1000)turnR=1000;
    else turnR=to_int(group(m,1));
-  }// why not "[a-zA-Z][\\s\\w']*[a-zA-Z]"
+  }//why not "[a-zA-Z][\\s\\w']*[a-zA-Z]"
   m=create_matcher("[a-zA-Z\\?](?:[a-zA-Z']|(?:\\s(?=\\w)))*",messages[i]);
-  if (find(m)) messages[i]=group(m,0);
+  if(m.find())messages[i]=group(m,0);
   buff(sender,messages[i],turnR,co);
+ }
+}
+
+boolean preHandled(string sender, string msg, string channel){
+ if(sender=="faxbot"){
+  if(msg.contains_text("help"))chat_private(get_property("_lastFax"),"Faxbot doesn't have that monster.");
+  else chat_private(get_property("_lastFax"),msg);
+  return true;
+ }
+ if(sender=="wangbot")return true;
+ if((sender=="MesaChat")&&(channel!=""))return true;
+ return false;
+}
+
+//CHANNELS: private,    clan,   hobopolis,      slimetube
+//IN:       ""          "/clan" "/hobopolis"    "/slimetube"
+//OUT:      name        ""      "/hobopolis "   "/slimetube "
+void main(string sender, string msg, string channel){
+ if(preHandled(sender,msg,channel))return;
+ msg=decodeHTML(msg,true);
+ switch (channel){
+  case "/clan":
+   clanHandler(sender,msg);
+   break;
+  case "/slimetube":
+   slimetubeHandler(sender,msg);
+   break;
+  case "/hobopolis":
+   hobopolisHandler(sender,msg);
+   break;
+  default:
+   privateHandler(sender,msg);
+   break;
  }
 }
