@@ -178,8 +178,8 @@ void createpack(string sender, string msg){
  string packname;
  string packdata;
  if(namem.find()){
-  packname=group(namem,1);
-  packdata=group(namem,2);
+  packname=namem.group(1);
+  packdata=namem.group(2);
  }else{
   chat_private(sender,"You must supply the appropriate data for us to save that.");
   return;
@@ -527,8 +527,8 @@ void mod(string sender,string msg){
  string cmdlist=msg;
  string user=sender;
  if(m.find()){
-  cmdlist=group(m,1);
-  user=group(m,2);
+  cmdlist=m.group(1);
+  user=m.group(2);
  }
  if(!adminonly) user=sender;
  m=create_matcher("[., ;]+",cmdlist);
@@ -671,16 +671,16 @@ string replyParser(string sender,string msg){
  if(variable.find()){
   temp=visit_url("showplayer.php?who="+randplayer.userid.to_string());
   variable=create_matcher("Class:</b></td><td>(.+?)<",temp);
-  if(variable.find())sclass=group(variable,1);
+  if(variable.find())sclass=variable.group(1);
   temp=visit_url("showplayer.php?who="+thesender.userid.to_string());
   variable=create_matcher("Class:</b></td><td>(.+?)<",temp);
-  if(variable.find())pclass=group(variable,1);
+  if(variable.find())pclass=variable.group(1);
  }
  if(thesender.nick=="") thesender.nick=sender;
  if(randplayer.nick=="") randplayer.nick=someone;
  variable=create_matcher("(?<!\\\\)\\$(\\w*)",msg);
  while (variable.find()){
-  switch (group(variable,1)) {
+  switch (variable.group(1)) {
    case "someone":
    case "sname":
     msg=replace_first(variable,someone);
@@ -694,7 +694,7 @@ string replyParser(string sender,string msg){
    case "sref":
    case "spos":
    case "sdet":
-    msg=replace_first(variable,genderPronoun(randplayer.nick,randplayer.gender,group(variable,1)));
+    msg=replace_first(variable,genderPronoun(randplayer.nick,randplayer.gender,variable.group(1)));
     break;
    case "sgender":
     msg=replace_first(variable,genderString(randplayer));
@@ -741,7 +741,7 @@ string replyParser(string sender,string msg){
    case "pref":
    case "ppos":
    case "pdet":
-    msg=replace_first(variable,genderPronoun(thesender.nick,thesender.gender,group(variable,1)));
+    msg=replace_first(variable,genderPronoun(thesender.nick,thesender.gender,variable.group(1)));
     break;
    case "pgender":
     msg=replace_first(variable,genderString(thesender));
@@ -822,8 +822,8 @@ string replyParser(string sender,string msg){
     msg=replace_first(variable,get_property("sewerValves"));
     break;
    default:
-    if(chatVars contains group(variable,1)) msg=replace_first(variable,chatVars[group(variable,1)]);
-    else msg=replace_first(variable,group(variable,1));
+    if(chatVars contains variable.group(1)) msg=replace_first(variable,chatVars[variable.group(1)]);
+    else msg=replace_first(variable,variable.group(1));
     break;
   }
   variable=create_matcher("(?<!\\\\)\\$(\\w*)",msg);
@@ -852,25 +852,25 @@ void train(string trainer,string msg){
  string trig;
  matcher ff=create_matcher("(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
  if(ff.find()){
-  if(group(ff,1).contains_text("r")) newr.flags=mustRefer;
-  if(group(ff,1).contains_text("c")) newr.flags|=caseSensitive;
-  if(group(ff,1).contains_text("n")) newr.flags&=~mustAddress;
-  if(group(ff,1).contains_text("o")) newr.flags|=fullText;
-  if(group(ff,1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
-  if((group(ff,1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
+  if(ff.group(1).contains_text("r")) newr.flags=mustRefer;
+  if(ff.group(1).contains_text("c")) newr.flags|=caseSensitive;
+  if(ff.group(1).contains_text("n")) newr.flags&=~mustAddress;
+  if(ff.group(1).contains_text("o")) newr.flags|=fullText;
+  if(ff.group(1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
+  if((ff.group(1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
   msg=replace_first(ff,"");
  }
  ff=create_matcher("(?<!\\\\)::(.+?)=(.+?)::",msg);
  if(ff.find()){
-  newr.cond1=group(ff,1);
-  newr.cond2=group(ff,2);
+  newr.cond1=ff.group(1);
+  newr.cond2=ff.group(2);
   msg=replace_first(ff,"");
  }
  ff=create_matcher("(.*)\\s?(?<!\\\\)<(\\w*?)(?<!\\\\)>\\s?(.*)",msg);
  if(ff.find()){
-  newr.reply=group(ff,3);
-  newr.method=group(ff,2).to_lower_case();
-  trig=group(ff,1);
+  newr.reply=ff.group(3);
+  newr.method=ff.group(2).to_lower_case();
+  trig=ff.group(1);
   boolean knownmethod=false;
   switch (newr.method){
    case "say":
@@ -1215,9 +1215,11 @@ string predicateFilter(string sender, string msg){
  matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
  string pred;
  string oper;
+ item whitem;
+ int i;
  if(first.find()){
-  pred=group(first,1);
-  oper=group(first,2);
+  pred=first.group(1);
+  oper=first.group(2);
  }else return msg;
  switch (pred){
   case "set":
@@ -1262,7 +1264,7 @@ string predicateFilter(string sender, string msg){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
-   item whitem=to_item(oper);
+   whitem=to_item(oper);
    if(oper=="meat"){
     string r="Meat: "+to_string(my_meat()+my_closet_meat())+". DMS:";
     r+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
@@ -1270,6 +1272,27 @@ string predicateFilter(string sender, string msg){
    }else if(whitem!=$item[none]){
     string r=whitem.to_string()+": "+item_amount(whitem).to_string();
     chat_private(sender,r);
+   }
+   return "x";
+  case "pull":
+   if(oper=="")return "x";
+   if((userdata[sender].flags&isAdmin)!=isAdmin){
+    errorMessage(sender,"No, don't do that!");
+    return "x";
+   }
+   first=create_matcher("(\\d+)\\s?(.+)",oper);
+   if(!first.find())return "x";
+   i=first.group(1).to_int();
+   whitem=first.group(2).to_item();
+   if(first.group(2)=="meat"){
+    if(i>250000){
+     errorMessage(sender,"Please contact bot Admin");
+     return "x";
+    }
+    cli_execute("csend "+i+" to "+sender+" || "+to_string(my_meat()+my_closet_meat()-i)+" meat remains.");
+   }else if(whitem!=$item[none]){
+    i=min(item_amount(whitem),i);
+    cli_execute("csend "+i+" "+whitem.to_string()+" to "+sender+" || "+to_string(item_amount(whitem)-i)+" remain.");
    }
    return "x";
   case "deals":
@@ -1481,9 +1504,9 @@ boolean fancyMath(string sender,string equation){
  if(!dm.find()) return false;
  float tmp=0;
  string mod;
- int low=group(dm,1).to_int();
- int high=group(dm,2).to_int();
- equation=group(dm,3);
+ int low=dm.group(1).to_int();
+ int high=dm.group(2).to_int();
+ equation=dm.group(3);
  if(low>high){
   tmp=low;
   low=high;
@@ -1659,8 +1682,8 @@ void publicChat(string sender, string msg){
  string pred;
  string oper;
  if(m.find()){
-  pred=group(m,1);
-  oper=group(m,2);
+  pred=m.group(1);
+  oper=m.group(2);
  }
  for i from 2 upto count(genders)-1 if(genders[i] contains 5) genderMatcherString+="|"+genders[i,5];
  genderMatcherString+=")";
@@ -1668,12 +1691,12 @@ void publicChat(string sender, string msg){
  else m=create_matcher("(?i)"+genderMatcherString,msg);
  if(m.find()){
   print("Gender set for "+sender,"blue");
-  setGender(sender,group(m,1));
+  setGender(sender,m.group(1));
   return;
  }
  m=create_matcher("(?i)(call me|am also known as|i go by)\\s([\\w ']*)",msg);
  if(m.find()&&(referred||addressed)){
-  setNick(sender,group(m,2));
+  setNick(sender,m.group(2));
   return;
  }
  if(addressed&&isMath(msg)){
@@ -1760,12 +1783,12 @@ void hobopolisHandler(string sender, string msg){
 }
 
 void privateHandler(string sender, string msg){
- if((channel=="")&&(sender=="Ominous Buffer"))systemHandler(msg);
+ if(sender=="Ominous Buffer")systemHandler(msg);
  if(sender=="MesaChat"){
   matcher m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
-   sender=group(m,1);
-   msg=group(m,2);
+   sender=m.group(1);
+   msg=m.group(2);
    clanHandler(sender,msg);
   }
   return;
@@ -1791,8 +1814,8 @@ void privateHandler(string sender, string msg){
  matcher m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
-  sender=group(m,1);
-  msg=group(m,2);
+  sender=m.group(1);
+  msg=m.group(2);
  }
  int turnR=0;
  m=create_matcher("[\;,]+",msg);
@@ -1802,11 +1825,11 @@ void privateHandler(string sender, string msg){
   turnR=0;
   m=create_matcher("(\\d+)",messages[i]);
   if(m.find()){
-   if(to_float(group(m,1))>1000)turnR=1000;
-   else turnR=to_int(group(m,1));
+   if(to_float(m.group(1))>1000)turnR=1000;
+   else turnR=to_int(m.group(1));
   }//why not "[a-zA-Z][\\s\\w']*[a-zA-Z]"
   m=create_matcher("[a-zA-Z\\?](?:[a-zA-Z']|(?:\\s(?=\\w)))*",messages[i]);
-  if(m.find())messages[i]=group(m,0);
+  if(m.find())messages[i]=m.group(0);
   buff(sender,messages[i],turnR,co);
  }
 }
