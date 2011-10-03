@@ -581,8 +581,10 @@ void handleMeat(){
  int event1=random(eventTimeCap-35)+30;
  int event2=random(eventTimeCap-35)+30;
  int event3=random(eventTimeCap-35)+30;
- while ((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
- while (((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
+ if (minutesToRollover()>120){
+  while ((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
+  while (((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
+ }
  books["Event1"]=event1;
  books["Event2"]=event2;
  books["Event3"]=event3;
