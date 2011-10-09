@@ -1563,7 +1563,7 @@ void searchDefine(string word){
  boolean[string] wts=$strings[noun,adjective,verb \\(used without object\\),verb \\(used with object\\),adverb,conjunction,preposition,pronoun];
  string[string,int] defn;
  foreach wordtype in wts{
-  m=create_matcher("<div class=\"pbk\"><span class=\"pg\">–?"+wordtype+" </span>[\\w\\W]+?</div></div>(</div>|<a class=\"less\">)",result);
+  m=create_matcher("<div class=\"pbk\"><span class=\"pg\">Â–?"+wordtype+" </span>[\\w\\W]+?</div></div>(</div>|<a class=\"less\">)",result);
   if(!m.find())continue;
   m=create_matcher("<div class=\"dndata\">(.+?)</div>",m.group(0));
   while(m.find()){
@@ -1600,7 +1600,7 @@ void searchDefine(string word){
    if(!m.find())break;
    d=m.replace_first("");
   }
-  m=create_matcher("[“”]",d);
+  m=create_matcher("[Â“Â”]",d);
   d=m.replace_all("\"");
   m=create_matcher("^\\((.+?)\\)\\.?$",d);
   if(m.find())d=m.group(1)+".";
@@ -1727,12 +1727,12 @@ void publicChat(string sender, string msg){
   case "spell":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
-   searchSpell(oper);
+   if(addressed) searchSpell(oper);
    return;
   case "urban":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
-   searchUrban(oper);
+   if(addressed) searchUrban(oper);
    return;
   case "market":
    analyze_md("!","link "+oper);
