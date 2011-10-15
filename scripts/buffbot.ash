@@ -462,7 +462,7 @@ void startGame(string sender, string msg){
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
     boolean[string]list;
-    file_to_map("wordshot/"+l.length()+".txt");
+    file_to_map("wordshot/"+l.length()+".txt",list);
     int[string] koldict;
     update(koldict,"wordshot/custom.txt");
     if((list contains l)||(koldict contains l)){

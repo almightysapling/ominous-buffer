@@ -114,7 +114,7 @@ string startWordshot(int l,string h){
  l=min(max(2,l),10);
  boolean[string] bigList;
  string[int] words;
- file_to_map("wordshot/"+l+".txt");
+ file_to_map("wordshot/"+l+".txt",bigList);
  foreach w in bigList words[count(words)]=w;
  l=count(words);
  h=words[random(l)];
@@ -213,10 +213,11 @@ string wordshot(string sender, string guess){
  if(guess.contains_text(" ")||(guess.length()!=word.length())){
   return guess;
  }
- string wordList=visit_url("http://clubefl.gr/games/wordox/"+word.length().to_string()+".html");
+ boolean[string]wordList;
+ file_to_map("wordshot/"+word.length()+".txt");
  int[string] koldict;
  file_to_map("koldict.txt",koldict);
- if ((!wordList.contains_text(guess.to_lower_case()))&&(!(koldict contains guess))){
+ if ((!(wordList contains guess))&&(!(koldict contains guess))){
   chat_private(sender,guess+" isn't a valid word.");
   return "x";
  }
