@@ -111,42 +111,18 @@ void closeAllGames(){
 string startWordshot(int l,string h){
  gameData game=loadGame(startGame(gameWordshot,0,true,h));
  if (l==0) l=random(3)+4;
- l=min(max(4,l),11);
- string list=visit_url("http://clubefl.gr/games/wordox/"+l.to_string()+".html");
- matcher m;
- switch (l){
-  case 4: m=create_matcher("</b>([\\w\\s\\r\\n]+)<br>",list);
-          break;
-  case 5: m=create_matcher("</b>([\\w\\s\\r\\n]+)</p>",list);
-          break;
-  case 6:
-  case 7: m=create_matcher("<br>([\\w\\s\\r\\n]+)<br>[\\s\\r\\n]*<br>",list);
-          break;
-  case 8:
-  case 11:m=create_matcher("</p>[\\s\\r\\n]*<p align=\"center\">([\\w\\s\\r\\n]+)<br>",list);
-          break;
-  case 9: m=create_matcher("<p align=\"left\">([\\w\\s\\r\\n]+)</p>",list);
-          break;
-  case 10: m=create_matcher("</b><br>([\\w\\s\\r\\n]+)<br>",list);
-          break;
- }
- if (m.find()){
-  list=m.group(1);
-  remove game.players[":SYSTEM"];
-  string[int] bigList=split_string(list,"\\W");
-  l=count(bigList);
-  list="";
-  while(list=="") list=bigList[random(l)];
-  game.players[list]=1;
-  print("Word: "+list);
-  game.intervals=3;
-  game.roundOver=0;
-  saveGame(game);
- }else{
-  print("No matches.");
-  closeGame();
-  return "e";
- }
+ l=min(max(2,l),10);
+ boolean[string] bigList;
+ string[int] words;
+ file_to_map("wordshot/"+l+".txt");
+ foreach w in bigList words[count(words)]=w;
+ l=count(words);
+ h=words[random(l)];
+ game.players[h]=1;
+ print("Word: "+h);
+ game.intervals=3;
+ game.roundOver=0;
+ saveGame(game);
  return gamesavedata["."].data[0];
 }
 string startWordshot(string host){
