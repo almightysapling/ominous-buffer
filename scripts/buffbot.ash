@@ -444,7 +444,7 @@ void startGame(string sender, string msg){
    if((sender==game.host)||getUF(sender,isAdmin)){
     closeGame();
     chat_private(sender,"Game canceled");
-    chat("You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
+    chat("","You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
    }else chat_private(sender,"You don't have permission to do that.");
   }else chat_private(sender,"A game is already in session by "+game.host+".");
   return;
@@ -461,10 +461,11 @@ void startGame(string sender, string msg){
    string w;
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
-    string list=visit_url("http://clubefl.gr/games/wordox/"+l.length().to_string()+".html");
+    boolean[string]list;
+    file_to_map("wordshot/"+l.length()+".txt");
     int[string] koldict;
-    update(koldict,"koldict.txt");
-    if((list.contains_text(l.to_lower_case()))||(koldict contains l)){
+    update(koldict,"wordshot/custom.txt");
+    if((list contains l)||(koldict contains l)){
      remove game.players[w];
      game.players[l]=1;
      print("Actually: "+l);
@@ -477,7 +478,7 @@ void startGame(string sender, string msg){
     }
    }
    chat_private(sender,"Game started.");
-   chat(w.length().to_string()+"-letter Wordshot! Send guesses to me!");
+   chat("",w.length().to_string()+"-letter Wordshot! Send guesses to me!");
    break;
   case "rr":case "russianroulette":
   case "russian roulette":
