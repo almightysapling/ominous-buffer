@@ -214,7 +214,7 @@ string wordshot(string sender, string guess){
   return guess;
  }
  boolean[string]wordList;
- file_to_map("wordshot/"+word.length()+".txt");
+ file_to_map("wordshot/"+word.length()+".txt",wordList);
  int[string] koldict;
  file_to_map("koldict.txt",koldict);
  if ((!(wordList contains guess))&&(!(koldict contains guess))){
