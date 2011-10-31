@@ -199,6 +199,13 @@ void delpack(string sender, string packname){
  map_to_file(userdata,"userdata.txt");
 }
 
+boolean sendRecord(int skillId, string sender){
+ item recording=to_item("recording of "+skillId.to_skill().to_string());
+ if(item_amount(recording)<1) return false;
+ cli_execute("csend 1 "+recording.to_string()+" to "+sender);
+ return true;
+}
+
 void buff(string sender, string msg, int numTurns, string ding){
  //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
  if((to_lower_case(sender)==turt_name)||(to_lower_case(sender)==sauc_name)){
@@ -322,7 +329,11 @@ void buff(string sender, string msg, int numTurns, string ding){
  else if(skillnum==6028) maxnum=5;
  if((skillnum>6019)&&(skillnum<6029)){
   if(maxnum-userdata["*"].buffs[skillnum]<1){
-   errorMessage(ding,"I'm sorry, but I'm all out of "+messageNew+" for today.");
+   if(sendRecord(skillnum,sender)){
+    userdata[ding].buffs[skillnum]+=1;
+    userdata["*"].buffs[skillnum]+=1;
+    map_to_file(userdata,"userdata.txt");
+   }else errorMessage(ding,"I'm sorry, but I'm all out of "+messageNew+" for today.");
    return;
   }//balance if not enough to meet request
   if(maxnum-userdata["*"].buffs[skillnum]<casts) casts=maxnum-userdata["*"].buffs[skillnum];
@@ -1840,6 +1851,7 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if(sender=="wangbot")return true;
  if((sender=="MesaChat")&&(channel!=""))return true;
+ if((sender==my_name())&&(channel!=""))return true;
  return false;
 }
 

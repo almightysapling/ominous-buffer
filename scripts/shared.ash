@@ -39,11 +39,13 @@ string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals";
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
+associates[21459]=true;//Hogs of Destiny
 associates[2046987019]=false;//Not Dead Yet
 associates[2046991167]=false;//This One Time
 associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
+
 int repValue=4;
 
 void setName(string newname){
@@ -234,14 +236,14 @@ void updateLimits(){
   n=visit_url(s); 
  }
  s="managecollectionshelves.php?pwd&action=arrange";
- if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(51-userdata["*"].buffs[6026]);
+ if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(max(51-userdata["*"].buffs[6026],1));
  else s+="&whichshelf4502=12";
- s+="&whichshelf4503="+to_string(6-userdata["*"].buffs[6028]);
- s+="&whichshelf4497="+to_string(11-userdata["*"].buffs[6020]);
- s+="&whichshelf4498="+to_string(11-userdata["*"].buffs[6021]);
- s+="&whichshelf4499="+to_string(11-userdata["*"].buffs[6022]);
- s+="&whichshelf4500="+to_string(11-userdata["*"].buffs[6023]);
- s+="&whichshelf4501="+to_string(11-userdata["*"].buffs[6024]);
+ s+="&whichshelf4503="+to_string(max(6-userdata["*"].buffs[6028],1));
+ s+="&whichshelf4497="+to_string(max(11-userdata["*"].buffs[6020],1));
+ s+="&whichshelf4498="+to_string(max(11-userdata["*"].buffs[6021],1));
+ s+="&whichshelf4499="+to_string(max(11-userdata["*"].buffs[6022],1));
+ s+="&whichshelf4500="+to_string(max(11-userdata["*"].buffs[6023],1));
+ s+="&whichshelf4501="+to_string(max(11-userdata["*"].buffs[6024],1));
  n=visit_url(s);
  s="62:"+to_string(userdata["*"].buffs[62])+":";
  s+="6020:"+to_string(userdata["*"].buffs[6020])+":";
