@@ -68,6 +68,7 @@ Rampaging Adding Machine	adding_machine
 Raver Giant	raver
 Scary Pirate	cursed
 Screambat	screambat
+Sexy Sorority Zombie	sexy_zombie
 Shaky Clown	shaky
 Skeletal Sommelier	wine
 Skinflute	skinflute

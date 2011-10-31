@@ -379,90 +379,43 @@ void checkLotto(){
  commit(books,"books.txt");
 }
 
-void burn(){
+void makeRecords(){
  checkOut(userdata,"userdata.txt");
- if ((userdata["*"].buffs[6020]< 10) || (userdata["*"].buffs[6023]< 10) || (userdata["*"].buffs[6028]< 5)){
-  int price_thing = mall_price($item[recording of The Ballad of Richie Thingfinder]);
-  int price_chorale = mall_price($item[recording of Chorale of Companionship]);
-  int price_inigo = mall_price($item[recording of Inigo's Incantation of Inspiration]);
-  int thing=530;
-  int chorale=533;
-  int inigo=716;
-  int best;
-  int next_best;
-  int worst;
-  int bestmax=10;
-  int nextmax=10;
-  int worstmax=10;
-  switch (max(max(price_thing,price_chorale),price_inigo)){
-   case price_thing:
-    best = thing;
-    switch (max(price_chorale,price_inigo)){
-     case price_chorale:
-      next_best = chorale;
-      worst = inigo;
-      worstmax = 5;
-      break;
-     default:
-      next_best = inigo;
-      worst = chorale;
-      nextmax = 5;
-      break;
-    }
-    break;
-   case price_chorale:
-    best = chorale;
-    switch (max(price_thing,price_inigo)){
-     case price_thing:
-      next_best = thing;
-      worst = inigo;
-      worstmax = 5;
-      break;
-     default:
-      next_best = inigo;
-      worst = thing;
-      nextmax = 5;
-      break;
-    }
-    break;
-   default:
-    bestmax=5;
-    best = inigo;
-    switch (price_thing>price_chorale){
-     case true:
-      next_best = thing;
-      worst = chorale;
-      break;
-     default:
-      next_best = chorale;
-      worst = thing;
-      break;
-    }
-    break;
-  }
-  if(userdata["*"].buffs[6020]+userdata["*"].buffs[6023]+userdata["*"].buffs[6028]<25){
-   visit_url("volcanoisland.php?action=tuba&pwd");
-   visit_url("choice.php?whichchoice=409&option=1&pwd");
-   visit_url("choice.php?whichchoice=410&option=2&pwd");
-   visit_url("choice.php?whichchoice=412&option=3&pwd");
-   visit_url("choice.php?whichchoice=418&option=3&pwd");
-   while ((my_mp() > 800) && (bestmax - userdata["*"].buffs[to_int(to_skill(to_effect(best)))] != 0)){
-    visit_url("choice.php?whichchoice=440&whicheffect=" + best + "&times=1&option=1&pwd="+my_hash());
-    userdata["*"].buffs[to_int(to_skill(to_effect(best)))]+=1;
-   }
-   while ((my_mp() > 800) && (nextmax - userdata["*"].buffs[to_int(to_skill(to_effect(next_best)))] != 0)){
-    visit_url("choice.php?whichchoice=440&whicheffect=" + next_best + "&times=1&option=1&pwd="+my_hash());
-    userdata["*"].buffs[to_int(to_skill(to_effect(next_best)))]+=1;
-   }
-   while ((my_mp() > 800) && (worstmax - userdata["*"].buffs[to_int(to_skill(to_effect(worst)))] != 0)){
-    visit_url("choice.php?whichchoice=440&whicheffect=" + worst + "&times=1&option=1&pwd="+my_hash());
-    userdata["*"].buffs[to_int(to_skill(to_effect(worst)))]+=1;
-   }
-   visit_url("choice.php?whichchoice=440&option=2&pwd="+my_hash());
-   commit(userdata,"userdata.txt");
-   updateLimits();
-  }
+ if(userdata["*"].buffs[6026]<50){//Donho
+  while(my_mp()<(50-userdata["*"].buffs[6026])*75)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=6026&times="+to_string(50-userdata["*"].buffs[6026])+"&option=1&pwd");
+  userdata["*"].buffs[6026]=50;
  }
+ if(userdata["*"].buffs[6028]<5){//Inigo
+  while(my_mp()<(5-userdata["*"].buffs[6028])*100)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=6028&times="+to_string(5-userdata["*"].buffs[6028])+"&option=1&pwd");
+  userdata["*"].buffs[6028]=5;
+ }
+ for song from 6020 to 6024 if(userdata["*"].buffs[song]<10){
+  while(my_mp()<(10-userdata["*"].buffs[song])*50)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect="+song+"&times="+to_string(10-userdata["*"].buffs[song])+"&option=1&pwd");
+  userdata["*"].buffs[song]=10;
+ }
+ commit(userdata,"userdata.txt");
+ updateLimits();
+}
+
+void burn(){
  int to_burn=my_mp()-800;
  if(to_burn<0) return;
  skill farmingbuff = $skill[Polka of Plenty];
@@ -644,6 +597,17 @@ void processQuestData(boolean rp){
  commit(userdata,"userdata.txt");
 }
 
+void nightlyPaperwork(){
+ string n=now_to_string("yyyyMMdd");
+ int[string]books;
+ claimResource("backup/"+n+"b.txt");
+ update(books,"books.txt");
+ commit(books,"backup/"+n+"b.txt");
+ claimResource("backup/"+n+"u.txt");
+ update(userdata,"userdata.txt");
+ commit(userdata,"backup/"+n+"u.txt");
+}
+
 void dailyBreakfast(){
  string rumpus=visit_url("clan_rumpus.php");
  int camp_mp_gain;
@@ -761,6 +725,8 @@ void main(){try{
  }
  if (MinutesToRollover()>burnMinutes) waitq(60);
  claimResource("adventuring");
+ print("Recording leftover songs.","red");
+ makeRecords();
  print("Using excess adventures before rollover.","red");
  if (have_effect($effect[Shape of...Mole!])>0){
   while (have_effect($effect[Shape of...Mole!])>0)
@@ -797,6 +763,7 @@ void main(){try{
  cli_execute("maximize adv -tie");
  cli_execute("set chatbotScript=");
  saveSettings(nightlySave);
+ nightlyPaperwork();
  checkApps();
  cli_execute("exit");
 }finally{
