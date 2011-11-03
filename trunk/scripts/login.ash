@@ -2,7 +2,7 @@ import <shared.ash>
 setName(__FILE__);
 string chatbotScript="buffbot.ash";
 int logMinutes=3;
-int burnMinutes=20;
+int burnMinutes=40;
 
 boolean prompted=false;
 int farmbuff=0;
@@ -388,7 +388,7 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=6026&times="+to_string(50-userdata["*"].buffs[6026])+"&option=1&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-userdata["*"].buffs[6026])+"&option=1&pwd");
   userdata["*"].buffs[6026]=50;
  }
  if(userdata["*"].buffs[6028]<5){//Inigo
@@ -398,7 +398,7 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=6028&times="+to_string(5-userdata["*"].buffs[6028])+"&option=1&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-userdata["*"].buffs[6028])+"&option=1&pwd");
   userdata["*"].buffs[6028]=5;
  }
  for song from 6020 to 6024 if(userdata["*"].buffs[song]<10){
@@ -408,7 +408,7 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect="+song+"&times="+to_string(10-userdata["*"].buffs[song])+"&option=1&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-userdata["*"].buffs[song])+"&option=1&pwd");
   userdata["*"].buffs[song]=10;
  }
  commit(userdata,"userdata.txt");
@@ -700,6 +700,7 @@ void main(){try{
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
+ set_property("_bufferOnly","");
  if (get_property("chatbotScript")=="") waitq (2);
  set_property("chatbotScript",chatbotScript);
  if (get_property("_breakfast")=="") dailyBreakfast();

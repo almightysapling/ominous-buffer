@@ -70,6 +70,10 @@ void chat(){
   return;
  }
  if(prefix.char_at(0)=="!")return;
+ if(prefix==my_name()){
+  print(response,"red");
+  return;
+ }
  chat_private(prefix,response);
 }
 void chat(string msg){
@@ -109,7 +113,7 @@ string genderString(userinfo data){
 }
 
 void errorMessage(string who, string what){
- if(errorMsg)chat_private(who,what);
+ if(errorMsg)chat(who,what);
 }
 
 void errorMessage(string who, string what, int g){
@@ -118,7 +122,7 @@ void errorMessage(string who, string what, int g){
   what=mx.replace_first(genderPronoun(who,g,mx.group(1)));
   mx=mx.reset(what);
  }
- if(getUF(who,noFlag))chat_private(who,what);
+ if(getUF(who,noFlag))chat(who,what);
 }
 
 boolean buffable(string sender){
@@ -163,13 +167,14 @@ string decodeHTML(string msg, boolean chat){
  return msg;
 }
 
-void logout(string sender){
+void logout(string sender,string options){
  if((userdata[sender].flags&isAdmin)!=isAdmin){
   chat_private(sender,"You do not have permission to use this command.");
   return;
  }
  saveSettings(earlySave);
  set_property("chatbotScript","off");
+ if(options=="buffer")set_property("_bufferOnly","1");
  cli_execute("exit");
 }
 
@@ -505,33 +510,9 @@ void pick(string options){
  chat("/em picks "+list[d]+".");
 }
 
-void reviselist(string sender, string msg, string command){
- if(!getUF(sender,isAdmin)){
-  errorMessage(sender,"You do not have permission to use "+command+".");
-  return;
- }
- int newuserid=updateId(msg,true);
- switch(command){
-  case "whitelist":
-   setUF(msg,whitelist);
-   chat_private(sender,msg+" has been whitelisted.");
-   break;
-  case "blacklist":
-   if(getUF(msg,isAdmin)) return;
-   setUF(msg,blacklist);
-   chat_private(sender,msg+" has been blacklisted.");
-   break;
-  case "reset":
-   unSetUF(msg,whitelist+blacklist+inClan);
-   userdata[msg].userid=0;
-   chat_private(sender,msg+" has been reset.");
-   break;
- }
- map_to_file(userdata,"userdata.txt");
-}
-
 void mod(string sender, string msg){
  boolean adminonly=getUF(sender,isAdmin);
+ if(sender==my_name())adminonly=true;
  matcher m=create_matcher("(.*)[., ;]*\\|\\|\\s*(.*)",msg);
  string cmdlist=msg;
  string user=sender;
@@ -548,43 +529,61 @@ void mod(string sender, string msg){
    case "noLimit":
     if(adminonly){
      setUF(user,noLimit);
-     chat_private(sender,user+" has had "+genders[userdata[user].gender,gPosDet]+" limit lifted.");
+     chat(sender,user+" has had "+genders[userdata[user].gender,gPosDet]+" limit lifted.");
     }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
     break;
    case "limit":
     if(adminonly){
      unSetUF(user,noLimit);
-     chat_private(sender,user+" has had "+genders[userdata[user].gender,gPosDet]+" limit re-imposed.");
+     chat(sender,user+" has had "+genders[userdata[user].gender,gPosDet]+" limit re-imposed.");
     }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
     break;
    case "nowarning":
     setUF(user,noFlag);
-    chat_private(sender,user+"\'s warnings disabled.");
+    chat(sender,user+"\'s warnings disabled.");
     break;
    case "warning":
     unSetUF(user,noFlag);
-    chat_private(sender,user+",s warnings enabled.");
+    chat(sender,user+"\'s warnings enabled.");
     break;
    case "clear":
     userdata[user].userId=0;
-    chat_private(sender,"Clan Status cleared for "+user+".");
+    chat(sender,"Clan Status cleared for "+user+".");
     break;
    case "add":
     if(adminonly){
      setUF(user,isAdmin);
-     chat_private(sender,user+" has been given administrative permissions.");
+     chat(sender,user+" has been given administrative permissions.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    case "remove":
     if(adminonly){
      unSetUF(user,isAdmin);
-     chat_private(sender,user+" has been removed as an administrator.");
+     chat(sender,user+" is no longer an administrator.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
-   case "whitelist":
+   case "whitelist":case "wl":
+    if(adminonly){
+     updateId(user,true);
+     setUF(user,whitelist);
+     chat(sender,user+" has been whitelisted to OB.");
+    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+    break;
    case "blacklist":
+    if(adminonly){
+     updateId(user,true);
+     setUF(user,blacklist);
+     chat(sender,user+" has been blacklisted from OB.");
+    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+    break;
    case "reset":
-    reviselist(sender,user,cmd);
+    if(adminonly){
+     updateId(user,true);
+     unSetUF(user,whitelist+blacklist+inClan);
+     userdata[user].userid=0;
+     chat(sender,user+" has had $ppos settings cleared.");
+    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+    break;
    default:
     errorMessage(sender,cmd+" seems to be an invalid command.");
     break;
@@ -944,24 +943,24 @@ void search(string sender, string msg){
  file_to_map("replies.txt",botdata);
  foreach trig,re in botdata{
   if(re.reply.to_lower_case().contains_text(msg)){
-   replm+="Trigger: "+trig+"\n";
+   replm+="T: "+trig+"\n";
    if(re.cond1!=re.cond2)replm+="If: \""+re.cond1+"\" = \""+re.cond2+"\"\n";
-   replm+="Method: "+re.method+"\n";
-   replm+="Response: "+re.reply+"\n\n";
+   replm+="M: "+re.method+"\n";
+   replm+="R: "+re.reply+"\n\n";
    continue;
   }
   if(trig.to_lower_case().contains_text(msg)){
-   replm+="Trigger: "+trig+"\n";
+   replm+="T: "+trig+"\n";
    if(re.cond1!=re.cond2)replm+="If: \""+re.cond1+"\" = \""+re.cond2+"\"\n";
-   replm+="Method: "+re.method+"\n";
-   replm+="Response: "+re.reply+"\n\n";
+   replm+="M: "+re.method+"\n";
+   replm+="R: "+re.reply+"\n\n";
    continue;
   }
   if(msg=="*"){
-   replm+="Trigger: "+trig+"\n";
+   replm+="T: "+trig+"\n";
    if(re.cond1!=re.cond2)replm+="If: \""+re.cond1+"\" = \""+re.cond2+"\"\n";
-   replm+="Method: "+re.method+"\n";
-   replm+="Response: "+re.reply+"\n\n";
+   replm+="M: "+re.method+"\n";
+   replm+="R: "+re.reply+"\n\n";
   }
  }
  string send=trigm+"\n"+replm;
@@ -1248,7 +1247,7 @@ string predicateFilter(string sender, string msg){
    if(!analyze_md(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
    return "x";
   case "logout":
-   logout(sender);
+   logout(sender,oper);
    return "x";
   case "wang":
    if(oper=="")oper=sender;
@@ -1319,11 +1318,6 @@ string predicateFilter(string sender, string msg){
   case "help":
   case "?":
    cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
-   return "x";
-  case "blacklist":
-  case "whitelist":
-  case "reset":
-   reviselist(sender,oper,pred);
    return "x";
   case "roll":
    roll(sender,oper);
@@ -1579,11 +1573,12 @@ void searchDefine(string word){
   if(!m.find())continue;
   m=create_matcher("<div class=\"dndata\">(.+?)</div>",m.group(0));
   while(m.find()){
-   temp=create_matcher("<div class=\"dndata\">(.+?)$",m.group(1));
+   temp=create_matcher("<div class=\"dndata\">(.+?)<",m.group(1));
    if(temp.find()) defn[wordtype,count(defn[wordtype])+1]=temp.group(1);
    else defn[wordtype,count(defn[wordtype])+1]=m.group(1);
   }
  }
+print(count(defn));
  int totalitems=0;
  string bigjar;
  int c=0;

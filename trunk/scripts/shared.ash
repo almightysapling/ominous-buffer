@@ -40,6 +40,7 @@ string ignorePile="_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeal
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
 associates[21459]=true;//Hogs of Destiny
+associates[67356]=true;//Piglets of Fate
 associates[2046987019]=false;//Not Dead Yet
 associates[2046991167]=false;//This One Time
 associates[2046983684]=false;//Clan of 14 Days
