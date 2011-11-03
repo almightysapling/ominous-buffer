@@ -128,13 +128,13 @@ void errorMessage(string who, string what, int g){
 boolean buffable(string sender){
  if(userdata[sender].userid==0)updateId(sender,true);
  if(getUF(sender,blacklist)){
-  chat_private(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
+  chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
   return false;
  }
  if(getUF(sender,inClan)||getUF(sender,whitelist)||getUF(sender,inAssociate)){
   return true;
  }else{
-  chat_private(sender,"We do what we must because we can. For the good of all of us. Except the ones who are not in Black Mesa.");
+  chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are not in Black Mesa.");
   return false;
  }
 }
@@ -169,7 +169,7 @@ string decodeHTML(string msg, boolean chat){
 
 void logout(string sender,string options){
  if((userdata[sender].flags&isAdmin)!=isAdmin){
-  chat_private(sender,"You do not have permission to use this command.");
+  chat(sender,"You do not have permission to use this command.");
   return;
  }
  saveSettings(earlySave);
@@ -186,21 +186,21 @@ void createpack(string sender, string msg){
   packname=namem.group(1);
   packdata=namem.group(2);
  }else{
-  chat_private(sender,"You must supply the appropriate data for us to save that.");
+  chat(sender,"You must supply the appropriate data for us to save that.");
   return;
  }
  if((count(userdata[sender].buffpacks)>9)&&(!(userdata[sender].buffpacks contains packname))){
-  chat_private(sender,"You already have 10 buffpacks, to have more would be ridiculous; not even funny.");
+  chat(sender,"You already have 10 buffpacks, to have more would be ridiculous; not even funny.");
   return;
  }
- chat_private(sender,"Your buffpack has been saved.");
+ chat(sender,"Your buffpack has been saved.");
  userdata[sender].buffpacks[packname]=packdata;
  map_to_file(userdata,"userdata.txt");
 }
 
 void delpack(string sender, string packname){
  string s=remove userdata[sender].buffpacks[packname];
- if(s!="")chat_private(sender,"Pack removed.");
+ if(s!="")chat(sender,"Pack removed.");
  map_to_file(userdata,"userdata.txt");
 }
 
@@ -348,7 +348,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  if(skillnum==6901){
   if(item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
   if(item_amount($item[time's arrow])<1){
-   chat_private(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
+   chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    print("Out of Time's Arrows.");
    freeResource("adventuring");
    return;
@@ -459,10 +459,10 @@ void startGame(string sender, string msg){
   if((msg=="cancel")||(msg=="stop")){
    if((sender==game.host)||getUF(sender,isAdmin)){
     closeGame();
-    chat_private(sender,"Game canceled");
+    chat(sender,"Game canceled");
     chat("","You must all be orphans, not even the host of the game loved you long enough to finish. Game canceled.");
-   }else chat_private(sender,"You don't have permission to do that.");
-  }else chat_private(sender,"A game is already in session by "+game.host+".");
+   }else chat(sender,"You don't have permission to do that.");
+  }else chat(sender,"A game is already in session by "+game.host+".");
   return;
  }
  matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
@@ -489,11 +489,11 @@ void startGame(string sender, string msg){
      saveGame(game);
     }else{
      closeGame();
-     chat_private(sender,"Word not found");
+     chat(sender,"Word not found");
      return;
     }
    }
-   chat_private(sender,"Game started.");
+   chat(sender,"Game started.");
    chat("",w.length().to_string()+"-letter Wordshot! Send guesses to me!");
    break;
   case "rr":case "russianroulette":
@@ -624,7 +624,7 @@ void fax(string sender, string msg){
  }
  string nm=m[to_monster(msg)];
  if(nm==""){
-  chat_private(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
+  chat(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
   nm=msg;
  }
  print("Requesting "+msg+" ("+nm+") from FaxBot.");
@@ -843,7 +843,7 @@ string replyParser(string sender, string msg){
 
 string chatFilter(string sender, string msg){
  if(msg.contains_text("fuck")){
-  chat_private(sender,"Try again, fuckwad.");
+  chat(sender,"Try again, fuckwad.");
   return "x";
  }
  return msg;
@@ -919,7 +919,7 @@ void train(string trainer, string msg){
   if((newr.flags&caseSensitive)==0)botdata[t.to_lower_case()]=newr;
   else botdata[t]=newr;
  }
- chat_private(trainer,"Training complete: "+newr.reply);
+ chat(trainer,"Training complete: "+newr.reply);
  map_to_file(botdata,"replies.txt");
  map_to_file(changes,"changes.txt");
 }
@@ -931,7 +931,7 @@ void untrain(string trainer, string msg){
  responses[string] botdata;
  file_to_map("replies.txt",botdata);
  responses fix=remove botdata[msg];
- chat_private(trainer,"Training removed: "+fix.reply);
+ chat(trainer,"Training removed: "+fix.reply);
  map_to_file(botdata,"replies.txt");
  map_to_file(changes,"changes.txt");
 }
@@ -1009,7 +1009,7 @@ void lookup(string sender, string who){
   if(yetfound>0)reply+=". ";
  }
  if(reply=="") reply="No matches found for "+who;
- if(length(reply)<151) chat_private(sender,reply);
+ if(length(reply)<151) chat(sender,reply);
  else{
   matcher m=create_matcher("\\. ",reply);
   reply=replace_all(m,".\n");
@@ -1026,7 +1026,7 @@ void multilookup(string sender, string who){
   if(count(userdata[who].multis)<1) reply="No known multis for "+who+"...";
  }else reply="No matches found for "+who+"...";
  reply=substring(reply,0,length(reply)-2);
- if(length(reply)<151) chat_private(sender,reply);
+ if(length(reply)<151) chat(sender,reply);
  else cli_execute("csend to "+sender+"||"+reply);
 }
 
@@ -1059,7 +1059,7 @@ void userDetails(string sender, string who){
   if(userdata[who].donated>0) reply+="Donated: "+userdata[who].donated.to_string()+" meat.\n";
   if(who==sender) reply+="Bank: "+userdata[who].wallet.to_string()+" meat.\n";
   cli_execute("csend to "+sender+"||"+reply);
- }else chat_private(sender,"No match found for "+who+".");
+ }else chat(sender,"No match found for "+who+".");
 }
 
 void userAccountEmpty(string w){
@@ -1117,12 +1117,12 @@ void setMulti(string sender, string newaltlist){
    }
   }
   if(tmatch==""){
-   chat_private(alt,sender+" is attempting to register you as "+genders[userdata[sender].gender,gPosDet]+" multi.");
+   chat(alt,sender+" is attempting to register you as "+genders[userdata[sender].gender,gPosDet]+" multi.");
    mlist[sender,alt]=now+100;
   }else if(length(matchtxt)<length(tmatch)) matchtxt=tmatch;
  }
- if(matchtxt=="") chat_private(sender,"Reminder sent to other accounts, you have 24 hours to register them.");
- else if(length(matchtxt)<111) chat_private(sender,"Multi properly registered for accounts:"+matchtxt);
+ if(matchtxt=="") chat(sender,"Reminder sent to other accounts, you have 24 hours to register them.");
+ else if(length(matchtxt)<111) chat(sender,"Multi properly registered for accounts:"+matchtxt);
  else cli_execute("csend to "+sender+"||Multi properly registered for accounts:"+matchtxt);
  map_to_file(mlist,"tempMultis.txt");
  map_to_file(userdata,"userdata.txt");
@@ -1135,6 +1135,61 @@ void setNick(string sender, string w){
  map_to_file(userdata,"userdata.txt");
 }
 
+void clanTitle(string sender, string newt){
+ if(!getUF(sender,inClan)){
+  chat("Only current members of the clan can have their clan title changed... idiot.");
+  return;
+ }
+ visit_url("clan_members.php?pwd&action=modify&pids[]="+userdata[sender].userid+"&title"+userdata[sender].userid+"="+newt);
+}
+
+void whitelistEdit(string oper){
+ string cw=visit_url("clan_whitelist.php");
+ matcher action=create_matcher("(-)?(\\w[\\w\\d\\s_]*)\\s*([:=]\\s*.+?)?",oper);
+ int i;
+ if(!action.find()){
+  chat("I'm not sure what exactly you want me to do with the whitelist.");
+  return;
+ }
+ i=getId(action.group(2));
+ if(i==0){
+  chat("I'm not sure who "+action.group(2)+" is.");
+  return;
+ }
+ if(action.group(1)=="-"){
+  i=getId(action.group(2));
+  if(!cw.contains_text("who="+i.to_string())){
+   chat(action.group(2)+" isn't currently on the whitelist.");
+   return;
+  }
+  cw=visit_url("clan_whitelist.php?action=update&pwd&player"+i+"="+i+"&drop"+i+"=on");
+  return;
+ }
+ i=getId(action.group(2));
+ string s="clan_whitelist.php?action=add&pwd";
+ if(cw.contains_text("who="+i.to_string())){
+  chat(action.group(2)+" is already whitelisted.");
+  return;
+ }
+ if(cw.contains_text("(#"+i+")")){
+  s+="&clannie="+i;
+  visit_url(s);
+  chat(action.group(2)+" added to whitelist.");
+  return;
+ }
+ s+="&addwho="+action.group(2);
+ switch(action.group(3)){
+  case "Weighted Companion Cube":case "WCC":case "Cube": s+="&level=4"; break;
+  case "Research Assistant":case "Research":case "Assistant":case "RA": s+="&level=14"; break;
+  case "Subject": s+="&level=6"; break;
+  case "Head Crab":case "HC":case "Head":case "Crab": s+="&level=3";
+  case "Exploding Lemons":case "Exploding":case "Lemon":case "EL": s+="&level=17";
+  default: s+="&level=7";
+ }
+ visit_url(s);
+ chat(action.group(2)+" added to whitelist.");
+}
+
 void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
@@ -1142,7 +1197,7 @@ void sendLink(string sender, string i){
  matcher m=create_matcher("\\s",i);
  i=m.replace_all("-");
  if(i==""){
-  chat_private(sender,base+"ominous-buffer");
+  chat(sender,base+"ominous-buffer");
   return;
  }
  t=visit_url(base+"ominous-buffer/functions");
@@ -1172,30 +1227,30 @@ void sendLink(string sender, string i){
  }
  m=create_matcher("href=\"(.+?)\"",t);
  if(m.find()){
-  chat_private(sender,m.group(1));
+  chat(sender,m.group(1));
   return;
  }
  link=base+"ominous-buffer/functions/"+i;
  if(length(visit_url(link))!=0){
-  chat_private(sender,link);
+  chat(sender,link);
   return;
  }
  link=base+"ominous-buffer/"+i;
  if(length(visit_url(link))!=0){
-  chat_private(sender,link);
+  chat(sender,link);
   return;
  }
  link=base+i;
  if(length(visit_url(link))!=0){
-  chat_private(sender,link);
+  chat(sender,link);
   return;
  }
  link=base+"mesachat/functions/"+i;
  if(length(visit_url(link))!=0){
-  chat_private(sender,link);
+  chat(sender,link);
   return;
  }
- chat_private(sender,base);
+ chat(sender,base);
 }
 
 string performMath(string sender, string msg){
@@ -1230,33 +1285,17 @@ string predicateFilter(string sender, string msg){
   oper=first.group(2);
  }else return msg;
  switch(pred){
-  case "set":
-  case "pack":
-   string r=userdata[sender].buffpacks[oper];
-   if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*"].buffpacks[oper];
-   if(r==""){
-    errorMessage(sender,"That buffpack does not exist.");
-    return "x";
-   }
-   return r;
-  case "mod":
-  case "settings":
-   mod(sender,oper);
+  case "alias":
+  case "createpack":
+   createpack(sender,oper);
    return "x";
-  case "market":
-   if(!analyze_md(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
+  case "alt":
+  case "multi":
+   setMulti(sender,oper);
    return "x";
-  case "logout":
-   logout(sender,oper);
-   return "x";
-  case "wang":
-   if(oper=="")oper=sender;
-   if(is_online("wangbot")){
-    chat_private("wangbot","target "+oper);
-   }else{
-    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
-    string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
-   }
+  case "alts":
+  case "multis":
+   multilookup(sender,oper);
    return "x";
   case "clear":
    if(oper=="")return "x";
@@ -1276,11 +1315,82 @@ string predicateFilter(string sender, string msg){
    if(oper=="meat"){
     string r="Meat: "+to_string(my_meat()+my_closet_meat())+". DMS:";
     r+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
-    chat_private(sender,r);
+    chat(r);
    }else if(whitem!=$item[none]){
     string r=whitem.to_string()+": "+item_amount(whitem).to_string();
-    chat_private(sender,r);
+    chat(r);
    }
+   return "x";
+  case "deals":
+   if((userdata[sender].flags&isAdmin)==isAdmin)updateDC(oper);
+   return "x";
+  case "delpack":
+   delpack(sender,oper);
+   return "x";
+  case "details":
+   userDetails(sender,oper);
+   return "x";
+  case "drop":
+  case "untrain":
+   untrain(sender,oper);
+   return "x";
+  case "fax":
+  case "get":
+   if(!getUF(sender,inClan)){
+    chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
+    return "x";
+   }
+   set_property("_lastFax",sender);
+   fax(sender,oper);
+   return "x";
+  case "help":
+  case "?":
+   cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+   return "x";
+  case "host":
+   startGame(sender,oper);
+   return "x";
+  case "learn":
+  case "teach":
+  case "train":
+   train(sender,oper);
+   return "x";
+  case "logout":
+   logout(sender,oper);
+   return "x";
+  case "market":
+   if(!analyze_md(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
+   return "x";
+  case "math":
+   oper=performMath(sender,oper);
+   chat(sender,oper);
+   return "x";
+  case "mod":
+  case "settings":
+   mod(sender,oper);
+   return "x";
+  case "nick":
+   first=create_matcher("([\\w ']*)",oper);
+   if(first.find()) oper=first.group(1);
+   else{
+    chat(sender,"Sorry, that's not a valid nickname.");
+    return "x";
+   }
+   setNick(sender,oper);
+   return "x";
+  case "pack":
+  case "set":
+   string r=userdata[sender].buffpacks[oper];
+   if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*"].buffpacks[oper];
+   if(r==""){
+    errorMessage(sender,"That buffpack does not exist.");
+    return "x";
+   }
+   return r;
+  case "ping":
+   chat(turt_name,"PING "+sender);
+   chat(sauc_name,"PING "+sender);
+   chat("Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
    if(oper=="")return "x";
@@ -1303,84 +1413,40 @@ string predicateFilter(string sender, string msg){
     cli_execute("csend "+i+" "+whitem.to_string()+" to "+sender+" || "+to_string(item_amount(whitem)-i)+" remain.");
    }
    return "x";
-  case "deals":
-   if((userdata[sender].flags&isAdmin)==isAdmin)updateDC(oper);
-   return "x";
-  case "ping":
-   chat(turt_name,"PING "+sender);
-   chat(sauc_name,"PING "+sender);
-   chat("Reply from Ominous Buffer.");
-   return "x";
-  case "math":
-   oper=performMath(sender,oper);
-   chat_private(sender,oper);
-   return "x";
-  case "help":
-  case "?":
-   cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
-   return "x";
   case "roll":
    roll(sender,oper);
-   return "x";
-  case "get":
-  case "fax":
-   if(!getUF(sender,inClan)){
-    chat_private(sender,"You must be in Black Mesa to utilize its faxing rights.");
-    return "x";
-   }
-   set_property("_lastFax",sender);
-   fax(sender,oper);
-   return "x";
-  case "alias":
-  case "createpack":
-   createpack(sender,oper);
-   return "x";
-  case "delpack":
-   delpack(sender,oper);
-   return "x";
-  case "teach":
-  case "learn":
-  case "train":
-   train(sender,oper);
-   return "x";
-  case "untrain":
-  case "drop":
-   untrain(sender,oper);
    return "x";
   case "search":
    search(sender,oper);
    return "x";
+  case "title":
+   clanTitle(sender,oper);
+   return "x";
+  case "unwhitelist":
+   if(getUF(sender,isAdmin))whitelistEdit("-"+oper);
+   else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
+   return "x";
+  case "wang":
+   if(oper=="")oper=sender;
+   if(is_online("wangbot")){
+    chat("wangbot","target "+oper);
+   }else{
+    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+    string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
+   }
+   return "x";
+  case "whitelist":
+   if(getUF(sender,isAdmin))whitelistEdit(oper);
+   else chat("You must be an admin to whitelist people to clan.");
+   return "x";
   case "whois":
    lookup(sender,oper);
    return "x";
-  case "alts":
-  case "multis":
-   multilookup(sender,oper);
-   return "x";
-  case "alt":
-  case "multi":
-   setMulti(sender,oper);
-   return "x";
-  case "nick":
-   first=create_matcher("([\\w ']*)",oper);
-   if(first.find()) oper=first.group(1);
-   else{
-    chat_private(sender,"Sorry, that's not a valid nickname.");
-    return "x";
-   }
-   setNick(sender,oper);
-   return "x";
-  case "details":
-   userDetails(sender,oper);
+  case "wiki":
+   sendLink(sender,oper);
    return "x";
   case "withdraw":
    userAccountEmpty(sender);
-   return "x";
-  case "host":
-   startGame(sender,oper);
-   return "x";
-  case "wiki":
-   sendLink(sender,oper);
    return "x";
  }
  return msg;
@@ -1711,48 +1777,48 @@ void publicChat(string sender, string msg){
   return;
  }
  switch(pred){
-  case "roll":
-   if(addressed)roll(sender,oper);
-   return;
-  case "pick":
   case "choose":
+  case "pick":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    if(addressed) pick(oper);
    return;
-  case "echo":
-   if(addressed)chat(replyParser(sender,oper));
-   return;
-  case "sum":
-   if(addressed) fancyMath(sender,oper);
-   return;
+  case "cross":
+   if(mathDot(oper,true))return;
+   break;
   case "define":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    searchDefine(oper);
+   return;
+  case "dot":
+   if(mathDot(oper,false))return;
+   break;
+  case "echo":
+   if(addressed)chat(replyParser(sender,oper));
+   return;
+  case "market":
+   analyze_md("!","link "+oper);
+   return;
+  case "roll":
+   if(addressed)roll(sender,oper);
    return;
   case "spell":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    if(addressed) searchSpell(oper);
    return;
+  case "stp":
+   if(mathSTP(oper))return;
+   break;
+  case "sum":
+   if(addressed) fancyMath(sender,oper);
+   return;
   case "urban":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+oper);
    if(addressed) searchUrban(oper);
    return;
-  case "market":
-   analyze_md("!","link "+oper);
-   return;
-  case "dot":
-   if(mathDot(oper,false))return;
-   break;
-  case "cross":
-   if(mathDot(oper,true))return;
-   break;
-  case "stp":
-   if(mathSTP(oper))return;
-   break;
  }
  nopredpass(sender,original,addressed);
  return;
@@ -1783,6 +1849,12 @@ void slimetubeHandler(string sender, string msg){
 void hobopolisHandler(string sender, string msg){
  if(sender=="Dungeon")return;
  prefix="/hobo ";
+ publicChat(sender,msg);
+}
+
+void hauntedhouseHandler(string sender, string msg){
+ if(sender=="Dungeon")return;
+ prefix="/hauntedhouse ";
  publicChat(sender,msg);
 }
 
@@ -1840,8 +1912,8 @@ void privateHandler(string sender, string msg){
 
 boolean preHandled(string sender, string msg, string channel){
  if(sender=="faxbot"){
-  if(msg.contains_text("help"))chat_private(get_property("_lastFax"),"Faxbot doesn't have that monster.");
-  else chat_private(get_property("_lastFax"),msg);
+  if(msg.contains_text("help"))chat(get_property("_lastFax"),"Faxbot doesn't have that monster.");
+  else chat(get_property("_lastFax"),msg);
   return true;
  }
  if(sender=="wangbot")return true;
@@ -1850,9 +1922,9 @@ boolean preHandled(string sender, string msg, string channel){
  return false;
 }
 
-//CHANNELS: private,    clan,   hobopolis,      slimetube
-//IN:       ""          "/clan" "/hobopolis"    "/slimetube"
-//OUT:      name        ""      "/hobopolis "   "/slimetube "
+//CHANNELS: private,    clan,   DUNGEON
+//IN:       ""          "/clan" "/DUNGEON"
+//OUT:      name        ""      "/DUNGEON "
 void main(string sender, string msg, string channel){
  if(preHandled(sender,msg,channel))return;
  msg=decodeHTML(msg,true);
@@ -1865,6 +1937,9 @@ void main(string sender, string msg, string channel){
    break;
   case "/hobopolis":
    hobopolisHandler(sender,msg);
+   break;
+  case "/hauntedhouse":
+   hauntedhouseHandler(sender,msg);
    break;
   default:
    privateHandler(sender,msg);
