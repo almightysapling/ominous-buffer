@@ -15,6 +15,7 @@ seperate	*separate	0	say
 sewer.status	There are $grates grate(s) opened and $valves valve(s) turned.	18	say		
 SLUTS	$player is a slut!	1	say		
 stat day?	Today is $statday and tomorrow is $statdaytomorrow.	0	say		
+thank you	You're welcome, $pnick.	8	say		
 thanks	You're welcome!	8	say		
 what language	$pnick: ASH for KoLmafia.	8	say		
 where are my keys	Did you check your other jacket?	0	say		
