@@ -815,6 +815,7 @@ anglified	false
 anglifies	false
 anglophil	false
 angriness	false
+angstroms   false
 anguiform	false
 anguipede	false
 anguished	false
@@ -25623,4 +25624,3 @@ zymologic	false
 zymolysis	false
 zymolytic	false
 zymometer	false
-�ngstr�ms	false
