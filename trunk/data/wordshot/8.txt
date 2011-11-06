@@ -760,6 +760,7 @@ anglists	false
 angriest	false
 anguiped	false
 angulate	false
+angstrom	false
 anhedral	false
 anhungry	false
 aniconic	false
@@ -26262,4 +26263,3 @@ zygaenid	false
 zygodont	false
 zygomata	false
 zymology	false
-�ngstr�m	false
