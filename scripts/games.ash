@@ -23,7 +23,7 @@ string startGame(int gType, int ivals, boolean started, string host){
  while(gamesavedata contains gId) gId=to_string(gId.to_int()+1);
  int now=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
  gamesavedata["."].players[gId]=gType;
- gamesavedata[gId].players[":SYSTEM"]=0;
+ gamesavedata[gId].players["*"]=0;
  gamesavedata[gId].intervals=ivals;
  gamesavedata[gId].roundOver=now+ivals;
  gamesavedata[gId].gameStarted=started;
@@ -33,7 +33,7 @@ string startGame(int gType, int ivals, boolean started, string host){
  return gId;
 }
 string startGame(int gType){
- return startGame(gType,3,false,":SYSTEM");
+ return startGame(gType,3,false,"*");
 }
 
 gameData loadGame(string gId){
@@ -135,12 +135,12 @@ print("RR");
  int now=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
  gameData game=loadGame();
  int v=-1;
- if (!game.gameStarted&&(sender!=":SYSTEM")){//Get contestants, until time is up.
+ if (!game.gameStarted&&(sender!="*")){//Get contestants, until time is up.
   m=create_matcher("(?i)(i am|\\Win\\W|i'll play)",msg);
   if((!find(m))||(game.roundOver<now))return;
   game.players[sender]=0;
   saveGame(game);
- }else if(sender!=":SYSTEM"){
+ }else if(sender!="*"){
   m=create_matcher("(\\d+)",msg);
   if(find(m)) v=group(m,1).to_int();
   foreach p,val in game.players if(val==v){
@@ -150,8 +150,8 @@ print("RR");
  }
 print("Players: "+count(game.players).to_string());
  if(!(game.players contains sender))return;
- if((sender!=":SYSTEM")&&(v>0)&&(v<=(count(game.players)-1))&&(game.players[sender]==0)) game.players[sender]=v;
- if(sender!=":SYSTEM"){
+ if((sender!="*")&&(v>0)&&(v<=(count(game.players)-1))&&(game.players[sender]==0)) game.players[sender]=v;
+ if(sender!="*"){
   saveGame(game);
   return;
  }
