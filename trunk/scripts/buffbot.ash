@@ -1897,8 +1897,14 @@ void privateHandler(string sender, string msg){
  m=create_matcher("[\;,]+",msg);
  msg=replace_all(m,"\;");
  string[int] messages=split_string(msg,"\;");
+ int multiplier=0;
  foreach i in messages{
   turnR=0;
+  m=create_matcher("(\\d+):(.*)",messages[i]);
+  if(m.find()){
+   multiplier=m.group(1).to_int();
+   messages[i]=m.group(2);
+  }
   m=create_matcher("(\\d+)",messages[i]);
   if(m.find()){
    if(to_float(m.group(1))>1000)turnR=1000;
@@ -1906,7 +1912,9 @@ void privateHandler(string sender, string msg){
   }//why not "[a-zA-Z][\\s\\w']*[a-zA-Z]"
   m=create_matcher("[a-zA-Z\\?](?:[a-zA-Z']|(?:\\s(?=\\w)))*",messages[i]);
   if(m.find())messages[i]=m.group(0);
-  buff(sender,messages[i],turnR,co);
+  if(multiplier==0)buff(sender,messages[i],turnR,co);
+  else if(turnR==0)buff(sender,messages[i],multiplier,co);
+  else buff(sender,messages[i],multiplier*turnR,co);
  }
 }
 
