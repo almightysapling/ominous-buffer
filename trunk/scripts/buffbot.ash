@@ -1380,11 +1380,11 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "pack":
   case "set":
-   m=create_matcher("(\\d+):(.*)",oper);
+   first=create_matcher("(\\d+):(.*)",oper);
    pred="";
-   if(m.find()){
-    pred=m.group(1);
-    oper=m.group(2);
+   if(first.find()){
+    pred=first.group(1);
+    oper=first.group(2);
    }
    string r=userdata[sender].buffpacks[oper];
    if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*"].buffpacks[oper];
