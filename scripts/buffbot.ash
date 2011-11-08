@@ -1380,13 +1380,19 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "pack":
   case "set":
+   m=create_matcher("(\\d+):(.*)",oper);
+   pred="";
+   if(m.find()){
+    pred=m.group(1);
+    oper=m.group(2);
+   }
    string r=userdata[sender].buffpacks[oper];
    if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*"].buffpacks[oper];
    if(r==""){
     errorMessage(sender,"That buffpack does not exist.");
     return "x";
-   }
-   return r;
+   } 
+   return pred+r;
   case "ping":
    chat(turt_name,"PING "+sender);
    chat(sauc_name,"PING "+sender);
