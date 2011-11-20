@@ -638,7 +638,7 @@ void dailyBreakfast(){
  drink(1,$item[can of swiller]);
  cli_execute("uneffect ode");
  if(have_skill($skill[Sonata of Sneakiness])) (!use_skill(1,$skill[Sonata of Sneakiness]));
- if((have_effect($effect[Dreams and Lights])<1)&&(have_effect($effect[Arcane in the Brain])<1)){
+ if(((have_effect($effect[Dreams and Lights])<1)||(have_effect($effect[Dreams and Lights])>8))&&(have_effect($effect[Arcane in the Brain])<1)){
   while(have_effect($effect[Dreams and Lights])<1) (!adventure(1,$location[Haunted Gallery]));
   cli_execute("uneffect sonata");
   retrieve_item(1,$item[llama lama gong]);
