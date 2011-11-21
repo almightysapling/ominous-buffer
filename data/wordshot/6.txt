@@ -510,7 +510,6 @@ apedom	false
 apeman	false
 apemen	false
 apepsy	false
-aper�u	false
 apexes	false
 aphids	false
 aphony	false
@@ -644,7 +643,6 @@ arroba	false
 arrows	false
 arrowy	false
 arroyo	false
-arr�ts	false
 arshin	false
 arsine	false
 artels	false
@@ -653,7 +651,6 @@ artful	false
 artics	false
 artier	false
 artist	false
-ar�tes	false
 asanas	false
 asarum	false
 ascend	false
@@ -1946,7 +1943,6 @@ byways	false
 byword	false
 bywork	false
 byzant	false
-b�tise	false
 cabala	false
 cabals	false
 cabana	false
@@ -2165,7 +2161,6 @@ carvel	false
 carven	false
 carver	false
 carves	false
-car�me	false
 casbah	false
 cascos	false
 casein	false
@@ -2231,7 +2226,6 @@ cawker	false
 caxons	false
 cayman	false
 cayuse	false
-ca�ada	false
 ceased	false
 ceases	false
 cecils	false
@@ -2348,7 +2342,6 @@ chaunt	false
 chawed	false
 chayas	false
 chazan	false
-cha�ne	false
 cheapo	false
 cheats	false
 checks	false
@@ -2503,7 +2496,6 @@ churrs	false
 chutes	false
 chyack	false
 chypre	false
-ch�vre	false
 cibols	false
 cicada	false
 cicala	false
@@ -3127,7 +3119,6 @@ crowds	false
 crowed	false
 crowns	false
 crozes	false
-cro�te	false
 cruces	false
 crucks	false
 cruddy	false
@@ -3156,7 +3147,6 @@ crwths	false
 crying	false
 crypto	false
 crypts	false
-cr�che	false
 ctenes	false
 cubage	false
 cubbed	false
@@ -3772,7 +3762,6 @@ divots	false
 diwans	false
 dixies	false
 dizain	false
-di�dre	false
 djebel	false
 djinni	false
 djinns	false
@@ -4019,7 +4008,6 @@ dryads	false
 dryers	false
 drying	false
 dryish	false
-dr�les	false
 dsobos	false
 dsomos	false
 dualin	false
@@ -5051,7 +5039,6 @@ flypes	false
 flyted	false
 flytes	false
 flyway	false
-fl�che	false
 foaled	false
 foamed	false
 fobbed	false
@@ -5143,7 +5130,6 @@ forthy	false
 fortis	false
 forums	false
 forwhy	false
-for�at	false
 fossae	false
 fossas	false
 fossed	false
@@ -5253,7 +5239,6 @@ frusts	false
 frutex	false
 fryers	false
 frying	false
-fr�res	false
 fubbed	false
 fucked	false
 fucker	false
@@ -5381,7 +5366,6 @@ galops	false
 galore	false
 galosh	false
 galuth	false
-gal�re	false
 gamash	false
 gambas	false
 gambet	false
@@ -5443,7 +5427,6 @@ garter	false
 garths	false
 garuda	false
 garvie	false
-gar�on	false
 gascon	false
 gashed	false
 gasher	false
@@ -6219,7 +6202,6 @@ hazers	false
 hazier	false
 hazily	false
 hazing	false
-ha�yne	false
 headed	false
 header	false
 healds	false
@@ -6648,7 +6630,6 @@ idlers	false
 idlest	false
 idling	false
 idylls	false
-igap�s	false
 igloos	false
 ignaro	false
 ignite	false
@@ -7160,7 +7141,6 @@ justly	false
 jutted	false
 jymold	false
 jynxes	false
-j�gers	false
 kaamas	false
 kababs	false
 kabala	false
@@ -7433,7 +7413,6 @@ krises	false
 kronen	false
 kroner	false
 kronor	false
-kr�nur	false
 kudzus	false
 kukris	false
 kulaks	false
@@ -7455,7 +7434,6 @@ kylins	false
 kyloes	false
 kythed	false
 kythes	false
-k�mmel	false
 laager	false
 labels	false
 labial	false
@@ -8222,7 +8200,6 @@ manual	false
 manuka	false
 manuls	false
 manure	false
-man�ge	false
 maples	false
 mapped	false
 mapper	false
@@ -8333,7 +8310,6 @@ mazier	false
 mazily	false
 mazing	false
 mazuma	false
-ma�ana	false
 mbiras	false
 meadow	false
 meager	false
@@ -8596,7 +8572,6 @@ misted	false
 mister	false
 mistle	false
 misuse	false
-mis�re	false
 miters	false
 mither	false
 mitier	false
@@ -10097,7 +10072,6 @@ piemen	false
 piends	false
 pierce	false
 pierid	false
-piet�s	false
 piffle	false
 pigeon	false
 pigged	false
@@ -10176,7 +10150,6 @@ piquet	false
 piracy	false
 pirate	false
 piraya	false
-pira�a	false
 pirnie	false
 pished	false
 pishes	false
@@ -10209,8 +10182,6 @@ pixing	false
 pizazz	false
 pizzas	false
 pizzle	false
-pi�ata	false
-pi�ons	false
 placed	false
 placer	false
 places	false
@@ -11722,7 +11693,6 @@ rybats	false
 ryking	false
 ryokan	false
 rypeck	false
-r�veur	false
 sabbat	false
 sabers	false
 sabins	false
@@ -13558,7 +13528,6 @@ subway	false
 succah	false
 succor	false
 succus	false
-succ�s	false
 sucked	false
 sucken	false
 sucker	false
@@ -14247,7 +14216,6 @@ tilths	false
 timbal	false
 timber	false
 timbre	false
-timb�s	false
 timely	false
 timers	false
 timing	false
@@ -14705,7 +14673,6 @@ tutses	false
 tutted	false
 tuttis	false
 tuxedo	false
-tuy�re	false
 twains	false
 twaite	false
 twangs	false
@@ -15387,7 +15354,6 @@ vicary	false
 vicing	false
 victim	false
 victor	false
-vicu�a	false
 vidame	false
 videos	false
 vidual	false

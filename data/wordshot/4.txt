@@ -200,7 +200,6 @@ ayes	false
 ayre	false
 ayus	false
 azan	false
-a�ne	false
 baal	false
 baas	false
 baba	false
@@ -1313,8 +1312,6 @@ fuze	false
 fuzz	false
 fyke	false
 fyrd	false
-f�hn	false
-f�te	false
 gabs	false
 gaby	false
 gade	false
@@ -1345,7 +1342,6 @@ gant	false
 gaol	false
 gape	false
 gaps	false
-gap�	false
 garb	false
 gare	false
 gars	false
@@ -2910,7 +2906,6 @@ pity	false
 pium	false
 pixy	false
 pize	false
-pi�a	false
 plan	false
 plap	false
 plat	false
@@ -3055,7 +3050,6 @@ pyet	false
 pyot	false
 pyre	false
 pyro	false
-p�re	false
 qadi	false
 qoph	false
 quad	false
@@ -3949,7 +3943,6 @@ trow	false
 troy	false
 true	false
 trug	false
-tr�s	false
 tsar	false
 tuan	false
 tuba	false
@@ -4002,7 +3995,6 @@ typo	false
 tyre	false
 tyro	false
 tzar	false
-t�te	false
 udal	false
 udos	false
 ueys	false
@@ -4443,4 +4435,3 @@ zoon	false
 zoos	false
 zouk	false
 zyme	false
-�sar	false

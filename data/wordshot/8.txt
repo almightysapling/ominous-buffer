@@ -375,7 +375,6 @@ aflutter	false
 aftereye	false
 agalloch	false
 agamoids	false
-aga�ante	false
 agedness	false
 agelasts	false
 agencies	false
@@ -492,7 +491,6 @@ alchemic	false
 alcohols	false
 alcopops	false
 alcorzas	false
-alc�zars	false
 aldehyde	false
 alderman	false
 aldermen	false
@@ -1733,7 +1731,6 @@ bauxitic	false
 bawcocks	false
 bawdiest	false
 bawlings	false
-bayad�re	false
 bayberry	false
 bayonets	false
 bazookas	false
@@ -1946,7 +1943,6 @@ bergenia	false
 bergfall	false
 berghaan	false
 bergylts	false
-berg�res	false
 beriberi	false
 berlines	false
 berobbed	false
@@ -2209,7 +2205,6 @@ blennies	false
 blesboks	false
 blessing	false
 blethers	false
-bleu�tre	false
 blighted	false
 blighter	false
 blimbing	false
@@ -2330,7 +2325,6 @@ bobstays	false
 bobtails	false
 bobwheel	false
 bodement	false
-bodhr�ns	false
 bodikins	false
 bodiless	false
 bodysuit	false
@@ -3028,7 +3022,6 @@ calypsos	false
 calyptra	false
 calzones	false
 camasses	false
-cama�eux	false
 cambered	false
 cambisms	false
 cambists	false
@@ -3861,7 +3854,6 @@ chutneys	false
 chutzpah	false
 chyacked	false
 chyluria	false
-ch�teaux	false
 ciabatta	false
 ciabatte	false
 cibation	false
@@ -4371,7 +4363,6 @@ communes	false
 commuted	false
 commuter	false
 commutes	false
-comm�res	false
 compacts	false
 compadre	false
 compages	false
@@ -4411,8 +4402,6 @@ compulse	false
 computed	false
 computer	false
 computes	false
-comp�red	false
-comp�res	false
 comrades	false
 conarial	false
 conarium	false
@@ -4481,7 +4470,6 @@ confocal	false
 conforms	false
 confound	false
 confront	false
-confr�re	false
 confused	false
 confuses	false
 confuted	false
@@ -4571,7 +4559,6 @@ contrist	false
 contrite	false
 contrive	false
 controls	false
-contr�le	false
 contused	false
 contuses	false
 convened	false
@@ -4717,7 +4704,6 @@ cortical	false
 cortices	false
 cortiles	false
 cortisol	false
-cort�ges	false
 corundum	false
 corvette	false
 corvuses	false
@@ -5067,7 +5053,6 @@ crownets	false
 crowning	false
 crownlet	false
 croziers	false
-cro�tons	false
 crubeens	false
 crucians	false
 cruciate	false
@@ -5191,8 +5176,6 @@ curative	false
 curators	false
 curatory	false
 curatrix	false
-cura�aos	false
-cura�oas	false
 curbable	false
 curbless	false
 curbside	false
@@ -5306,7 +5289,6 @@ czarinas	false
 czarists	false
 czaritsa	false
 czaritza	false
-c�rdobas	false
 dabblers	false
 dabbling	false
 dabchick	false
@@ -5782,7 +5764,6 @@ dermises	false
 derogate	false
 derricks	false
 derrises	false
-derri�re	false
 desalted	false
 descaled	false
 descales	false
@@ -7524,7 +7505,6 @@ esoteric	false
 espalier	false
 espartos	false
 especial	false
-espi�gle	false
 espousal	false
 espoused	false
 espouser	false
@@ -8032,8 +8012,6 @@ fawnings	false
 fayalite	false
 fayences	false
 fazendas	false
-fa�ences	false
-fa�onnes	false
 fealties	false
 fearless	false
 fearsome	false
@@ -8528,8 +8506,6 @@ flypitch	false
 flyspeck	false
 flytings	false
 flywheel	false
-fl�nerie	false
-fl�neurs	false
 foalfoot	false
 foamiest	false
 foamings	false
@@ -8957,7 +8933,6 @@ frumpish	false
 frustule	false
 frustums	false
 frutices	false
-fr�ulein	false
 fubsiest	false
 fuchsias	false
 fuchsine	false
@@ -9531,7 +9506,6 @@ glycolic	false
 glyconic	false
 glycosyl	false
 glyptics	false
-gl�hwein	false
 gnarlier	false
 gnarling	false
 gnarring	false
@@ -9875,7 +9849,6 @@ guaiacum	false
 guanacos	false
 guaranis	false
 guaranty	false
-guaran�s	false
 guardage	false
 guardant	false
 guardees	false
@@ -11555,7 +11528,6 @@ jaculate	false
 jaderies	false
 jaggedly	false
 jaggiest	false
-jalape�o	false
 jalopies	false
 jalouses	false
 jalousie	false
@@ -12448,7 +12420,6 @@ likewise	false
 limacels	false
 limacine	false
 limation	false
-lima�ons	false
 limbecks	false
 limbered	false
 limbless	false
@@ -12794,7 +12765,6 @@ lyricist	false
 lyriform	false
 lysosome	false
 lysozyme	false
-l�ndlers	false
 macaques	false
 macarise	false
 macarism	false
@@ -12828,8 +12798,6 @@ madrasah	false
 madrases	false
 madrigal	false
 madrones	false
-madro�as	false
-madro�os	false
 madwoman	false
 madwomen	false
 madworts	false
@@ -13019,7 +12987,6 @@ manurers	false
 manurial	false
 manuring	false
 manyfold	false
-man�ging	false
 mappings	false
 mappists	false
 maquette	false
@@ -13385,7 +13352,6 @@ metopism	false
 metrical	false
 metrists	false
 metritis	false
-meuni�re	false
 mezereon	false
 mezereum	false
 mezuzahs	false
@@ -13464,7 +13430,6 @@ millings	false
 millions	false
 milliped	false
 millirem	false
-milli�me	false
 millpond	false
 millrace	false
 millrind	false
@@ -16574,7 +16539,6 @@ pockmark	false
 pockpits	false
 podagral	false
 podagric	false
-podest�s	false
 podgiest	false
 podiatry	false
 podocarp	false
@@ -16759,7 +16723,6 @@ porterly	false
 porthole	false
 porticos	false
 portions	false
-porti�re	false
 portland	false
 portlast	false
 portlier	false
@@ -18720,7 +18683,6 @@ riveters	false
 riveting	false
 rivetted	false
 rivieras	false
-rivi�res	false
 rivulets	false
 roaching	false
 roadings	false
@@ -18991,8 +18953,6 @@ rutilant	false
 ruttiest	false
 ruttings	false
 ryotwari	false
-r�ntgens	false
-r�veuses	false
 sabatons	false
 sabayons	false
 sabbatic	false
@@ -19372,7 +19332,6 @@ schizoid	false
 schizont	false
 schlepps	false
 schlocky	false
-schl�ger	false
 schmaltz	false
 schmalzy	false
 schmecks	false
@@ -20895,7 +20854,6 @@ soleness	false
 solenoid	false
 soleuses	false
 solfeggi	false
-solf�ges	false
 solicits	false
 solidago	false
 solidary	false
@@ -21019,7 +20977,6 @@ soundman	false
 soundmen	false
 soupiest	false
 soupling	false
-soup�ons	false
 sourcing	false
 sourdine	false
 sourings	false
@@ -22095,7 +22052,6 @@ suckings	false
 sucklers	false
 suckling	false
 suctions	false
-sucuruj�	false
 sudamina	false
 sudaries	false
 sudarium	false
@@ -23313,7 +23269,6 @@ torchier	false
 torching	false
 torchlit	false
 torchons	false
-torch�re	false
 torcular	false
 toreador	false
 toreutic	false
@@ -23731,7 +23686,6 @@ troutier	false
 trouting	false
 troutlet	false
 trouveur	false
-trouv�re	false
 trowsers	false
 truanted	false
 truantry	false
@@ -24994,7 +24948,6 @@ vapulate	false
 vaqueros	false
 varactor	false
 vareuses	false
-vargue�o	false
 variable	false
 variably	false
 variance	false
@@ -25384,7 +25337,6 @@ vulsella	false
 vultures	false
 vulturns	false
 vulvitis	false
-v�luspas	false
 wabblers	false
 wabbling	false
 wackiest	false
@@ -26262,4 +26214,3 @@ zygaenid	false
 zygodont	false
 zygomata	false
 zymology	false
-�ngstr�m	false

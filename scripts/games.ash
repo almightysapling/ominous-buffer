@@ -111,7 +111,7 @@ void closeAllGames(){
 string startWordshot(int l,string h){
  gameData game=loadGame(startGame(gameWordshot,0,true,h));
  if (l==0) l=random(3)+4;
- l=min(max(2,l),10);
+ l=min(max(3,l),10);
  boolean[string] bigList;
  string[int] words;
  file_to_map("wordshot/"+l+".txt",bigList);

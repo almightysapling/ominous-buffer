@@ -1640,7 +1640,6 @@ bastardize	false
 bastinaded	false
 bastinades	false
 bastinados	false
-bastn�site	false
 batfowling	false
 bathhouses	false
 batholites	false
@@ -3179,8 +3178,6 @@ churlishly	false
 chylaceous	false
 chylifying	false
 chymifying	false
-ch�telaine	false
-ch�telains	false
 cibachrome	false
 cicatrices	false
 cicatricle	false
@@ -3309,7 +3306,6 @@ cleverness	false
 clicketing	false
 clientages	false
 clientship	false
-client�les	false
 cliffhangs	false
 climatical	false
 climatised	false
@@ -4167,7 +4163,6 @@ corruption	false
 corruptive	false
 corselette	false
 corsetiers	false
-corseti�re	false
 corticated	false
 corticoids	false
 cortisones	false
@@ -4249,7 +4244,6 @@ cousinages	false
 cousinhood	false
 cousinship	false
 couturiers	false
-couturi�re	false
 covariance	false
 covariants	false
 covenanted	false
@@ -4563,7 +4557,6 @@ cytometers	false
 cytoplasms	false
 cytotoxins	false
 czarevitch	false
-c�telettes	false
 dabblingly	false
 dachshunds	false
 dacoitages	false
@@ -6497,7 +6490,6 @@ entrapping	false
 entreaties	false
 entreating	false
 entrechats	false
-entrec�tes	false
 entrenched	false
 entrenches	false
 entropions	false
@@ -7273,7 +7265,6 @@ fermentive	false
 ferntickle	false
 fernticled	false
 fernticles	false
-ferroni�re	false
 ferroprint	false
 ferrotypes	false
 fertilised	false
@@ -10383,7 +10374,6 @@ janitorial	false
 janitrixes	false
 janizarian	false
 janizaries	false
-jardini�re	false
 jargoneers	false
 jargonelle	false
 jargonised	false
@@ -10758,7 +10748,6 @@ laureation	false
 laurustine	false
 laurvikite	false
 lavalieres	false
-lavalli�re	false
 lavatorial	false
 lavatories	false
 lavendered	false
@@ -11217,7 +11206,6 @@ malacology	false
 maladapted	false
 maladdress	false
 malaguetta	false
-malague�as	false
 malapertly	false
 malapropos	false
 malaxating	false
@@ -16985,8 +16973,6 @@ rustlingly	false
 ruthenious	false
 rutherford	false
 ruthlessly	false
-r�ntgenise	false
-r�ntgenize	false
 sabbatical	false
 sabbatised	false
 sabbatises	false
@@ -18084,7 +18070,6 @@ smouldered	false
 smudginess	false
 smugglings	false
 smuttiness	false
-sm�rrebr�d	false
 snaileries	false
 snakebirds	false
 snakebites	false
@@ -20240,7 +20225,6 @@ toponymics	false
 topophilia	false
 topsyturvy	false
 torbernite	false
-torchi�res	false
 torchlight	false
 tormenters	false
 tormentils	false
@@ -22174,7 +22158,6 @@ vitriolize	false
 vituperate	false
 vivacities	false
 vivandiers	false
-vivandi�re	false
 viviparism	false
 viviparity	false
 viviparous	false
@@ -22677,4 +22660,3 @@ zygosphene	false
 zygospores	false
 zymologist	false
 zymometers	false
-�sterreich	false

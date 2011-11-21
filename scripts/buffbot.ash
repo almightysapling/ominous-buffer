@@ -173,8 +173,7 @@ void logout(string sender,string options){
   return;
  }
  saveSettings(earlySave);
- set_property("chatbotScript","off");
- if(options=="buffer")set_property("_bufferOnly","1");
+ if(options!="all")set_property("_bufferOnly","1");
  cli_execute("exit");
 }
 
@@ -223,6 +222,15 @@ void buff(string sender, string msg, int numTurns, string ding){
    case "CASTRQ":
     if(sender==turt_name)set_property('tamerCasts',failsplit[1]);
     if(sender==sauc_name)set_property('sauceCasts',failsplit[1]);
+    break;
+   case "RATION ITEM":
+    use_skill(12,$skill[Fat Leon's Phat Loot Lyric],sender);
+    break;
+   case "RATION MEAT":
+    use_skill(12,$skill[Polka of Plenty],sender);
+    break;
+   case "RATION NONCOMBAT":
+    use_skill(12,$skill[Carlweather's Cantata of Confrontation],sender);
     break;
    case "FUNDS":
     chat_private("Almighty Sapling","low funds on "+sender+".");
@@ -412,41 +420,6 @@ string roll(string sender, string msg){
   return "";
  }
  for die from 1 to to_int(rolling[0]) running+=(1+random(to_int(rolling[1])));
-/* BLOCKED OUT, because the rep filter currently doesn't exist.
- //The following is to try to avoid the repetition filter, in case that becomes an issue.
- string endsentence=".";
- boolean good=false;
- while (!good){
-  good=(checkRep("roll"+endsentence)==-1);
-  if(!good) switch(endsentence){
-   case ".":
-    endsentence="!";
-    break;
-   case "!":
-    endsentence="...";
-    break;
-   case "...":
-    endsentence="";
-    break;
-   case "":
-    endsentence="..";
-    break;
-   case "..":
-    endsentence="!!";
-    break;
-   default:
-    endsentence="!!!";
-    break;   
-  }
- }
- switch(method) {
-  case "public":
-   chat("Rolling "+rolling[0]+"d"+rolling[1]+" for "+sender+" gives "+running+endsentence);
-   break;
-  case "pm":
-   chat_private(sender,"Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
-   break;
- }*/
  if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
  else chat("Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
  return running.to_string();
@@ -1396,7 +1369,7 @@ string predicateFilter(string sender, string msg){
   case "ping":
    chat(turt_name,"PING "+sender);
    chat(sauc_name,"PING "+sender);
-   chat("Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
+   chat(sender,"Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
    if(oper=="")return "x";
@@ -1786,7 +1759,7 @@ void publicChat(string sender, string msg){
   case "choose":
   case "pick":
    if(checkRep(pred+oper)>-1)return;
-   addRep(pred+oper);
+   addRep(pred+":"+oper);
    if(addressed) pick(oper);
    return;
   case "cross":
@@ -1794,7 +1767,7 @@ void publicChat(string sender, string msg){
    break;
   case "define":
    if(checkRep(pred+oper)>-1)return;
-   addRep(pred+oper);
+   addRep(pred+":"+oper);
    searchDefine(oper);
    return;
   case "dot":
@@ -1811,7 +1784,7 @@ void publicChat(string sender, string msg){
    return;
   case "spell":
    if(checkRep(pred+oper)>-1)return;
-   addRep(pred+oper);
+   addRep(pred+":"+oper);
    if(addressed) searchSpell(oper);
    return;
   case "stp":
@@ -1822,7 +1795,7 @@ void publicChat(string sender, string msg){
    return;
   case "urban":
    if(checkRep(pred+oper)>-1)return;
-   addRep(pred+oper);
+   addRep(pred+":"+oper);
    if(addressed) searchUrban(oper);
    return;
  }
@@ -1925,6 +1898,10 @@ void privateHandler(string sender, string msg){
 }
 
 boolean preHandled(string sender, string msg, string channel){
+ if(get_property("chatScriptDisabled")!=""){
+  if(channel=="")chat(sender,"Sorry, I've got science to do.");
+  return true;
+ }
  if(sender=="faxbot"){
   if(msg.contains_text("help"))chat(get_property("_lastFax"),"Faxbot doesn't have that monster.");
   else chat(get_property("_lastFax"),msg);

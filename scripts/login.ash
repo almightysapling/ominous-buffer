@@ -362,7 +362,9 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=418&option=3&pwd");
   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-userdata["*"].buffs[6026])+"&option=1&pwd");
   userdata["*"].buffs[6026]=50;
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
+ 
  if(userdata["*"].buffs[6028]<5){//Inigo
   while(my_mp()<(5-userdata["*"].buffs[6028])*100)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
@@ -372,6 +374,7 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=418&option=3&pwd");
   visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-userdata["*"].buffs[6028])+"&option=1&pwd");
   userdata["*"].buffs[6028]=5;
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
  for song from 6020 to 6024 if(userdata["*"].buffs[song]<10){
   while(my_mp()<(10-userdata["*"].buffs[song])*50)cli_execute("use mmj");
@@ -382,6 +385,7 @@ void makeRecords(){
   visit_url("choice.php?whichchoice=418&option=3&pwd");
   visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-userdata["*"].buffs[song])+"&option=1&pwd");
   userdata["*"].buffs[song]=10;
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
  commit(userdata,"userdata.txt");
  updateLimits();
@@ -406,27 +410,7 @@ void burn(){
  }
  int casts_to_use=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
  casts_to_use=max((casts_to_use/3),1);
- int currentmp=my_mp();
- int tryL=0;
- while(my_mp()==currentmp){
-  use_skill(casts_to_use,farmingbuff,"Ominous Tamer");
-  tryL+=1;
-  if(tryL>5)break;
- }
- tryL=0;
- currentmp=my_mp();
- while(my_mp()==currentmp){
-  use_skill(casts_to_use,farmingbuff,"Ominous Sauceror");
-  tryL+=1;
-  if(tryL>5)break;
- }
- tryL=0;
- currentmp = my_mp();
- while(my_mp() == currentmp){
-  use_skill(casts_to_use,farmingbuff);
-  tryL+=1;
-  if(tryL>5)break;
- }
+ use_skill(casts_to_use,farmingbuff);
 }
 
 void handleMeat(){
@@ -585,7 +569,7 @@ void dailyBreakfast(){
  int camp_mp_gain;
  int rollmp;
  int rolladv=numeric_modifier("adventures");
- camp_mp_gain=to_int(numeric_modifier("base resting mp")*(1+numeric_modifier("resting mp percent")/100));
+ camp_mp_gain=to_int(numeric_modifier("base resting mp")*(1+numeric_modifier("resting mp percent")/100.0));
  if(contains_text(rumpus,"rump1_1.gif")||contains_text(rumpus,"rump1_2.gif"))rolladv+=3;
  if(contains_text(rumpus,"rump2_3.gif"))rolladv+=5;
  if(contains_text(rumpus,"rump4_3.gif"))rolladv+=1;
@@ -658,9 +642,9 @@ void main(){try{
  updateLimits();
  updateDC();
  set_property("_bufferOnly","");
- if(get_property("chatbotScript")=="")waitq (2);
  set_property("chatbotScript",chatbotScript);
  if(get_property("_breakfast")=="")dailyBreakfast();
+ set_property("chatScriptDisabled","");
  cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
  freeResource("adventuring");
@@ -683,6 +667,7 @@ void main(){try{
  }
  if(MinutesToRollover()>burnMinutes)waitq(60);
  claimResource("adventuring");
+ set_property("chatScriptDisabled","adventuring");
  makeRecords();
  print("Using excess adventures before rollover.","red");
  if(have_effect($effect[Shape of...Mole!])>0){
@@ -708,6 +693,7 @@ void main(){try{
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
  freeResource("adventuring");
+ set_property("chatScriptDisabled","");
  chat_private("Ominous Tamer","CASTRQ");
  chat_private("Ominous Sauceror","CASTRQ");
  checkapps();
@@ -717,8 +703,9 @@ void main(){try{
  waitq((MinutesToRollover()-logMinutes)*60);
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
- cli_execute("set chatbotScript=");
  saveSettings(nightlySave);
+ set_property("_bufferOnly","1");
+ set_property("chatScriptDisabled","on");
  nightlyPaperwork();
  checkApps();
  cli_execute("exit");
