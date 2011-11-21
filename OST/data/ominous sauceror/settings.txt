@@ -8,7 +8,7 @@ turns	400
 tpc	20
 formalName	Ominous Sauceror
 mainbot	Ominous Buffer
-burnMinutes	20
+burnMinutes	40
 logMinutes	4
 chatbotScript	chat.ash
 alias:1453212	almighty sapling
