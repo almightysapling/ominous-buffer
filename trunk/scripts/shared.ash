@@ -258,11 +258,13 @@ void updateLimits(){
 }
 
 int checkRep(string check){
- for i from 0 to repValue if (userdata["*"].buffpacks[i.to_string()]==check) return i;
+ return -1;
+ for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
  return -1;
 }
 
 void addRep(string s){
+ return;
  for i from 10 to 1{
   userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i-1)];
  }
