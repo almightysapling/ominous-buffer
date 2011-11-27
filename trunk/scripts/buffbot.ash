@@ -59,6 +59,7 @@ string response="";
 string someoneDefined="";
 string[string] chatVars;
 int TPC=25;
+boolean raidlogRead=false;
 
 void chat(){
  if((prefix=="")||(prefix.char_at(0)=="/")){
@@ -604,20 +605,17 @@ void fax(string sender, string msg){
  chat_private("FaxBot",nm);
 }
 
-void updateGrates(){
+void updateRaidlog(){
+ if(raidlogRead)return;
  string v=visit_url("clan_raidlogs.php");
  matcher mx=create_matcher("opened (a|\\d+) sewer grate",v);
  int turned=0;
- while(mx.find()) if(mx.group(1)=="a") turned+=1;
+ while(mx.find())if(mx.group(1)=="a") turned+=1;
  else turned+=mx.group(1).to_int();
  set_property("sewerGrates",turned);
-}
-
-void updateValves(){
- string v=visit_url("clan_raidlogs.php");
- matcher mx=create_matcher("lowered the water level .+?\\((\\d+) turn",v);
- int turned=0;
- while(mx.find()) turned+=mx.group(1).to_int();
+ mx=create_matcher("lowered the water level.+?\\((\\d+) turn",v);
+ turned=0;
+ while(mx.find())turned+=mx.group(1).to_int();
  set_property("sewerValves",turned);
 }
 
@@ -790,14 +788,14 @@ string replyParser(string sender, string msg){
     break;
    case "grates":
     if(!createOnce.contains_text(".grates")){
-     updateGrates();
+     updateRaidlog();
      createOnce+=".grates";
     }
     msg=replace_first(variable,get_property("sewerGrates"));
     break;
    case "valves":
     if(!createOnce.contains_text(".valves")){
-     updateValves();
+     updateRaidlog();
      createOnce+=".valves";
     }
     msg=replace_first(variable,get_property("sewerValves"));
@@ -1569,7 +1567,7 @@ boolean fancyMath(string sender, string equation){
  userdata[sender].lastMath=tmp;
  userdata["*"].lastMath=tmp;
  map_to_file(userdata,"userdata.txt");
- chat(tmp.to_string());
+ chat(tmp.to_string(8));
  return true;
 }
 
@@ -1581,8 +1579,8 @@ boolean mathDot(string data, boolean cross){
  u=m.group(1).to_vector();
  v=m.group(2).to_vector();
  string x;
- if(cross) x=to_string(u.cross(v));
- else x=to_string(u.dot(v));
+ if(cross) x=u.cross(v).to_string(8);
+ else x=u.dot(v).to_string(8);
  chat(x);
  return true;
 }
@@ -1596,7 +1594,7 @@ boolean mathSTP(string data){
  a=m.group(1).to_vector();
  b=m.group(2).to_vector();
  c=m.group(3).to_vector();
- string x=a.dot(b.cross(c)).to_string();
+ string x=a.dot(b.cross(c)).to_string(8);
  chat(x);
  return true;
 }
