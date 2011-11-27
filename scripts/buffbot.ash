@@ -1239,7 +1239,7 @@ string performMath(string sender, string msg){
   last=mathlibeval(chunk,mathvars);
  }
  userdata[sender].lastMath=last;
- msg=last.to_string();
+ msg=last.to_string(8);
  map_to_file(userdata,"userdata.txt");
  if(msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
  return msg;
