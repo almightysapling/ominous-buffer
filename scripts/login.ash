@@ -352,6 +352,7 @@ void checkLotto(){
 }
 
 void makeRecords(){
+ print("Recording leftover music.");
  checkOut(userdata,"userdata.txt");
  if(userdata["*"].buffs[6026]<50){//Donho
   while(my_mp()<(50-userdata["*"].buffs[6026])*75)cli_execute("use mmj");
@@ -364,7 +365,7 @@ void makeRecords(){
   userdata["*"].buffs[6026]=50;
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
- 
+ print("Donho's complete");
  if(userdata["*"].buffs[6028]<5){//Inigo
   while(my_mp()<(5-userdata["*"].buffs[6028])*100)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
@@ -376,6 +377,7 @@ void makeRecords(){
   userdata["*"].buffs[6028]=5;
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
+ print("Inigo's complete");
  for song from 6020 to 6024 if(userdata["*"].buffs[song]<10){
   while(my_mp()<(10-userdata["*"].buffs[song])*50)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
@@ -387,6 +389,7 @@ void makeRecords(){
   userdata["*"].buffs[song]=10;
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
+ print("Hobopolis complete");
  commit(userdata,"userdata.txt");
  updateLimits();
 }
@@ -529,7 +532,7 @@ void processQuestData(boolean rp){
  //Lotto
  int[string] books;
  checkOut(books,"books.txt");
- matcher m=create_matcher("(\\d+)\\|(\\d+)\\|(\\d+)\\|(\\d+)\\|(\\d+)",get_property("books"));
+ matcher m=create_matcher("(\\d+)::(\\d+)::(\\d+)::(\\d+)::(\\d+)",get_property("books"));
  if(m.find()){
   if(!rp){
    books["Event1"]=m.group(1).to_int();
@@ -544,12 +547,19 @@ void processQuestData(boolean rp){
  checkOut(userdata,"userdata.txt");
  string limits=get_property("_limitBuffs");
  if(limits!=""){
-  string[int] limit=split_string(limits,':');
+/*  string[int] limit=split_string(limits,':');
   int y=count(limit)/2;
   if(y>0)for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
+  */
+  userdata["*"].buffs[62]=to_int(limits);
  }
+ limits=visit_url("skills.php");
+ m=create_matcher("(\\d+)>[^>]+?\\((\\d+)\\s*/",limits);
+ while(m.find()) userdata["*"].buffs[m.group(1).to_int()]=m.group(2).to_int();
  string[int] wintext=split_string(get_property("winners"),"::");
  foreach i,s in wintext if(length(s)>1)userdata["*"].buffpacks["winner"+s.char_at(0)]=s.substring(2);
+ wintext=split_string(get_property("admins"),"::");
+ foreach i,s in wintext setUF(s,isAdmin);
  commit(userdata,"userdata.txt");
 }
 
@@ -671,7 +681,7 @@ void main(){try{
  makeRecords();
  print("Using excess adventures before rollover.","red");
  if(have_effect($effect[Shape of...Mole!])>0){
-  while(have_effect($effect[Shape of...Mole!])>0) (!adventure(1,$location[Mt. Molehill]));
+  while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
   if(!adventure(1,$location[Mt. Molehill])){}
   visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
  }
