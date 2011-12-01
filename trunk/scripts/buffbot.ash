@@ -207,7 +207,7 @@ void delpack(string sender, string packname){
 boolean sendRecord(int skillId, string sender){
  item recording=to_item("recording of "+skillId.to_skill().to_string());
  if(item_amount(recording)<1) return false;
- cli_execute("csend 1 "+recording.to_string()+" to "+sender);
+ cli_execute("csend 1 "+recording.to_string()+" to "+sender+" ||");
  return true;
 }
 

@@ -35,7 +35,7 @@ file_to_map("userdata.txt",userdata);
 string sauc_name="ominous sauceror";
 string turt_name="ominous tamer";
 string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
-string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books;winners";
+string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals";
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
@@ -46,7 +46,6 @@ associates[2046991167]=false;//This One Time
 associates[2046983684]=false;//Clan of 14 Days
 associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
-
 int repValue=4;
 
 void setName(string newname){
@@ -246,14 +245,7 @@ void updateLimits(){
  s+="&whichshelf4500="+to_string(max(11-userdata["*"].buffs[6023],1));
  s+="&whichshelf4501="+to_string(max(11-userdata["*"].buffs[6024],1));
  n=visit_url(s);
- s="62:"+to_string(userdata["*"].buffs[62])+":";
- s+="6020:"+to_string(userdata["*"].buffs[6020])+":";
- s+="6021:"+to_string(userdata["*"].buffs[6021])+":";
- s+="6022:"+to_string(userdata["*"].buffs[6022])+":";
- s+="6023:"+to_string(userdata["*"].buffs[6023])+":";
- s+="6024:"+to_string(userdata["*"].buffs[6024])+":";
- s+="6026:"+to_string(userdata["*"].buffs[6026])+":";
- s+="6028:"+to_string(userdata["*"].buffs[6028])+":";
+ s=to_string(userdata["*"].buffs[62]);
  set_property("_limitBuffs",s);
 }
 
