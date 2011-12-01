@@ -1351,7 +1351,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "pack":
   case "set":
-   first=create_matcher("(\\d+):(.*)",oper);
+   first=create_matcher("(\\d+)\\s*:\\s*(.*)",oper);
    pred="";
    if(first.find()){
     pred=first.group(1);
@@ -1363,7 +1363,7 @@ string predicateFilter(string sender, string msg){
     errorMessage(sender,"That buffpack does not exist.");
     return "x";
    } 
-   return pred+r;
+   return pred+":"+r;
   case "ping":
    chat(turt_name,"PING "+sender);
    chat(sauc_name,"PING "+sender);
