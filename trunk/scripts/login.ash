@@ -28,6 +28,7 @@ gift[$item[black forest cake]]=1;
 gift[$item[bulky buddy box]]=1;
 
 void checkApps(){
+ claimResource("adventuring");
  boolean acceptall=true;
  matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
  if((appcheck.find())&&(acceptall)){
@@ -36,7 +37,7 @@ void checkApps(){
    print("Accepting "+applicants.group(2)+" into the clan.");
    visit_url("clan_applications.php?request"+applicants.group(1)+"=1&action=process");
    visit_url("clan_members.php?pwd="+my_hash()+"&action=modify&level"+applicants.group(1)+"=7&title"+applicants.group(1)+"=Cake&pids[]="+applicants.group(1));
-   if(getUF(applicants.group(2),receivedCake))return;
+   if(getUF(applicants.group(2),receivedCake))continue;
    retrieve_item(1,$item[black forest cake]);
    retrieve_item(1,$item[bulky buddy box]);
    /**/kmail(applicants.group(1),"Welcome to Black Mesa! I'm the clan's multi-purpose bot. When you get a chance, please hop into chat to say \"hello.\" If you're new to the game and don't know how to do this, please send a message to Sentrion or Twinkertoes, and they will get back to you as quickly as possible. Otherwise, if you have any questions, just ask in chat, and someone should be able to answer. Enjoy!",0,gift);
@@ -47,6 +48,18 @@ void checkApps(){
    commit(userdata,"userdata.txt");
   }
  }
+ freeResource("adventuring");
+}
+
+void checkData(){
+ checkOut(userdata,"userdata.txt");
+ if(!(userdata["*"].buffpacks contains "boss")){
+  userdata["*"].buffpacks["boss"]="25 phat loot, 25 thingfinder, 25 chorale";
+  chat_private("Sentrion","I am error.");
+  chat_private("Almighty Sapling","I am error.");
+  chat_clan("I am error.");
+ }
+ commit(userdata,"userdata.txt");
 }
 
 void raffleAnnounce(gameData g){
@@ -338,7 +351,9 @@ void checkLotto(){
    wintext+=i.to_string()+" "+userdata["*"].buffpacks["winner"+i.to_string()]+"::";
   }
   set_property("winners",wintext);
+  claimResource("adventuring");
   visit_url(buf);
+  freeResource("adventuring");
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_string()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
   books["thisLotto"]=books["nextLotto"]-1;
@@ -352,10 +367,22 @@ void checkLotto(){
 }
 
 void makeRecords(){
+ claimResource("adventuring");
  print("Recording leftover music.");
  checkOut(userdata,"userdata.txt");
  if(userdata["*"].buffs[6026]<50){//Donho
-  while(my_mp()<(50-userdata["*"].buffs[6026])*75)cli_execute("use mmj");
+  if(userdata["*"].buffs[6026]<25){
+   while(my_mp()<(25-userdata["*"].buffs[6026])*75)cli_execute("use mmj");
+   visit_url("volcanoisland.php?action=tuba&pwd");
+   visit_url("choice.php?whichchoice=409&option=1&pwd");
+   visit_url("choice.php?whichchoice=410&option=2&pwd");
+   visit_url("choice.php?whichchoice=412&option=3&pwd");
+   visit_url("choice.php?whichchoice=418&option=3&pwd");
+   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(25-userdata["*"].buffs[6026])+"&option=1&pwd");
+   userdata["*"].buffs[6026]=25;
+   visit_url("choice.php?pwd&whichchoice=440&option=2");
+  }
+  while(my_mp()<max(50-userdata["*"].buffs[6026],0)*75)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
   visit_url("choice.php?whichchoice=409&option=1&pwd");
   visit_url("choice.php?whichchoice=410&option=2&pwd");
@@ -392,6 +419,7 @@ void makeRecords(){
  print("Hobopolis complete");
  commit(userdata,"userdata.txt");
  updateLimits();
+ freeResource("adventuring");
 }
 
 void burn(){
@@ -652,13 +680,12 @@ void main(){try{
  updateLimits();
  updateDC();
  set_property("_bufferOnly","");
- set_property("chatbotScript",chatbotScript);
  if(get_property("_breakfast")=="")dailyBreakfast();
- set_property("chatScriptDisabled","");
  cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
  freeResource("adventuring");
  print("Entering wait cycle.","green");
+ set_property("chatbotScript",chatbotScript);
  int n;
  while(MinutesToRollover()>(burnMinutes+3)){
   coreGameCycle();
@@ -671,20 +698,21 @@ void main(){try{
    lastCheck=n+15;
    checkApps();
    checkMail();
+   checkData();
   }
   freeResource("adventuring");
   waitq(5);
  }
  if(MinutesToRollover()>burnMinutes)waitq(60);
  claimResource("adventuring");
- set_property("chatScriptDisabled","adventuring");
- makeRecords();
+ claimResource("science");
  print("Using excess adventures before rollover.","red");
  if(have_effect($effect[Shape of...Mole!])>0){
   while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
   if(!adventure(1,$location[Mt. Molehill])){}
   visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
  }
+ makeRecords();
  int burnTurns=150-to_int(get_property("rolladv"));
  if((my_adventures()-burnTurns)>0){
   burn();
@@ -702,22 +730,22 @@ void main(){try{
  cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
+ freeResource("science");
  freeResource("adventuring");
- set_property("chatScriptDisabled","");
  chat_private("Ominous Tamer","CASTRQ");
  chat_private("Ominous Sauceror","CASTRQ");
- checkapps();
+ checkApps();
  waitq((MinutesToRollover()-logMinutes-5)*60);
  chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
- checkapps();
+ checkApps();
  waitq((MinutesToRollover()-logMinutes)*60);
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  saveSettings(nightlySave);
  set_property("_bufferOnly","1");
- set_property("chatScriptDisabled","on");
  nightlyPaperwork();
  checkApps();
+ set_property("chatbotScript","");
  cli_execute("exit");
 }finally{
  print("Script Halted");

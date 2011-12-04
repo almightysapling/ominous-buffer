@@ -48,40 +48,50 @@ associates[2046991423]=false;//Margaretting Tye
 associates[76566]=false;//Imitation Plastic Death Star
 int repValue=4;
 
+record resource{
+ string owner;
+ int depth;
+};
+
 void setName(string newname){
  NAME_=newname;
 }
 
 void cleanResources(){ //Remove all holds
- string[string]blank;
+ resource[string]blank;
  map_to_file(blank,"resources.txt");
 }
 
 void releaseResources(){ //Remove all holds of a certain script
- string[string] resources;
+ resource[string] resources;
  file_to_map("resources.txt",resources);
- foreach res,owner in resources if (owner==NAME_) resources[res]="";
+ foreach name,res in resources if(res.owner==NAME_){
+  resources[name].owner="";
+  resources[name].depth=0;
+ }
  map_to_file(resources,"resources.txt");
 }
 
 boolean claimResource(string resourceName){ //Lock a symbol
- string[string] resources;
+ resource[string] resources;
  file_to_map("resources.txt",resources);
- while ((resources[resourceName]!="")&&(resources[resourceName]!=NAME_)){
+ while((resources[resourceName].owner!="")&&(resources[resourceName].owner!=NAME_)){
   waitq(1);
   file_to_map("resources.txt",resources);
  }
- resources[resourceName]=NAME_;
+ resources[resourceName].owner=NAME_;
+ resources[resourceName].depth+=1;
  map_to_file(resources,"resources.txt");
  return true;
 }
 
 string freeResource(string resourceName){ //Free a symbol without saving
- string[string] resources;
+ resource[string] resources;
  file_to_map("resources.txt",resources);
- string owner=resources[resourceName];
- if (owner==NAME_){
-  resources[resourceName]="";
+ string owner=resources[resourceName].owner;
+ if(owner==NAME_){
+  resources[resourceName].depth-=1;
+  if(resources[resourceName].depth==0)resources[resourceName].owner="";
   map_to_file(resources,"resources.txt");
  }
  return owner;
@@ -103,19 +113,27 @@ aggregate update(aggregate data, string resourceName){ //Load a symbol, but don'
 }
 
 string commit(aggregate data, string resourceName, boolean freeR){ //Save data to a symbol, optionally free the symbol
- string[string] resources;
+ resource[string] resources;
  file_to_map("resources.txt",resources);
- string owner=resources[resourceName];
- if (owner==NAME_){
+ string owner=resources[resourceName].owner;
+ if(owner==NAME_){
   map_to_file(data,resourceName);
-  resources[resourceName]="";
-  if (freeR) map_to_file(resources,"resources.txt");
+  resources[resourceName].depth-=1;
+  if(resources[resourceName].depth==0)resources[resourceName].owner="";
+  if(freeR)map_to_file(resources,"resources.txt");
  }
  return owner;
 }
 
 string commit(aggregate data, string resourceName){ //Save data to a symbol and free it
- return commit(data, resourceName, true);
+ return commit(data,resourceName,true);
+}
+
+boolean couldClaim(string resourceName){
+ resource[string] resources;
+ file_to_map("resources.txt",resources);
+ if((resources[resourceName].owner!="")&&(resources[resourceName].owner!=NAME_))return false;
+ return true;
 }
 
 void setUF(string user, int f){
@@ -127,19 +145,23 @@ void unSetUF(string user, int f){
 }
 
 boolean getUF(string user, int f){
- return (userdata[user].flags&f)==f;
+ return(userdata[user].flags&f)==f;
 }
 
 //check clan whitelist for user if not in clan
 boolean checkWhitelist(int id){
+ claimResource("adventuring");
  string page=visit_url("clan_whitelist.php");
+ freeResource("adventuring");
  matcher m=create_matcher("(?i)="+id.to_string()+"'",page);
- if (find(m)) return true;
+ if(find(m))return true;
  return false;
 }
 
 string to_playerName(int pId){
+ claimResource("adventuring");
  string v=visit_url("showplayer.php?who="+pId.to_string());
+ freeResource("adventuring");
  matcher m=create_matcher("<center><b>(.+?)</b>",v);
  if (m.find()){
   return m.group(1);
@@ -147,33 +169,45 @@ string to_playerName(int pId){
  return ":NONE";
 }
 
+string to_clanName(int cId){
+ claimResource("adventuring");
+ string p=visit_url("showclan.php?whichclan="+cId);
+ freeResource("adventuring");
+ matcher m=create_matcher("blue><b>(.+?)</b",p);
+ if(!m.find())return "";
+ return m.group(1);
+}
+
 //request unknown user's id. if (add) then place them into the users file.
 int updateId(string user,boolean add){
- if (user=="") return 0;
+ if(user=="")return 0;
+ claimResource("adventuring");
  string searchstring=visit_url("searchplayer.php?searching=Yep.&searchstring="+user+"&hardcoreonly=0");
+ freeResource("adventuring");
  matcher name_clan=create_matcher('(?i)(\\d*)">'+user+'</a></b> (?: \\(PvP\\))?(?:<br>\\(<a target=mainpane href="showclan\\.php\\?whichclan=(\\d*))?',searchstring);
- if(!find(name_clan)) return 0;
- if (!add) return group(name_clan,1).to_int();
+ if(!find(name_clan))return 0;
+ checkOut(userdata,"userdata.txt");
+ if(!add)return group(name_clan,1).to_int();
  userdata[user].gender=2;
  userdata[user].userid=group(name_clan,1).to_int();
  unSetUF(user,inClan+inAssociate+highAssociate);
- if (group(name_clan,2).to_int()==clanid) setUF(user,inClan);
+ if(group(name_clan,2).to_int()==clanid)setUF(user,inClan);
  else unSetUF(user,inClan);
- if (associates contains group(name_clan,2).to_int()){
+ if(associates contains group(name_clan,2).to_int()){
   setUF(user,inAssociate);
-  if (associates[group(name_clan,2).to_int()]==true) setUF(user,highAssociate);
+  if(associates[group(name_clan,2).to_int()]==true)setUF(user,highAssociate);
  }
- if (!(getUF(user,inClan))){
+ if(!(getUF(user,inClan))){
   boolean wl=checkWhitelist(userdata[user].userid);
-  if (wl) setUF(user,inClan);
+  if(wl)setUF(user,inClan);
  }
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  return userdata[user].userid;
 }
 
 //return id for given username. If name not on file, request it.
 int getId(string sender){
- if (sender=="") return 0;
+ if(sender=="")return 0;
  int x=userdata[sender].userid;
  if(x==0)x=updateId(sender,false);
  return x;
@@ -190,14 +224,14 @@ string to_commad(int i){
 }
 
 void updateDC(string list){
- if (list=="useCurrent") list=get_property("_currentDeals");
+ if(list=="useCurrent")list=get_property("_currentDeals");
  else set_property("_currentDeals",list);
  string deals="";
  matcher extra=create_matcher("\\s,\\s",list);
  list=replace_all(extra,",");
  string[int] names=split_string(list,",");
  foreach x in names deals+=names[x]+" (#"+getId(names[x]).to_int()+")\n";
- if (deals==" (#0)\n"){
+ if(deals==" (#0)\n"){
 //  print("No deals for DC","green");
   deals="";
  }else{
@@ -208,7 +242,7 @@ void updateDC(string list){
  int served=get_property('sauceCasts').to_int()+get_property('tamerCasts').to_int()+get_property('totalCastsEver').to_int();
  int days=get_property('totalDaysCasting').to_int()+1;
  string avg=to_string(served*1.0/days);
- if (index_of(avg,'.')+3<length(avg)) avg=substring(avg,0,index_of(avg,'.')+3);
+ if(index_of(avg,'.')+3<length(avg))avg=substring(avg,0,index_of(avg,'.')+3);
  string s="managecollection.php?action=changetext&pwd&newtext=";
  s+="Over "+to_commad(served)+" casts served since 2011!\n";
  s+="Daily Avg: "+avg+"\n\n";
@@ -217,7 +251,9 @@ void updateDC(string list){
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
  s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
+ claimResource("adventuring");
  visit_url(s);
+ freeResource("adventuring");
 }
 
 void updateDC(){
@@ -227,6 +263,7 @@ void updateDC(){
 void updateLimits(){
  string s;
  buffer n;
+ claimResource("adventuring");
  if((50-userdata["*"].buffs[6026])>10){
   s="managecollection.php?action=modifyshelves&pwd&newname12=";
   s+=to_string(50-userdata["*"].buffs[6026]);
@@ -247,6 +284,7 @@ void updateLimits(){
  n=visit_url(s);
  s=to_string(userdata["*"].buffs[62]);
  set_property("_limitBuffs",s);
+ freeResource("adventuring");
 }
 
 int checkRep(string check){
@@ -271,27 +309,30 @@ int KoLday(){
 }
 
 void saveSettings(){
- visit_url("questlog.php?which=4&action=updatenotes&font=0&notes="); 
+ claimResource("adventuring");
+ visit_url("questlog.php?which=4&action=updatenotes&font=0&notes=");
+ freeResource("adventuring");
 }
 
 boolean loadSettings(string postRO){
+ claimResource("adventuring");
  boolean rollpassed=false;
  string ls=visit_url("questlog.php?which=4");
+ freeResource("adventuring");
  matcher notef=create_matcher(";'\\>([\\s\\S]*)\\</text",ls);
- if(!find(notef)) return false;
+ if(!find(notef))return false;
  string[int] setting=split_string(group(notef,1),'\\r?\\n|\\s=\\s');
  int x=count(setting)/2;
- if (x==0) return false;
+ if(x==0)return false;
  int day=-1;
- for i from 0 to count(setting)-1 if(setting[i]=="!day") day=setting[i+1].to_int();
- if (day!=gameday_to_int()){
+ for i from 0 to count(setting)-1 if(setting[i]=="!day")day=setting[i+1].to_int();
+ if(day!=gameday_to_int()){
   rollpassed=true;
   string[int] skipsplit=split_string(postRO,';');
   int[string] skip;
   foreach toskip in skipsplit skip[skipsplit[toskip]]=1;
-  for i from 0 to x-1 if (!(skip contains setting[2*i])) set_property(setting[2*i],setting[2*i+1]);
- }else
-  for i from 0 to x-1 set_property(setting[2*i],setting[2*i+1]);
+  for i from 0 to x-1 if(!(skip contains setting[2*i]))set_property(setting[2*i],setting[2*i+1]);
+ }else for i from 0 to x-1 set_property(setting[2*i],setting[2*i+1]);
  saveSettings();
  return rollpassed;
 }
@@ -305,17 +346,23 @@ void saveSettings(string settings){
  foreach i in setting submit+=setting[i]+" = "+get_property(setting[i])+"\n";
  submit+="!day = "+gameday_to_int();
  submit="questlog.php?which=4&action=updatenotes&font=0&notes="+submit;
+ claimResource("adventuring");
  visit_url(submit);
+ freeResource("adventuring");
 }
 
 void deleteAnnouncement(){
+ claimResource("adventuring");
  string t=visit_url("clan_hall.php");
  matcher m=create_matcher("(\\d+)\">delete</a>\\]<b><br>From: Ominous Buffer \\(",t);
- if (m.find()) visit_url("clan_hall.php?action=delete&pwd&msgid="+m.group(1));
+ if(m.find())visit_url("clan_hall.php?action=delete&pwd&msgid="+m.group(1));
+ freeResource("adventuring");
 }
 
 void announceClan(string message){
+ claimResource("adventuring");
  deleteAnnouncement();
  string t="clan_board.php?action=postannounce&pwd&message="+message;
  visit_url(t);
+ freeResource("adventuring");
 }

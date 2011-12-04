@@ -49,9 +49,10 @@ record timestamp{
  int lastBh;
  int lastBm;
 };
-timestamp[int] ctimestemp;
-file_to_map("timefile.txt",ctimestemp);
-timestamp ctimes=ctimestemp[0];
+timestamp[int] ctimestamp;
+update(ctimestamp,"timefile.txt");
+timestamp ctimes=ctimestamp[0];
+update(userdata,"userdata.txt");
 
 boolean errorMsg=true;
 string prefix="";
@@ -194,20 +195,24 @@ void createpack(string sender, string msg){
   return;
  }
  chat(sender,"Your buffpack has been saved.");
+ checkOut(userdata,"userdata.txt");
  userdata[sender].buffpacks[packname]=packdata;
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void delpack(string sender, string packname){
+ checkOut(userdata,"userdata.txt");
  string s=remove userdata[sender].buffpacks[packname];
  if(s!="")chat(sender,"Pack removed.");
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 boolean sendRecord(int skillId, string sender){
  item recording=to_item("recording of "+skillId.to_skill().to_string());
  if(item_amount(recording)<1) return false;
+ claimResource("adventuring");
  cli_execute("csend 1 "+recording.to_string()+" to "+sender+" ||");
+ freeResource("adventuring");
  return true;
 }
 
@@ -249,9 +254,10 @@ void buff(string sender, string msg, int numTurns, string ding){
     errorMessage(failsplit[2],"The cake is a lie. So is that thing you asked for, since it wasn't a buff.");
     break;
    case "S":
+    checkOut(userdata,"userdata.txt");
     userdata[ding].buffs[failsplit[3].to_int()]+=1;
     userdata["*"].buffs[failsplit[3].to_int()]+=1;
-    map_to_file(userdata,"userdata.txt");
+    commit(userdata,"userdata.txt");
     updateDC("useCurrent");
     updateLimits();
     break;
@@ -344,38 +350,41 @@ void buff(string sender, string msg, int numTurns, string ding){
  if((skillnum>6019)&&(skillnum<6029)){
   if(maxnum-userdata["*"].buffs[skillnum]<1){
    if(sendRecord(skillnum,sender)){
+    checkOut(userdata,"userdata.txt");
     userdata[ding].buffs[skillnum]+=1;
     userdata["*"].buffs[skillnum]+=1;
-    map_to_file(userdata,"userdata.txt");
+    commit(userdata,"userdata.txt");
    }else errorMessage(ding,"I'm sorry, but I'm all out of "+messageNew+" for today.");
    return;
   }//balance if not enough to meet request
   if(maxnum-userdata["*"].buffs[skillnum]<casts) casts=maxnum-userdata["*"].buffs[skillnum];
  }
  //This is the actual casting function.
- claimResource("adventuring");
  if(skillnum==6901){
   if(item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
   if(item_amount($item[time's arrow])<1){
    chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    print("Out of Time's Arrows.");
-   freeResource("adventuring");
    return;
   }
+  claimResource("adventuring");
   string t=visit_url("curse.php?action=use&pwd="+my_hash()+"&whichitem=4939&targetplayer="+sender);
   print("Throwing Time's Arrow at "+sender);
   freeResource("adventuring");
+  checkOut(userdata,"userdata.txt");
   userdata[ding].buffs[skillnum]+=1;
-  map_to_file(userdata,"userdata.txt");
+  commit(userdata,"userdata.txt");
   return;
  }
+ claimResource("adventuring");
+ checkOut(userdata,"userdata.txt");
  if(have_skill(to_skill(skillnum))){
   if(use_skill(casts,to_skill(skillnum),sender)){
    int totCastsE=get_property('totalCastsEver').to_int()+casts;
    set_property('totalCastsEver',totCastsE.to_string());
    userdata[ding].buffs[skillnum]+=casts;
    userdata["*"].buffs[skillnum]+=casts;
-   map_to_file(userdata,"userdata.txt");
+   commit(userdata,"userdata.txt",false);
    if(((skillnum>6019)&&(skillnum<6029))||(skillnum==62)){
     updateDC("useCurrent");
     updateLimits();
@@ -408,7 +417,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   if(item_amount($item[magical mystery juice])<1) retrieve_item(1,$item[magical mystery juice]);
   use(1,$item[magical mystery juice]);
  }
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  freeResource("adventuring");
 }
 
@@ -452,7 +461,7 @@ void startGame(string sender, string msg){
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
     boolean[string]list;
-    file_to_map("wordshot/"+l.length()+".txt",list);
+    update(list,"wordshot/"+l.length()+".txt");
     int[string] koldict;
     update(koldict,"wordshot/custom.txt");
     if((list contains l)||(koldict contains l)){
@@ -498,6 +507,7 @@ void mod(string sender, string msg){
  m=create_matcher("[., ;]+",cmdlist);
  cmdlist=replace_all(m," ");
  string[int]cmds=split_string(cmdlist," ");
+ checkOut(userdata,"userdata.txt");
  foreach i,cmd in cmds
   switch(cmd){
    case "noLimit":
@@ -562,12 +572,12 @@ void mod(string sender, string msg){
     errorMessage(sender,cmd+" seems to be an invalid command.");
     break;
   }
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void fax(string sender, string msg){
  string[monster]m;
- file_to_map("faxnames.txt",m);
+ update(m,"faxnames.txt");
  switch(msg){
   case "hipster":
    msg="peeved roomate";
@@ -607,7 +617,9 @@ void fax(string sender, string msg){
 
 void updateRaidlog(){
  if(raidlogRead)return;
+ claimResource("adventuring");
  string v=visit_url("clan_raidlogs.php");
+ freeResource("adventuring");
  matcher mx=create_matcher("opened (a|\\d+) sewer grate",v);
  int turned=0;
  while(mx.find())if(mx.group(1)=="a") turned+=1;
@@ -637,11 +649,10 @@ string replyParser(string sender, string msg){
   }
  }
  if(someoneDefined!="")someone=someoneDefined;
- if(userdata[someone].userid==0) updateId(someone,true);
- if(userdata[sender].userid==0) updateId(sender,true);
- if(userdata[someone].gender==0) userdata[someone].gender=2;
- if(userdata[sender].gender==0) userdata[sender].gender=2;
- map_to_file(userdata,"userdata.txt");
+ if(userdata[someone].userid==0)updateId(someone,true);
+ if(userdata[sender].userid==0)updateId(sender,true);
+ if(userdata[someone].gender==0)userdata[someone].gender=2;
+ if(userdata[sender].gender==0)userdata[sender].gender=2;
  userinfo randplayer=userdata[someone];
  userinfo thesender=userdata[sender];
  string pclass;
@@ -657,9 +668,9 @@ string replyParser(string sender, string msg){
  }
  if(thesender.nick=="") thesender.nick=sender;
  if(randplayer.nick=="") randplayer.nick=someone;
- variable=create_matcher("(?<!\\\\)\\$(\\w*)",msg);
+ variable=create_matcher("(?<!\\\\)\\$(\\w*)(\\([\\w\\s]*\\))?",msg);
  while (variable.find()){
-  switch(variable.group(1)) {
+  switch(variable.group(1)){
    case "someone":
    case "sname":
     msg=replace_first(variable,someone);
@@ -684,7 +695,7 @@ string replyParser(string sender, string msg){
    case "sresult":
    case "smath":
     temp=randplayer.lastMath.to_string();
-    if(randplayer.lastMath.to_int()==randplayer.lastMath) temp=randplayer.lastMath.to_int().to_string();
+    if(randplayer.lastMath.to_int()==randplayer.lastMath)temp=randplayer.lastMath.to_int().to_string();
     msg=replace_first(variable,temp);
     break;
    case "sclass":
@@ -731,7 +742,7 @@ string replyParser(string sender, string msg){
    case "presult":
    case "pmath":
     temp=thesender.lastMath.to_string();
-    if(thesender.lastMath.to_int()==thesender.lastMath) temp=thesender.lastMath.to_int().to_string();
+    if(thesender.lastMath.to_int()==thesender.lastMath)temp=thesender.lastMath.to_int().to_string();
     msg=replace_first(variable,temp);
     break;
    case "pclass":
@@ -767,7 +778,7 @@ string replyParser(string sender, string msg){
    case "math":
    case "result":
     temp=userdata["*"].lastMath.to_string();
-    if(userdata["*"].lastMath.to_int()==userdata["*"].lastMath) temp=userdata["*"].lastMath.to_int().to_string();
+    if(userdata["*"].lastMath.to_int()==userdata["*"].lastMath)temp=userdata["*"].lastMath.to_int().to_string();
     msg=replace_first(variable,temp);
     break;
    case "trigger":
@@ -775,7 +786,7 @@ string replyParser(string sender, string msg){
     break;
    case "lotto":
     int[string] books;
-    file_to_map("books.txt",books);
+    update(books,"books.txt");
     temp=books["thisLotto"].to_string()+"k";
     msg=replace_first(variable,temp);
     break;
@@ -800,12 +811,18 @@ string replyParser(string sender, string msg){
     }
     msg=replace_first(variable,get_property("sewerValves"));
     break;
+   case "rand":
+    int i=100;
+    if(variable.group_count()>1)i=variable.group(2).to_int();
+    i=random(i);
+    msg=replace_first(variable,i.to_string());
+    break;
    default:
-    if(chatVars contains variable.group(1)) msg=replace_first(variable,chatVars[variable.group(1)]);
+    if(chatVars contains variable.group(1))msg=replace_first(variable,chatVars[variable.group(1)]);
     else msg=replace_first(variable,variable.group(1));
     break;
   }
-  variable=create_matcher("(?<!\\\\)\\$(\\w*)",msg);
+  variable.reset(msg);
  }
  variable=create_matcher("\\\\\\$",msg);
  msg=replace_all(variable,"$");
@@ -822,10 +839,10 @@ string chatFilter(string sender, string msg){
 
 void train(string trainer, string msg){
  string[int,string] changes;
- file_to_map("changes.txt",changes);
+ checkOut(changes,"changes.txt");
  changes[count(changes),trainer]=msg;
  responses[string] botdata;
- file_to_map("replies.txt",botdata);
+ checkOut(botdata,"replies.txt");
  responses newr;
  newr.flags=mustAddress;
  string trig;
@@ -858,6 +875,8 @@ void train(string trainer, string msg){
   }
   if(!knownmethod){
    errorMessage(trainer,"Training failed: Unknown method: "+newr.method);
+   freeResource("changes.txt");
+   freeResource("replies.txt");
    return;
   }
   string t=newr.reply;
@@ -891,27 +910,27 @@ void train(string trainer, string msg){
   else botdata[t]=newr;
  }
  chat(trainer,"Training complete: "+newr.reply);
- map_to_file(botdata,"replies.txt");
- map_to_file(changes,"changes.txt");
+ commit(botdata,"replies.txt");
+ commit(changes,"changes.txt");
 }
 
 void untrain(string trainer, string msg){
  string[int,string] changes;
- file_to_map("changes.txt",changes);
+ checkOut(changes,"changes.txt");
  changes[count(changes),trainer]="drop "+msg;
  responses[string] botdata;
- file_to_map("replies.txt",botdata);
+ checkOut(botdata,"replies.txt");
  responses fix=remove botdata[msg];
  chat(trainer,"Training removed: "+fix.reply);
- map_to_file(botdata,"replies.txt");
- map_to_file(changes,"changes.txt");
+ commit(botdata,"replies.txt");
+ commit(changes,"changes.txt");
 }
 
 void search(string sender, string msg){
  msg=msg.to_lower_case();
  string trigm,replm;
  responses[string] botdata;
- file_to_map("replies.txt",botdata);
+ update(botdata,"replies.txt");
  foreach trig,re in botdata{
   if(re.reply.to_lower_case().contains_text(msg)){
    replm+="T: "+trig+"\n";
@@ -944,11 +963,13 @@ void clearData(string what){
  switch(what){
   case "changelog":
    string[int,string] changes;
-   map_to_file(changes,"changes.txt");
+   claimResource("changes.txt");
+   commit(changes,"changes.txt");
    break;
   case "filter":
+   checkOut(userdata,"userdata.txt");
    for i from 0 to 6 userdata["*"].buffpacks[i.to_string()]="";
-   map_to_file(userdata,"userdata.txt");
+   commit(userdata,"userdata.txt");
    break;
  }
 }
@@ -1004,12 +1025,17 @@ void multilookup(string sender, string who){
 void userDetails(string sender, string who){
  if(who=="")who=sender;
  string reply;
+ string t;
  if((who=="ob")||(who=="ominous buffer")){
   reply="User: Ominous Buffer\n";
   reply+="Known Multis: Ominous Tamer, Ominous Sauceror\nGoes by: OB\n";
   reply+="Gender neutral.\n\n";
-  reply+="Currently casting for the following clans: ";
-  reply+="Black Mesa, Not Dead Yet, This One Time, Imitation Plastic Death Star, and Clan of 14 Days.";
+  reply+="Currently casting for the following clans: Black Mesa";
+  foreach pId in associates{
+   t=pId.to_clanName();
+   if(t!="")reply+=", "+t;
+  }
+  reply+=".";
   cli_execute("csend to "+sender+"||"+reply);
   return;
  }
@@ -1042,8 +1068,9 @@ void userAccountEmpty(string w){
   errorMessage(w,"Error sending meat, try again later, preferably out of ronin/HC.");
   return;
  }
+ checkOut(userdata,"userdata.txt");
  userdata[w].wallet=0;
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 string addMulti(string n1, string n2){
@@ -1073,7 +1100,8 @@ string addMulti(string n1, string n2){
 
 void setMulti(string sender, string newaltlist){
  int[string,string] mlist;
- file_to_map("tempMultis.txt",mlist);
+ checkOut(mlist,"tempMultis.txt");
+ checkOut(userdata,"userdata.txt");
  boolean match=false;
  string[int]alts=split_string(newaltlist,",\\s?");
  int now=now_to_string("yDDDHH").to_int();
@@ -1095,15 +1123,16 @@ void setMulti(string sender, string newaltlist){
  if(matchtxt=="") chat(sender,"Reminder sent to other accounts, you have 24 hours to register them.");
  else if(length(matchtxt)<111) chat(sender,"Multi properly registered for accounts:"+matchtxt);
  else cli_execute("csend to "+sender+"||Multi properly registered for accounts:"+matchtxt);
- map_to_file(mlist,"tempMultis.txt");
- map_to_file(userdata,"userdata.txt");
+ commit(mlist,"tempMultis.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void setNick(string sender, string w){
  print("Nick set for "+sender,"blue");
+ checkOut(userdata,"userdata.txt");
  userdata[sender].nick=w;
  foreach alt in userdata[sender].multis userdata[alt].nick=w;
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 void clanTitle(string sender, string newt){
@@ -1111,41 +1140,50 @@ void clanTitle(string sender, string newt){
   chat("Only current members of the clan can have their clan title changed... idiot.");
   return;
  }
+ claimResource("adventuring");
  visit_url("clan_members.php?pwd&action=modify&pids[]="+userdata[sender].userid+"&title"+userdata[sender].userid+"="+newt);
+ freeResource("adventuring");
 }
 
 void whitelistEdit(string oper){
+ claimResource("adventuring");
  string cw=visit_url("clan_whitelist.php");
  matcher action=create_matcher("(-)?(\\w[\\w\\d\\s_]*)\\s*([:=]\\s*.+?)?",oper);
  int i;
  if(!action.find()){
   chat("I'm not sure what exactly you want me to do with the whitelist.");
+  freeResource("adventuring");
   return;
  }
  i=getId(action.group(2));
  if(i==0){
   chat("I'm not sure who "+action.group(2)+" is.");
+  freeResource("adventuring");
   return;
  }
  if(action.group(1)=="-"){
   i=getId(action.group(2));
   if(!cw.contains_text("who="+i.to_string())){
    chat(action.group(2)+" isn't currently on the whitelist.");
+   freeResource("adventuring");
    return;
   }
   cw=visit_url("clan_whitelist.php?action=update&pwd&player"+i+"="+i+"&drop"+i+"=on");
+  freeResource("adventuring");
   return;
  }
  i=getId(action.group(2));
  string s="clan_whitelist.php?action=add&pwd";
  if(cw.contains_text("who="+i.to_string())){
   chat(action.group(2)+" is already whitelisted.");
+  freeResource("adventuring");
   return;
  }
  if(cw.contains_text("(#"+i+")")){
   s+="&clannie="+i;
   visit_url(s);
   chat(action.group(2)+" added to whitelist.");
+  freeResource("adventuring");
   return;
  }
  s+="&addwho="+action.group(2);
@@ -1159,6 +1197,7 @@ void whitelistEdit(string oper){
  }
  visit_url(s);
  chat(action.group(2)+" added to whitelist.");
+ freeResource("adventuring");
 }
 
 void sendLink(string sender, string i){
@@ -1229,6 +1268,7 @@ string performMath(string sender, string msg){
  matcher m=create_matcher("\\s*",msg);
  msg=replace_all(m,"");
  string[int] chunks=split_string(msg,",");
+ checkOut(userdata,"userdata.txt");
  float last=userdata[sender].lastMath;
  float[string] mathvars;
  foreach i,chunk in chunks{
@@ -1240,7 +1280,7 @@ string performMath(string sender, string msg){
  }
  userdata[sender].lastMath=last;
  msg=last.to_string(8);
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  if(msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
  return msg;
 }
@@ -1408,8 +1448,10 @@ string predicateFilter(string sender, string msg){
    if(is_online("wangbot")){
     chat("wangbot","target "+oper);
    }else{
+    claimResource("adventuring");
     if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
     string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
+    freeResource("adventuring");
    }
    return "x";
   case "whitelist":
@@ -1432,11 +1474,11 @@ string predicateFilter(string sender, string msg){
 void nopredpass(string sender, string msg, boolean addressed){
  //print("yo");
  responses[string] botdata;
- file_to_map("replies.txt",botdata);
+ update(botdata,"replies.txt");
  boolean foundmatch=false;
  boolean referred=addressed;
  matcher ref=create_matcher("(?i)(\\WOB\\W|\\WOminous Buffer\\W)",msg);
- if(ref.find()) referred=true;
+ if(ref.find())referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
  responses the_one;
@@ -1462,10 +1504,11 @@ void nopredpass(string sender, string msg, boolean addressed){
   break;
  }
  if(foundmatch){
+  checkOut(userdata,"userdata.txt");
   userdata[sender].lastTrigger=th;
   userdata["*"].lastTrigger=th;
   addRep(th);
-/*WHAT?*/  map_to_file(userdata,"userdata.txt");
+  commit(userdata,"userdata.txt");
   switch(the_one.method){
    case "say":chat(replyParser(sender,the_one.reply));
     break;
@@ -1478,7 +1521,7 @@ void nopredpass(string sender, string msg, boolean addressed){
 void setGender(string sender, string gender){
  int gval=2;
  matcher g=create_matcher("(?i)(WHO I AM|ME)",gender);
- if(g.find()) gval=1;
+ if(g.find())gval=1;
  int tc=2;
  while(gval==2){
   tc+=1;
@@ -1487,16 +1530,17 @@ void setGender(string sender, string gender){
   g=create_matcher("(?i)("+genders[tc,5]+")",gender);
   if(g.find()) gval=tc;
  }
+ checkOut(userdata,"userdata.txt");
  userdata[sender].gender=gval;
  foreach m in userdata[sender].multis userdata[m].gender=gval;
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
 }
 
 int timeSinceLastChat(string who){
  boolean useA=true;
  string lastSpeaker;
  if((ctimes.lastCA==who)||(ctimes.lastCB==who)){
-  if(ctimes.lastCB==who) useA=false;
+  if(ctimes.lastCB==who)useA=false;
   ctimes.lastChatterA=~useA;
  }else{
   useA=~ctimes.lastChatterA;
@@ -1525,10 +1569,12 @@ int timeSinceLastChat(string who){
   ctimes.lastBm=nowM;
   ctimes.lastCB=who;
  }
- ctimestemp[0]=ctimes;
- map_to_file(ctimestemp,"timefile.txt");
+ ctimestamp[0]=ctimes;
+ claimResource("timefile.txt");
+ commit(ctimestamp,"timefile.txt");
+ checkOut(userdata,"userdata.txt");
  userdata[who].lastTime=now_to_string("MMMM d, yyyy 'at' hh:mm:ss a z");
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  lastM=lastM+lastH*60;
  nowM=nowM+nowH*60;
  nowM-=lastM;
@@ -1564,9 +1610,10 @@ boolean fancyMath(string sender, string equation){
   mod=replace_all(dm,i.to_string());
   tmp+=mathlibeval(mod);
  }
+ checkOut(userdata,"userdata.txt");
  userdata[sender].lastMath=tmp;
  userdata["*"].lastMath=tmp;
- map_to_file(userdata,"userdata.txt");
+ commit(userdata,"userdata.txt");
  chat(tmp.to_string(8));
  return true;
 }
@@ -1732,7 +1779,7 @@ void publicChat(string sender, string msg){
   pred=m.group(1);
   oper=m.group(2);
  }
- for i from 2 upto count(genders)-1 if(genders[i] contains 5) genderMatcherString+="|"+genders[i,5];
+ for i from 2 upto count(genders)-1 if(genders[i] contains 5)genderMatcherString+="|"+genders[i,5];
  genderMatcherString+=")";
  if(!addressed) m=create_matcher(genderMatcherString,msg);
  else m=create_matcher("(?i)"+genderMatcherString,msg);
@@ -1748,8 +1795,9 @@ void publicChat(string sender, string msg){
  }
  if(addressed&&isMath(msg)){
   msg=performMath(sender,msg);
+  checkOut(userdata,"userdata.txt");
   userdata["*"].lastMath=userdata[sender].lastMath;
-  map_to_file(userdata,"userdata.txt");
+  commit(userdata,"userdata.txt");
   chat(msg);
   return;
  }
@@ -1789,12 +1837,12 @@ void publicChat(string sender, string msg){
    if(mathSTP(oper))return;
    break;
   case "sum":
-   if(addressed) fancyMath(sender,oper);
+   if(addressed)fancyMath(sender,oper);
    return;
   case "urban":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+":"+oper);
-   if(addressed) searchUrban(oper);
+   if(addressed)searchUrban(oper);
    return;
  }
  nopredpass(sender,original,addressed);
@@ -1896,7 +1944,7 @@ void privateHandler(string sender, string msg){
 }
 
 boolean preHandled(string sender, string msg, string channel){
- if(get_property("chatScriptDisabled")!=""){
+ if(!couldClaim("science")){
   if(channel=="")chat(sender,"Sorry, I've got science to do.");
   return true;
  }
