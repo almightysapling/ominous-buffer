@@ -688,20 +688,27 @@ void main(){try{
  set_property("chatbotScript",chatbotScript);
  int n;
  while(MinutesToRollover()>(burnMinutes+3)){
+ print("start loop(0): "+permisionDepth("adventuring"));
   coreGameCycle();
+ print("after games(0): "+permissionDepth("adventuring"));
   claimResource("adventuring");
   checkLotto();
+ print("after lotto (1): "+permissionDepth("adventuring"));
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n<15)n+=1440;
   if(n>=(lastCheck+15)){
    if(n>1439)n-=1440;
    lastCheck=n+15;
    checkApps();
+ print("after apps(1): "+permissionDepth("adventuring"));
    checkMail();
+ print("after mail (1): "+permissionDepth("adventuring"));
    checkData();
+ print("after data (1): "+permissionDepth("adventuring"));
   }
   freeResource("adventuring");
   waitq(5);
+ print("end loop (0): "+permissionDepth("adventuring"));
  }
  if(MinutesToRollover()>burnMinutes)waitq(60);
  claimResource("adventuring");
