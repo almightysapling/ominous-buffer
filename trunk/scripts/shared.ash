@@ -136,6 +136,13 @@ boolean couldClaim(string resourceName){
  return true;
 }
 
+int permissionDepth(string resourceName){
+ resource[string] resources;
+ file_to_map("resources.txt",resources);
+ if(resources[resourceName].owner==NAME_)return resources[resourceName].depth;
+ return -resources[resourceName].depth;
+}
+
 void setUF(string user, int f){
  userdata[user].flags|=f;
 }
