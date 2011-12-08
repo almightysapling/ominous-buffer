@@ -302,12 +302,12 @@ void buff(string sender, string msg, int numTurns, string ding){
   }
  }
  if((skillnum>2000)&&(skillnum<3000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+to_string(max);
+  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
   chat_private(turt_name,mout);
   return;
  }
  if((skillnum>4000)&&(skillnum<5000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+to_string(max);
+  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
   chat_private(sauc_name,mout);
   return;
  }
@@ -1945,7 +1945,7 @@ void privateHandler(string sender, string msg){
 
 boolean preHandled(string sender, string msg, string channel){
  if(!couldClaim("science")){
-  if(channel=="")chat(sender,"Sorry, I've got science to do.");
+  if(channel=="")chat(sender,"You've got no use chatting, I've got science to do.");
   return true;
  }
  if(sender=="faxbot"){
