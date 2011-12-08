@@ -47,15 +47,15 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
   return;
  }
  if (numTurns==0) numTurns=200;
-
+ 
  int[int,int] dailybuffs;
  file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
  skill msgNew=to_skill(skillnum);
  int limit=maxTurns/settings["tpc"].to_int();
- int casts=min(ceil(numTurns/settings["tpc"].to_float()),limit);
- if (casts>limit) casts=limit;
- if (dailybuffs[sender] contains skillnum){
-  if ((casts+dailybuffs[sender,skillnum])>limit) casts=limit-dailybuffs[sender,skillnum];
+ int casts=ceil(numTurns/settings["tpc"].to_float());
+ if((casts>limit)&&(maxTurns>0))casts=limit;
+ if((dailybuffs[sender] contains skillnum)&&(maxTurns>0)){
+  if((casts+dailybuffs[sender,skillnum])>limit)casts=limit-dailybuffs[sender,skillnum];
  }
 
  if (casts<1){
