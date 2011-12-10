@@ -591,7 +591,7 @@ void processQuestData(boolean rp){
  commit(userdata,"userdata.txt");
 }
 
-void nightlyPaperwork(){{
+void nightlyPaperwork(){
  string n=now_to_string("yyyyMMdd");
  int[string]books;
  claimResource("backup/"+n+"b.txt");
