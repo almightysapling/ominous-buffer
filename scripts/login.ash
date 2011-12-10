@@ -591,7 +591,7 @@ void processQuestData(boolean rp){
  commit(userdata,"userdata.txt");
 }
 
-void nightlyPaperwork(){
+void nightlyPaperwork(){{
  string n=now_to_string("yyyyMMdd");
  int[string]books;
  claimResource("backup/"+n+"b.txt");
@@ -600,6 +600,13 @@ void nightlyPaperwork(){
  claimResource("backup/"+n+"u.txt");
  update(userdata,"userdata.txt");
  commit(userdata,"backup/"+n+"u.txt");
+}
+
+void clearBuffs(){
+ for i from 6000 to 6030{
+  if((i==6006)||(i==6010))continue;
+  if(i.to_skill().to_effect().have_effect()>0)cli_execute("uneffect "+i.to_skill().to_effect().to_string());
+ }
 }
 
 void dailyBreakfast(){
@@ -654,15 +661,15 @@ void dailyBreakfast(){
  if(item_amount($item[supernova champagne])<6)retrieve_item(6,$item[supernova champagne]);
  if(item_amount($item[can of swiller])<1)retrieve_item(1,$item[can of swiller]);
  if(have_skill($skill[Lunch Break])) (!use_skill(1,$skill[Lunch Break]));
- cli_execute("uneffect cantata");
+ clearBuffs();
  if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
  drink(6,$item[supernova champagne]);
  drink(1,$item[can of swiller]);
- cli_execute("uneffect ode");
+ clearBuffs();
  if(have_skill($skill[Sonata of Sneakiness])) (!use_skill(1,$skill[Sonata of Sneakiness]));
  if(((have_effect($effect[Dreams and Lights])<1)||(have_effect($effect[Dreams and Lights])>8))&&(have_effect($effect[Arcane in the Brain])<1)){
   while(have_effect($effect[Dreams and Lights])<1) (!adventure(1,$location[Haunted Gallery]));
-  cli_execute("uneffect sonata");
+  clearBuffs();
   retrieve_item(1,$item[llama lama gong]);
   cli_execute("gong mole");
   if(!adventure(8,$location[Mt. Molehill])){
@@ -726,7 +733,7 @@ void main(){try{
  }
  updateDC();
  visit_url("bhh.php");
- cli_execute("uneffect cantata");
+ clearBuffs();
  cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
