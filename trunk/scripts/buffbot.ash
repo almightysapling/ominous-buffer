@@ -1963,6 +1963,7 @@ boolean preHandled(string sender, string msg, string channel){
 //IN:       ""          "/clan" "/DUNGEON"
 //OUT:      name        ""      "/DUNGEON "
 void main(string sender, string msg, string channel){
+debug();
  if(preHandled(sender,msg,channel))return;
  msg=decodeHTML(msg,true);
  switch(channel){
