@@ -57,6 +57,12 @@ void setName(string newname){
  NAME_=newname;
 }
 
+void debug(){
+ resource[string] resources;
+ file_to_map("resources.txt",resources);
+ foreach name,res in resources if(res.depth!=0)print(name+": "+res.owner+"["+res.depth+"]");
+}
+
 void cleanResources(){ //Remove all holds
  resource[string]blank;
  map_to_file(blank,"resources.txt");

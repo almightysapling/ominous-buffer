@@ -119,6 +119,7 @@ void endRaffle(gameData g){
 }
 
 void checkMail(){
+ claimResource("adventuring");
  checkOut(userdata,"userdata.txt");
  message[int] mail=parseMail();
  matcher mx;
@@ -259,6 +260,7 @@ raffle gameData{
   }
  }
  commit(userdata,"userdata.txt");
+ freeResource("adventuring");
 }
 
 void checkRaffle(){
@@ -312,7 +314,7 @@ void checkLotto(){
  foreach name in inClan clannies[count(clannies)]=name;
  int num=count(clannies);
  if(num<1){
-  set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
+  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
   commit(books,"books.txt");
   return;
  }
@@ -528,7 +530,7 @@ void handleMeat(){
  books["Event1"]=event1;
  books["Event2"]=event2;
  books["Event3"]=event3;
- set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
+ set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
 }
 
@@ -680,6 +682,7 @@ void dailyBreakfast(){
 }
 
 void main(){try{
+debug();
  print("Starting Login...");
  if(get_property("_thisBreakfast")=="")cleanPC();
  claimResource("adventuring");
@@ -695,6 +698,7 @@ void main(){try{
  set_property("chatbotScript",chatbotScript);
  int n;
  while(MinutesToRollover()>(burnMinutes+3)){
+debug();
   coreGameCycle();
   claimResource("adventuring");
   checkLotto();
@@ -741,11 +745,16 @@ void main(){try{
  freeResource("adventuring");
  chat_private("Ominous Tamer","CASTRQ");
  chat_private("Ominous Sauceror","CASTRQ");
+debug();
  checkApps();
+debug();
  waitq((MinutesToRollover()-logMinutes-5)*60);
  chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
+debug();
  checkApps();
+debug();
  waitq((MinutesToRollover()-logMinutes)*60);
+debug();
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  saveSettings(nightlySave);

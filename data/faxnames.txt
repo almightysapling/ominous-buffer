@@ -80,6 +80,7 @@ Some Zombie Waltzers	waltzers
 Spam Witch	spam_witch
 Spider Gremlin	spider_gremlin
 Sub-Assistant Knob Mad Scientist	firecracker
+Swarm of fudgewasps	fudge_wasps
 Swarm of Scarab Beatles	beatles
 The Angels of Avalon	avalon
 The Remains of a Jilted Mistress	jilted
