@@ -1,7 +1,7 @@
 import <shared.ash>
 import <market.ash>
 import <mathlib.ash>
-setName(__FILE__);
+invokeResourceMan(__FILE__);
 string[int] to_array(boolean[string] data){
  string[int] x;
  foreach y in data
@@ -1140,6 +1140,10 @@ void clanTitle(string sender, string newt){
   chat("Only current members of the clan can have their clan title changed... idiot.");
   return;
  }
+ if(!getUF(sender,isAdmin)){
+  chat("Only admins can use this until it gets fixed for rank recognition, sorry.");
+  return;
+ }
  claimResource("adventuring");
  visit_url("clan_members.php?pwd&action=modify&pids[]="+userdata[sender].userid+"&title"+userdata[sender].userid+"="+newt);
  freeResource("adventuring");
@@ -1281,7 +1285,7 @@ string performMath(string sender, string msg){
  userdata[sender].lastMath=last;
  msg=last.to_string(8);
  commit(userdata,"userdata.txt");
- if(msg.to_float()==msg.to_int()) msg=substring(msg,0,length(msg)-2);
+ if(msg.to_float()==msg.to_int())msg=substring(msg,0,length(msg)-2);
  return msg;
 }
 
@@ -1962,7 +1966,7 @@ boolean preHandled(string sender, string msg, string channel){
 //CHANNELS: private,    clan,   DUNGEON
 //IN:       ""          "/clan" "/DUNGEON"
 //OUT:      name        ""      "/DUNGEON "
-void main(string sender, string msg, string channel){
+void main(string sender, string msg, string channel){try{
 debug();
  if(preHandled(sender,msg,channel))return;
  msg=decodeHTML(msg,true);
@@ -1983,4 +1987,6 @@ debug();
    privateHandler(sender,msg);
    break;
  }
-}
+}finally{
+ releaseResources();
+}}

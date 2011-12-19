@@ -141,7 +141,7 @@ void throw(int error){
 //decimals, optionally add zeroes.
 string to_string(float value, int prec, boolean zeros){
  string out=to_string(value);
- matcher m=create_matcher("E([+-]\\d+)",out);
+ matcher m=create_matcher("E(-?\\d+)",out);
  if (m.find()){
   int place=m.group(1).to_int();
   out=replace_all(m,"");
@@ -157,7 +157,11 @@ string to_string(float value, int prec, boolean zeros){
    out="0."+out;
    if(neg) out="-"+out;
   }else{
-   
+   while(length(out)<(place+2))out=out+"0";
+   if(length(out)>(place+1)){
+    m=create_matcher("(\\d{"+to_string(place+1)+"})(\\d*)",out);
+    if(m.find())out=m.group(1)+"."+m.group(2);
+   }
   }
  }
  int decimal=index_of(out,".")+1;

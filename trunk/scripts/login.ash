@@ -1,5 +1,5 @@
 import <shared.ash>
-setName(__FILE__);
+invokeResourceMan(__FILE__);
 string chatbotScript="buffbot.ash";
 int logMinutes=3;
 int burnMinutes=40;
@@ -52,14 +52,15 @@ void checkApps(){
 }
 
 void checkData(){
- checkOut(userdata,"userdata.txt");
+ update(userdata,"userdata.txt");
  if(!(userdata["*"].buffpacks contains "boss")){
+  checkOut(userdata,"userdata.txt");
   userdata["*"].buffpacks["boss"]="25 phat loot, 25 thingfinder, 25 chorale";
+  commit(userdata,"userdata.txt");
   chat_private("Sentrion","I am error.");
   chat_private("Almighty Sapling","I am error.");
   chat_clan("I am error.");
  }
- commit(userdata,"userdata.txt");
 }
 
 void raffleAnnounce(gameData g){
@@ -293,6 +294,7 @@ void sendMeat(string who, int amount){
 
 void checkLotto(){
  int[string] books;
+debug(297);
  checkOut(books,"books.txt");
  int event=0;
  int time=minutesToRollover();
@@ -301,6 +303,7 @@ void checkLotto(){
  if(time<books["Event3"])event=3;
  if(event<1){
   commit("books.txt");
+debug(306);
   return;
  }
  books["Event"+event.to_string()]=0;
@@ -316,6 +319,7 @@ void checkLotto(){
  if(num<1){
   set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
   commit(books,"books.txt");
+debug(322);
   return;
  }
  float perc;
@@ -366,6 +370,7 @@ void checkLotto(){
  }
  set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
  commit(books,"books.txt");
+debug(373);
 }
 
 void makeRecords(){
@@ -684,8 +689,10 @@ void dailyBreakfast(){
 void main(){try{
 debug();
  print("Starting Login...");
+ claimResource("science");
  if(get_property("_thisBreakfast")=="")cleanPC();
  claimResource("adventuring");
+ set_property("chatbotScript",chatbotScript);
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
@@ -694,14 +701,13 @@ debug();
  cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
  freeResource("adventuring");
+ freeResource("science");
  print("Entering wait cycle.","green");
- set_property("chatbotScript",chatbotScript);
  int n;
  while(MinutesToRollover()>(burnMinutes+3)){
-debug();
   coreGameCycle();
-  claimResource("adventuring");
   checkLotto();
+if(permissionDepth("books.txt")>0)print("WHAT?");
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n<15)n+=1440;
   if(n>=(lastCheck+15)){
@@ -711,12 +717,11 @@ debug();
    checkMail();
    checkData();
   }
-  freeResource("adventuring");
   waitq(5);
  }
  if(MinutesToRollover()>burnMinutes)waitq(60);
- claimResource("adventuring");
  claimResource("science");
+ claimResource("adventuring");
  print("Using excess adventures before rollover.","red");
  if(have_effect($effect[Shape of...Mole!])>0){
   while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
@@ -741,20 +746,15 @@ debug();
  cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
- freeResource("science");
  freeResource("adventuring");
+ freeResource("science");
  chat_private("Ominous Tamer","CASTRQ");
  chat_private("Ominous Sauceror","CASTRQ");
-debug();
  checkApps();
-debug();
  waitq((MinutesToRollover()-logMinutes-5)*60);
  chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
-debug();
  checkApps();
-debug();
  waitq((MinutesToRollover()-logMinutes)*60);
-debug();
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  saveSettings(nightlySave);

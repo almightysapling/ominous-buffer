@@ -52,20 +52,43 @@ record resource{
  string owner;
  int depth;
 };
+int noHold=0;
+int inWait=1;
+int locked=2;
+record resourceManagerItem{
+ int status;
+};
+resourceManagerItem[string] resourceMan;
 
-void setName(string newname){
+void invokeResourceMan(string newname){
  NAME_=newname;
+ resource[string] resources;
+ file_to_map("resources.txt",resources);
+ foreach n,res in resources if((res.owner==NAME_)||(res.depth==0)) remove resources[n];
+ map_to_file(resources,"resources.txt");
+ clear(resourceMan);
+}
+
+void debug(int i){
+ resource[string] resources;
+ file_to_map("resources.txt",resources);
+ boolean out=false;
+ foreach name,res in resources if(res.depth!=0){
+  if((!out)&&(i>0))print("@"+i+" {");
+  print((i>0?"-":"")+name+": "+res.owner+"["+res.depth+"]");
+  out=true;
+ }
+ if((out)&&(i>0))print("}");
 }
 
 void debug(){
- resource[string] resources;
- file_to_map("resources.txt",resources);
- foreach name,res in resources if(res.depth!=0)print(name+": "+res.owner+"["+res.depth+"]");
+ debug(-1);
 }
 
 void cleanResources(){ //Remove all holds
  resource[string]blank;
  map_to_file(blank,"resources.txt");
+ clear(resourceMan);
 }
 
 void releaseResources(){ //Remove all holds of a certain script
@@ -76,6 +99,7 @@ void releaseResources(){ //Remove all holds of a certain script
   resources[name].depth=0;
  }
  map_to_file(resources,"resources.txt");
+ clear(resourceMan);
 }
 
 boolean claimResource(string resourceName){ //Lock a symbol
@@ -85,6 +109,7 @@ boolean claimResource(string resourceName){ //Lock a symbol
   waitq(1);
   file_to_map("resources.txt",resources);
  }
+ resourceMan[resourceName].status=locked;
  resources[resourceName].owner=NAME_;
  resources[resourceName].depth+=1;
  map_to_file(resources,"resources.txt");
@@ -95,6 +120,7 @@ string freeResource(string resourceName){ //Free a symbol without saving
  resource[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName].owner;
+ if(resourceMan contains resourceName)remove resourceMan[resourceName];
  if(owner==NAME_){
   resources[resourceName].depth-=1;
   if(resources[resourceName].depth==0)resources[resourceName].owner="";
@@ -110,11 +136,13 @@ string commit(string resourceName){ //Free a symbol without saving
 aggregate checkOut(aggregate data, string resourceName){ //Lock a symbol and load its contents
  claimResource(resourceName);
  file_to_map(resourceName,data);
+// resourceMan[resourceName].data=data;
  return data;
 }
 
 aggregate update(aggregate data, string resourceName){ //Load a symbol, but don't get permission to save
  file_to_map(resourceName,data);
+// resourceMan[resourceName].data=data;
  return data;
 }
 
@@ -124,9 +152,14 @@ string commit(aggregate data, string resourceName, boolean freeR){ //Save data t
  string owner=resources[resourceName].owner;
  if(owner==NAME_){
   map_to_file(data,resourceName);
-  resources[resourceName].depth-=1;
-  if(resources[resourceName].depth==0)resources[resourceName].owner="";
-  if(freeR)map_to_file(resources,"resources.txt");
+  if(freeR){
+   resources[resourceName].depth-=1;
+   if(resources[resourceName].depth==0){
+    resources[resourceName].owner="";
+    remove resourceMan[resourceName];
+   }
+   map_to_file(resources,"resources.txt");
+  }
  }
  return owner;
 }
