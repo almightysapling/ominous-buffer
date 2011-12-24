@@ -707,7 +707,6 @@ debug();
  while(MinutesToRollover()>(burnMinutes+3)){
   coreGameCycle();
   checkLotto();
-if(permissionDepth("books.txt")>0)print("WHAT?");
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n<15)n+=1440;
   if(n>=(lastCheck+15)){
