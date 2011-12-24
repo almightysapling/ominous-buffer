@@ -361,10 +361,10 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  //This is the actual casting function.
  if(skillnum==6901){
-  if(item_amount($item[time's arrow])<1) cli_execute("stash take time's arrow");  
+  if(item_amount($item[time's arrow])<1)
+   if(cli_execute("stash take time's arrow")){}
   if(item_amount($item[time's arrow])<1){
    chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
-   print("Out of Time's Arrows.");
    return;
   }
   claimResource("adventuring");
@@ -421,18 +421,21 @@ void buff(string sender, string msg, int numTurns, string ding){
  freeResource("adventuring");
 }
 
-string roll(string sender, string msg){
- string[int] rolling;
- int running;
- rolling=split_string(msg,"d|D");
- if((to_int(rolling[0])<1)||(to_int(rolling[0])>1000000)||(to_int(rolling[1])<2)||(to_int(rolling[1])>1000000)){
-  errorMessage(sender,"That's an invalid range.");
-  return "";
+int roll(string sender, string msg){
+ matcher m=create_matcher("(\\d+)[dD](\\d+)",msg);
+ if(!m.find()){
+  errorMessage(sender,"You're doing it wrong. Typical.");
+  return 0;
  }
- for die from 1 to to_int(rolling[0]) running+=(1+random(to_int(rolling[1])));
- if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+rolling[0]+"d"+rolling[1]+").");
- else chat("Rolling "+rolling[0]+"d"+rolling[1]+" gives "+running+".");
- return running.to_string();
+ int running;
+ if((m.group(1).to_int()<1)||(m.group(1).to_int()>1000000)||(m.group(2).to_int()<2)||(m.group(2).to_int()>1000000)){
+  errorMessage(sender,"That's an invalid range.");
+  return 0;
+ }
+ for die from 1 to m.group(1).to_int() running+=(1+random(m.group(2).to_int()));
+ if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+m.group(1)+"d"+m.group(2)+").");
+ else chat("Rolling "+m.group(1)+"d"+m.group(2)+" gives "+running+".");
+ return running;
 }
 
 void startGame(string sender, string msg){
