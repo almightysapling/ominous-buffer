@@ -1067,7 +1067,7 @@ void userAccountEmpty(string w){
   errorMessage(w,"You don't have sufficient funds to withdraw.");
   return;
  }
- if(!kmail(w,"Your balance in full.",userdata[w].wallet)){
+ if(kmail(w,"Your balance in full.",userdata[w].wallet)!=1){
   errorMessage(w,"Error sending meat, try again later, preferably out of ronin/HC.");
   return;
  }
