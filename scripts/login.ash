@@ -104,7 +104,7 @@ void endRaffle(gameData g){
  int toPull=ceil(g.players[":meat"]*1.0/1000);
  cli_execute("closet take "+toPull.to_string()+" dense meat stack");
  cli_execute("autosell * dense meat stack");
- if (!kmail(g.data[numtix],"Congratulations, you've got the golden ticket!",g.players[":meat"],reward)){
+ if(kmail(g.data[numtix],"Congratulations, you've got the golden ticket!",g.players[":meat"],reward)!=1){
   g.players[":meat"]=max(0,g.players[":meat"]-50*count(reward));
   string send;
   foreach it,amt in reward{
@@ -130,12 +130,12 @@ void checkMail(){
  }
  foreach i,m in mail{
   if((m.sender=="smashbot")||(m.sender=="ominous tamer")||(m.sender=="ominous sauceror")){
-   deleteMail(m.id);
+   deleteMail(m);
    continue;
   }
   mx=create_matcher("(?i)donat(?:e|ation)",m.text);
   if(mx.find()){
-   deleteMail(m.id);
+   deleteMail(m);
    if(m.things[$item[dense meat stack]]>0){
     cli_execute("autosell "+m.things[$item[dense meat stack]].to_string()+" dense meat stack");
     m.meat+=m.things[$item[dense meat stack]]*1000;
@@ -164,7 +164,7 @@ void checkMail(){
    build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
   }
   if(build!="-"){
-   deleteMail(m.id);
+   deleteMail(m);
    checkOut(gamesavedata,"gameMode.txt");
    gameData game;
    if(gamesavedata contains "raffle"){
@@ -203,7 +203,7 @@ void checkMail(){
       if(m.meat==0)break;
       int numt=m.meat/game.intervals;
       m.meat=m.meat-(numt*game.intervals);
-      if(m.meat>0)if(!kmail(m.sender,"Considering the cost of tickets, this is what was left over.",m.meat)){
+      if(m.meat>0)if(kmail(m.sender,"Considering the cost of tickets, this is what was left over.",m.meat)!=1){
        userdata[m.sender].wallet+=m.meat;
        kmail(m.sender,"Your refund failed to send, so I'll hold it for you for now: "+m.meat.to_string()+" meat.");
       }
