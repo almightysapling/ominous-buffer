@@ -525,10 +525,10 @@ void handleMeat(){
  books[now_to_string("yDDD")+"ear"]=totalDMS-18;
  books[now_to_string("yDDD")+"div"]=totspent;
  int eventTimeCap=minutesToRollover();
- int event1=random(eventTimeCap-35)+30;
- int event2=random(eventTimeCap-35)+30;
- int event3=random(eventTimeCap-35)+30;
- if(minutesToRollover()>120){
+ int event1=random(eventTimeCap-15)+30;
+ int event2=random(eventTimeCap-15)+30;
+ int event3=random(eventTimeCap-15)+30;
+ if(minutesToRollover()>180){
   while((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
   while(((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
  }
@@ -626,7 +626,6 @@ void dailyBreakfast(){
  if(contains_text(rumpus,"rump2_3.gif"))rolladv+=5;
  if(contains_text(rumpus,"rump4_3.gif"))rolladv+=1;
  checkMail();
- handleMeat();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
  set_property("rolladv",rolladv);
  rollmp = my_maxmp()-1000;
@@ -683,6 +682,7 @@ void dailyBreakfast(){
    print("Arcane in the Brain Error","red");
   }
  }
+ handleMeat();
  set_property("_breakfast","1");
 }
 
