@@ -361,8 +361,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  //This is the actual casting function.
  if(skillnum==6901){
-  if(item_amount($item[time's arrow])<1)
-   if(cli_execute("stash take time's arrow")){}
+  if(item_amount($item[time's arrow])<1)retrieve_item(1,$item[time's arrow]);
   if(item_amount($item[time's arrow])<1){
    chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    return;
