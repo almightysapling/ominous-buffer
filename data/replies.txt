@@ -2,21 +2,24 @@ alot	a lot*	0	say
 ascention	ascension*	0	say		
 BBT?	Big Bang Theory, $pnick.	3	say		
 CAB?	Combat Action Bar, $pnick.	3	say		
-definate	*definite	0	say		
+CS?	Collector's Score, $pnick.	3	say		
+definate	definite*	0	say		
+dissapear	disappear*	0	say		
 Finker	You mean Twinker, $pname.	0	say		
 HIMYM?	How I Met Your Mother, $pnick.	3	say		
 is chat dead	It has been $timedif minutes since someone last spoke.	16	say		
-MMJ?	magical mystery juice, $pnick.	3	say		
+MMJ?	Magical mystery juice, $pnick.	3	say		
 NPH?	Neil Patrick Harris, $pnick.	3	say		
 OB?	is OB, $pnick.	3	do		
 om nom nom	Much better, thank you.	0	say	$ptrigger	omnomnom
 omnomnom	Chew a bit slower, $pnick.	0	say		
-seperate	*separate	0	say		
+seperate	separate*	0	say		
 sewer.status	There are $grates grate(s) opened and $valves valve(s) turned.	18	say		
 SLUTS	$player is a slut!	1	say		
 stat day?	Today is $statday and tomorrow is $statdaytomorrow.	0	say		
 thank you	You're welcome, $pnick.	8	say		
 thanks	You're welcome!	8	say		
+TPTB?	The powers that be, $pnick.	3	say		
 what language	$pnick: ASH for KoLmafia.	8	say		
 where are my keys	Did you check your other jacket?	0	say		
 you shout "hi-keeba!" and deliver a fierce karate chop to the prism.	cheers for and then shoryukens $player.	16	do		
