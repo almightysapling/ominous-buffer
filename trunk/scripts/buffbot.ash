@@ -1459,6 +1459,7 @@ string predicateFilter(string sender, string msg){
     string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
     freeResource("adventuring");
    }
+   set_property("_lastWang",oper);
    return "x";
   case "whitelist":
    if(getUF(sender,isAdmin))whitelistEdit(oper);
@@ -1959,7 +1960,15 @@ boolean preHandled(string sender, string msg, string channel){
   else chat(get_property("_lastFax"),msg);
   return true;
  }
- if(sender=="wangbot")return true;
+ if(sender=="wangbot"){
+  if(msg.contains_text("dried out")){
+   claimResource("adventuring");
+   if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+   string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+get_property("_lastWang"));
+   freeResource("adventuring");
+  }
+  return true;
+ }
  if((sender=="MesaChat")&&(channel!=""))return true;
  if((sender==my_name())&&(channel!=""))return true;
  return false;
