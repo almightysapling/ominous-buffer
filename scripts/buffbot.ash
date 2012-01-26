@@ -495,6 +495,13 @@ void pick(string options){
  chat("/em picks "+list[d]+".");
 }
 
+void fact(){
+ string[int] list;
+ file_to_map("facts.txt",list);
+ int d=random(count(list));
+ chat(list[d]);
+}
+
 void mod(string sender, string msg){
  boolean adminonly=getUF(sender,isAdmin);
  if(sender==my_name())adminonly=true;
@@ -1828,6 +1835,9 @@ void publicChat(string sender, string msg){
    break;
   case "echo":
    if(addressed)chat(replyParser(sender,oper));
+   return;
+  case "fact":
+   if(addressed)fact();
    return;
   case "market":
    analyze_md("!","link "+oper);
