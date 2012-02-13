@@ -59,6 +59,9 @@ string prefix="";
 string response="";
 string someoneDefined="";
 string[string] chatVars;
+string trueUser="";
+string trueChannel="";
+boolean impliedOB=false;
 int TPC=25;
 boolean raidlogRead=false;
 
@@ -1298,6 +1301,27 @@ string performMath(string sender, string msg){
  return msg;
 }
 
+void modSessionVar(string sender,string var,string val){
+ checkOut(userdata,"userdata.txt");
+ string[int] varslist=userdata[sender].sessionVars.split_string(":");
+ string[string] vars;
+ foreach i in varslist if((!i.odd())&&(varslist contains (i+1))) vars[varslist[i]]=varslist[i+1];
+ vars[var]=val;
+ if(val=="")remove vars[var];
+ string save="";
+ foreach vari,valu in vars save+=vari+":"+valu+":";
+ userdata[sender].sessionVars=save;
+ commit(userdata,"userdata.txt");
+}
+
+string getSessionVar(string sender,string var){
+ update(userdata,"userdata.txt");
+ string[int] varslist=userdata[sender].sessionVars.split_string(":");
+ string[string] vars;
+ foreach i in varslist if((!i.odd())&&(varslist contains (i+1))) vars[varslist[i]]=varslist[i+1];
+ return vars[var];
+}
+
 string predicateFilter(string sender, string msg){
  matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
  string pred;
@@ -1459,6 +1483,44 @@ string predicateFilter(string sender, string msg){
   case "search":
    search(sender,oper);
    return "x";
+  case "su":
+   if((userdata[trueUser].flags&isAdmin)!=isAdmin){
+    errorMessage(trueUser,"No, don't do that!");
+    return "x";
+   }
+   switch(oper){
+    case "":
+     modSessionVar(trueUser,"suser",".root");
+     break;
+    case "x":case "end":case "return":case "exit":
+     modSessionVar(trueUser,"suser","");
+     break;
+    default:
+     modSessionVar(trueUser,"suser",oper);    
+   }
+   return "x";
+  case "sue":
+   if((userdata[trueUser].flags&isAdmin)!=isAdmin){
+    errorMessage(trueUser,"No, don't do that!");
+    return "x";
+   }
+   switch(oper){
+    case "hobopolis":case "hobo":case "hobop":case "h":
+     modSessionVar(trueUser,"schannel","/hobopolis");
+     break;
+    case "slimetube":case "s":case "slime":case "st":case "tube":
+     modSessionVar(trueUser,"schannel","/slimetube");
+     break;
+    case "haunted house":case "haunted":case "hh":
+     modSessionVar(trueUser,"schannel","/hauntedhouse");
+     break;
+    case "return":case "exit":case "end":case "x":
+     modSessionVar(trueUser,"schannel","");
+     break;
+    default:
+     modSessionVar(trueUser,"schannel","/clan");
+   }
+   return "x";
   case "title":
    clanTitle(sender,oper);
    return "x";
@@ -1602,22 +1664,22 @@ int timeSinceLastChat(string who){
  lastM=lastM+lastH*60;
  nowM=nowM+nowH*60;
  nowM-=lastM;
- if(nowM<0) nowM+=1440;
- if(nowM==1) return 0;
+ if(nowM<0)nowM+=1440;
+ if(nowM==1)return 0;
  return nowM;
 }
 
 boolean isMath(string m){
- matcher fix=create_matcher("(?i)(last|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)",m);
+ matcher fix=create_matcher("(?i)(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)",m);
  m=replace_all(fix,"+");
  fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
- if(fix.find()) return false;
+ if(fix.find())return false;
  return true;
 }
 
 boolean fancyMath(string sender, string equation){
  matcher dm=create_matcher("\\[(\\d*),(\\d*)\\]\\s?(.*)",equation);
- if(!dm.find()) return false;
+ if(!dm.find())return false;
  float tmp=0;
  string mod;
  int low=dm.group(1).to_int();
@@ -1645,7 +1707,7 @@ boolean fancyMath(string sender, string equation){
 boolean mathDot(string data, boolean cross){
  vector u;
  vector v;
- matcher m=create_matcher("<(.+?)>\\s?<(.+?)>",data);
+ matcher m=create_matcher("<(.+?)>,?\\s?<(.+?)>",data);
  if(!m.find()) return false;
  u=m.group(1).to_vector();
  v=m.group(2).to_vector();
@@ -1796,6 +1858,7 @@ void publicChat(string sender, string msg){
  }
  m=create_matcher("(?i)(ominous buffer|\\Wob\\W)",msg);
  if(m.find())referred=true;
+ if(impliedOB)addressed=true;
  m=create_matcher("([\\w\\d]*):?\\s?(.*)",msg);
  string pred;
  string oper;
@@ -1858,7 +1921,7 @@ void publicChat(string sender, string msg){
   case "spell":
    if(checkRep(pred+oper)>-1)return;
    addRep(pred+":"+oper);
-   if(addressed) searchSpell(oper);
+   if(addressed)searchSpell(oper);
    return;
   case "stp":
    if(mathSTP(oper))return;
@@ -1994,13 +2057,32 @@ boolean preHandled(string sender, string msg, string channel){
  return false;
 }
 
+string applySUE(string sender,string channel){
+ if(channel!="")return sender;
+ trueUser=sender;
+ string s=getSessionVar(sender,"suser");
+ if(s=="")return sender;
+ else if(s==".root")return sender;
+ return s;
+}
+
+string applySUE(string channel){
+ if(channel!="")return channel;
+ impliedOB=true;
+ trueChannel=channel;
+ string s=getSessionVar(trueUser,"schannel");
+ if(s=="")return channel;
+ return s;
+}
+
 //CHANNELS: private,    clan,   DUNGEON
 //IN:       ""          "/clan" "/DUNGEON"
 //OUT:      name        ""      "/DUNGEON "
 void main(string sender, string msg, string channel){try{
-debug();
  if(preHandled(sender,msg,channel))return;
- msg=decodeHTML(msg,true);
+ sender=sender.applySUE(channel);
+ msg=msg.decodeHTML(true);
+ channel=channel.applySUE();
  switch(channel){
   case "/clan":
    clanHandler(sender,msg);
