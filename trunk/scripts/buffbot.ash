@@ -1443,6 +1443,16 @@ string predicateFilter(string sender, string msg){
     cli_execute("csend "+i+" "+whitem.to_string()+" to "+sender+" || "+to_string(item_amount(whitem)-i)+" remain.");
    }
    return "x";
+  case "recheck":
+   if((userdata[sender].flags&isAdmin)!=isAdmin){
+    errorMessage(sender,"No, don't do that!");
+    return "x";
+   }
+   chat("Looking for new test subjects and evaluating test data.");
+   checkApps();
+   checkMail();
+   checkData();
+   return "x";   
   case "roll":
    roll(sender,oper);
    return "x";
