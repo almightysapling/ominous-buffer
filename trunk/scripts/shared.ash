@@ -15,6 +15,7 @@ record userinfo{
  int donated;
  int wallet;
  string gHobopPassword;
+ string sessionVars;
 };
 //flag bits
 int noFlag=1;//no error messages
