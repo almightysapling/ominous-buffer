@@ -23,6 +23,19 @@ int minutesToRollover(){
  return GMT;
 }
 
+void updateProfile(){
+ int[string]books;
+ update(books,"books.txt");
+ string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
+ buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nCurrent Lotto for "+to_commad(14+books["thisLotto"])+",000 meat!\nLast Five Lotto Winners:";
+ string wintext=get_property("winners");
+ string[int] winners=split_string(wintext,"::");
+ for i from 0 upto count(winners)-1 buf+="\n"+winners[i];
+ claimResource("adventuring");
+ visit_url(buf);
+ freeResource("adventuring");
+}
+
 void checkRaffle(){
  set_property("_checkedRaffle","y");
  checkOut(gamesavedata,"gameMode.txt");
@@ -53,7 +66,7 @@ void sendMeat(string who, int amount){
 
 void checkLotto(){
  int[string] books;
-debug(297);
+debug(56);
  checkOut(books,"books.txt");
  int event=0;
  int time=minutesToRollover();
@@ -62,7 +75,6 @@ debug(297);
  if(time<books["Event3"])event=3;
  if(event<1){
   commit("books.txt");
-debug(306);
   return;
  }
  books["Event"+event.to_string()]=0;
@@ -78,7 +90,7 @@ debug(306);
  if(num<1){
   set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
   commit(books,"books.txt");
-debug(322);
+  updateProfile();
   return;
  }
  float perc;
@@ -108,28 +120,21 @@ debug(322);
   for i from 5 downto 2 if(userdata["*"].buffpacks contains ("winner"+to_string(i-1)))userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
   userdata["*"].buffpacks["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
   commit(userdata,"userdata.txt");
-  string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
-  buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nLast Five Lotto Winners:";
   string wintext="";
-  for i from 1 to 5 if(userdata["*"].buffpacks contains ("winner"+i.to_string())){
-   buf+="\n"+userdata["*"].buffpacks["winner"+i.to_string()];
-   wintext+=i.to_string()+" "+userdata["*"].buffpacks["winner"+i.to_string()]+"::";
-  }
+  for i from 1 to 5 if(userdata["*"].buffpacks contains ("winner"+i.to_string()))wintext+=userdata["*"].buffpacks["winner"+i.to_string()]+"::";
   set_property("winners",wintext);
-  claimResource("adventuring");
-  visit_url(buf);
-  freeResource("adventuring");
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_string()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
   books["thisLotto"]=books["nextLotto"]-1;
-  books["nextLotto"]=1;
+  books["nextLotto"]=1;  
  }else{
   print("No winner.");
   chat_clan("Just what I thought. Everyone here is a loser. And probably an orphan as well.");
  }
- set_property("books",books["Event1"].to_string()+"|"+books["Event2"].to_string()+"|"+books["Event3"].to_string()+"|"+books["nextLotto"].to_string()+"|"+books["thisLotto"].to_string());
+ set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
-debug(373);
+ updateProfile();
+debug(130);
 }
 
 void makeRecords(){
@@ -336,15 +341,12 @@ void processQuestData(boolean rp){
   books["nextLotto"]=m.group(4).to_int();
   books["thisLotto"]=m.group(5).to_int();
  }
+ set_property("books",books["Event1"]+"::"+books["Event2"]+"::"+books["Event3"]+"::"+books["nextLotto"]+"::"+books["thisLotto"]);
  commit(books,"books.txt");
  //Limited Buffs
  checkOut(userdata,"userdata.txt");
  string limits=get_property("_limitBuffs");
  if(limits!=""){
-/*  string[int] limit=split_string(limits,':');
-  int y=count(limit)/2;
-  if(y>0)for x from 0 to y-1 userdata["*"].buffs[to_int(limit[x*2])]=to_int(limit[x*2+1]);
-  */
   userdata["*"].buffs[62]=to_int(limits);
  }
  limits=visit_url("skills.php");
@@ -355,9 +357,7 @@ void processQuestData(boolean rp){
  wintext=split_string(get_property("admins"),"::");
  foreach i,s in wintext if(s.length()>0)setUF(s,isAdmin);
  commit(userdata,"userdata.txt");
- limits="";
- foreach u in userdata if(getUF(u,isAdmin))limits+=u+"::";
- set_property("admins",limits);
+ updateProfile();
 }
 
 void nightlyPaperwork(){
@@ -434,9 +434,9 @@ void dailyBreakfast(){
  drink(6,$item[supernova champagne]);
  drink(1,$item[can of swiller]);
  clearBuffs();
- if(have_skill($skill[Sonata of Sneakiness])) (!use_skill(1,$skill[Sonata of Sneakiness]));
- if(((have_effect($effect[Dreams and Lights])<1)||(have_effect($effect[Dreams and Lights])>8))&&(have_effect($effect[Arcane in the Brain])<1)){
-  while(have_effect($effect[Dreams and Lights])<1) (!adventure(1,$location[Haunted Gallery]));
+ if((have_skill($skill[Sonata of Sneakiness]))&&(have_effect($effect[Sonata of Sneakiness])<1))(!use_skill(1,$skill[Sonata of Sneakiness]));
+ if((have_effect($effect[Dreams and Lights])<1)||((have_effect($effect[Dreams and Lights])<9)&&(have_effect($effect[Arcane in the Brain])<1))){
+  while(have_effect($effect[Dreams and Lights])<9)(!adventure(1,$location[Haunted Gallery]));
   clearBuffs();
   retrieve_item(1,$item[llama lama gong]);
   cli_execute("gong mole");
