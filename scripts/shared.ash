@@ -387,7 +387,15 @@ boolean loadSettings(){
  return loadSettings("");
 }
 
+void formProps(){
+ //admins
+ string prop="";
+ foreach u in userdata if(getUF(u,isAdmin))prop+=u+"::";
+ set_property("admins",prop);
+}
+
 void saveSettings(string settings){
+ formProps();
  string[int] setting=split_string(settings,';');
  string submit="";
  foreach i in setting submit+=setting[i]+" = "+get_property(setting[i])+"\n";
