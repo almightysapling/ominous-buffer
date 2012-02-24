@@ -1319,7 +1319,63 @@ string getSessionVar(string sender,string var){
  string[int] varslist=userdata[sender].sessionVars.split_string(":");
  string[string] vars;
  foreach i in varslist if((!i.odd())&&(varslist contains (i+1))) vars[varslist[i]]=varslist[i+1];
- return vars[var];
+ if(vars contains var)return vars[var];
+ return "";
+}
+
+boolean subUser(string oper){
+ if((userdata[trueUser].flags&isAdmin)!=isAdmin){
+  errorMessage(trueUser,"No, don't do that!");
+  return false;
+ }
+ switch(oper){
+  case "":
+   modSessionVar(trueUser,"suser",".root");
+   break;
+  case "x":case "end":case "return":case "exit":
+   modSessionVar(trueUser,"suser","");
+   break;
+  default:
+   if(userdata contains oper)modSessionVar(trueUser,"suser",oper);
+   else{
+    errorMessage(trueUser,"Sorry, that user doesn't exist.");
+    return false;
+   }
+ }
+ return true;
+}
+
+boolean subEnv(string oper){
+ if((userdata[trueUser].flags&isAdmin)!=isAdmin){
+  errorMessage(trueUser,"No, don't do that!");
+  return false;
+ }
+ switch(oper){
+  case "hobopolis":case "hobo":case "hobop":case "h":
+   modSessionVar(trueUser,"schannel","hobopolis");
+   chat(trueUser,"#hobopolis>");
+   break;
+  case "slimetube":case "s":case "slime":case "st":case "tube":
+   modSessionVar(trueUser,"schannel","slimetube");
+   chat(trueUser,"#slimetube>");
+   break;
+  case "haunted house":case "haunted":case "hh":
+   modSessionVar(trueUser,"schannel","hauntedhouse");
+   chat(trueUser,"#hauntedhouse>");
+   break;
+  case "return":case "exit":case "end":case "x":case "quit":
+   modSessionVar(trueUser,"schannel","");
+   chat(trueUser,"#!>");
+   break;
+  case "clan":case "":
+   modSessionVar(trueUser,"schannel","clan");
+   chat(trueUser,"#clan>");
+   break;
+  default:
+   chat(trueUser,"#"+(getSessionVar(trueUser,"schannel")==""?"!":getSessionVar(trueUser,"schannel"))+">");
+   return false;
+ }
+ return true;
 }
 
 string predicateFilter(string sender, string msg){
@@ -1483,43 +1539,11 @@ string predicateFilter(string sender, string msg){
   case "search":
    search(sender,oper);
    return "x";
-  case "su":
-   if((userdata[trueUser].flags&isAdmin)!=isAdmin){
-    errorMessage(trueUser,"No, don't do that!");
-    return "x";
-   }
-   switch(oper){
-    case "":
-     modSessionVar(trueUser,"suser",".root");
-     break;
-    case "x":case "end":case "return":case "exit":
-     modSessionVar(trueUser,"suser","");
-     break;
-    default:
-     modSessionVar(trueUser,"suser",oper);    
-   }
+  case "se":
+   subEnv(oper);
    return "x";
-  case "sue":
-   if((userdata[trueUser].flags&isAdmin)!=isAdmin){
-    errorMessage(trueUser,"No, don't do that!");
-    return "x";
-   }
-   switch(oper){
-    case "hobopolis":case "hobo":case "hobop":case "h":
-     modSessionVar(trueUser,"schannel","/hobopolis");
-     break;
-    case "slimetube":case "s":case "slime":case "st":case "tube":
-     modSessionVar(trueUser,"schannel","/slimetube");
-     break;
-    case "haunted house":case "haunted":case "hh":
-     modSessionVar(trueUser,"schannel","/hauntedhouse");
-     break;
-    case "return":case "exit":case "end":case "x":
-     modSessionVar(trueUser,"schannel","");
-     break;
-    default:
-     modSessionVar(trueUser,"schannel","/clan");
-   }
+  case "su":
+   subUser(oper);
    return "x";
   case "title":
    clanTitle(sender,oper);
@@ -1943,7 +1967,21 @@ void systemHandler(string msg){
  prefix=":";
 }
 
+boolean metaParser(string sender, string msg){
+ matcher first=create_matcher("(\\S*)\\s?(.*)",msg);
+ string pred;
+ string oper;
+ if(!first.find())return false;
+ pred=first.group(1);
+ oper=first.group(2);
+ switch(pred){
+  case "se":return subEnv(oper);
+  default:return false;
+ }
+}
+
 void clanHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
  prefix="";
  switch(gameType()){
   case gameRoulette:
@@ -1956,18 +1994,21 @@ void clanHandler(string sender, string msg){
 }
 
 void slimetubeHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
  if(sender=="Dungeon")return;
  prefix="/slimetube ";
  publicChat(sender,msg);
 }
 
 void hobopolisHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
  if(sender=="Dungeon")return;
  prefix="/hobo ";
  publicChat(sender,msg);
 }
 
 void hauntedhouseHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
  if(sender=="Dungeon")return;
  prefix="/hauntedhouse ";
  publicChat(sender,msg);
@@ -2071,8 +2112,8 @@ string applySUE(string channel){
  impliedOB=true;
  trueChannel=channel;
  string s=getSessionVar(trueUser,"schannel");
- if(s=="")return channel;
- return s;
+ if(s=="")return s;
+ return "/"+s;
 }
 
 //CHANNELS: private,    clan,   DUNGEON
