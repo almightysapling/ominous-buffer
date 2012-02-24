@@ -470,10 +470,9 @@ debug();
   coreGameCycle();
   checkLotto();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
-  if(n<15)n+=1440;
-  if(n>=(lastCheck+15)){
-   if(n>1439)n-=1440;
-   lastCheck=n+15;
+  if(n>=(lastCheck+10)){
+   lastCheck=n+10;
+   if(lastCheck>1439)lastCheck-=1440;
    checkApps();
    checkMail();
    checkData();
