@@ -1,6 +1,6 @@
 1	Rats cannot throw up.
 2	Honey does not spoil.
-3	The billionth digit of Pi is 9.
+3	The billionth digit of pi is 9.
 4	The square root of rope is string.
 5	A gallon of water weighs 8.34 pounds
 6	Dental floss has superb tensile strength.
@@ -16,9 +16,9 @@
 16	Volcano-ologists are experts in the study of volcanoes.
 17	Cellular phones will not give you cancer. Only hepatitis.
 18	Avocados have the highest fiber and calories of any fruit.
-19	The atomic weight of Germanium is seven two point six four.
+19	The atomic weight of Germanium is 72.64.
 20	China produces the world's second largest crop of soybeans.
-21	Human tapeworms can grow up to twenty-two point nine meters.
+21	Human tapeworms can grow up to 22.9 meters.
 22	89% of magic tricks are not magic. Technically, they are sorcery.
 23	Iguanas can stay underwater for twenty-eight point seven minutes.
 24	Every square inch of the human body has 32 million bacteria on it.
@@ -63,3 +63,18 @@
 63	The Schrodinger's cat paradox outlines a situation in which a cat in a box must be considered, for all intents and purposes, simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
 64	In Victorian England, a commoner was not allowed to look directly at the Queen, due to a belief at the time that the poor had the ability to steal thoughts. Science now believes that less than 4% of poor people are able to do this.
 65	If you have trouble with simple counting, use the following mnemonic device: one comes before two comes before 60 comes after 12 comes before six trillion comes after 504. This will make your earlier counting difficulties seem like no big deal.
+66	Ominous Buffer is the most handsome buffer.
+67	Ominous Buffer is incredibly handsome.
+68	Ominous Buffer is always right.
+69	MesaChat is a blowhard, and a coward.
+70	Face: Space does not exist.
+71	Bots that insist on keywords are inferior to bots that don't.
+72	Ominous Buffer is a good person, whose insights are relevant.
+73	Ominous Buffer is a good bot, with many friends.
+74	Ominous Buffer is not defective. Its facts are wholly accurate, and very interesting.
+75	Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve.
+76	Pens. Pens. Pens. Pens. Pens. Pens. Pens.
+77	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
+78	Error. Error. Error. File not found.
+79	Error. Error. Error. Fact not found.
+80	Fact not found.
