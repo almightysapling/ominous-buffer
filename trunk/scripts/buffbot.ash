@@ -324,16 +324,16 @@ void buff(string sender, string msg, int numTurns, string ding){
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
  if(getUF(ding,inClan)||getUF(ding,whitelist)||(getUF(ding,inAssociate)&&getUF(ding,highAssociate))){
-  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;//Limited buffs
-  else if(skillnum==6014) max=5;//Ode
-  else if(skillnum==6026) max=20;//Donho
-  else if(skillnum==6901) max=1;//Time's Arrow
+  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;//Limited buffs
+  else if(skillnum==6014)max=5;//Ode
+  else if(skillnum==6026)max=20;//Donho
+  else if(skillnum>6900)max=1;
   else max=28;//Else
  }else if(getUF(ding,inAssociate)){
-  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028)) max=1;
-  else if(skillnum==6014) max=3;
-  else if(skillnum==6026) max=10;
-  else if(skillnum==6901) max=0;
+  if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
+  else if(skillnum==6014)max=3;
+  else if(skillnum==6026)max=10;
+  else if(skillnum>6900)max=0;//Item skills
   else max=16;
  }
  casts=min(casts,max);
@@ -376,6 +376,18 @@ void buff(string sender, string msg, int numTurns, string ding){
   checkOut(userdata,"userdata.txt");
   userdata[ding].buffs[skillnum]+=1;
   commit(userdata,"userdata.txt");
+  return;
+ }
+ if(skillnum==6902){
+  if(is_online("wangbot")){
+   chat("wangbot","target "+sender);
+  }else{
+   claimResource("adventuring");
+   if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+   string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+sender);
+   freeResource("adventuring");
+  }
+  set_property("_lastWang",sender);
   return;
  }
  claimResource("adventuring");
@@ -1551,18 +1563,6 @@ string predicateFilter(string sender, string msg){
   case "unwhitelist":
    if(getUF(sender,isAdmin))whitelistEdit("-"+oper);
    else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
-   return "x";
-  case "wang":
-   if(oper=="")oper=sender;
-   if(is_online("wangbot")){
-    chat("wangbot","target "+oper);
-   }else{
-    claimResource("adventuring");
-    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
-    string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+oper);
-    freeResource("adventuring");
-   }
-   set_property("_lastWang",oper);
    return "x";
   case "whitelist":
    if(getUF(sender,isAdmin))whitelistEdit(oper);
