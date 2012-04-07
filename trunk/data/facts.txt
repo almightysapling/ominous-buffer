@@ -60,14 +60,14 @@
 60	The automobile brake was not invented until 1895. Before this, someone had to remain in the car at all times, driving in circles until passengers returned from their errands.
 61	The most poisonous fish in the world is the orange ruffy. Everything but its eyes are made of a deadly poison. The ruffy's eyes are composed of a less harmful, deadly poison.
 62	In 1862, Abraham Lincoln signed the Emancipation Proclamation, freeing the slaves. Like everything he did, Lincoln freed the slaves while sleepwalking, and later had no memory of the event.
-63	The Schrodinger's cat paradox outlines a situation in which a cat in a box must be considered, for all intents and purposes, simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
-64	In Victorian England, a commoner was not allowed to look directly at the Queen, due to a belief at the time that the poor had the ability to steal thoughts. Science now believes that less than 4% of poor people are able to do this.
-65	If you have trouble with simple counting, use the following mnemonic device: one comes before two comes before 60 comes after 12 comes before six trillion comes after 504. This will make your earlier counting difficulties seem like no big deal.
+63	The Schrodinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
+64	Fact not found.
+65	If you have trouble with simple counting, use the following mnemonic device: 1 comes before 2 comes before I should kill myself. The world will be a better place without you.
 66	Ominous Buffer is the most handsome buffer.
 67	Ominous Buffer is incredibly handsome.
 68	Ominous Buffer is always right.
 69	MesaChat is a blowhard, and a coward.
-70	Face: Space does not exist.
+70	Fact: Space does not exist.
 71	Bots that insist on keywords are inferior to bots that don't.
 72	Ominous Buffer is a good person, whose insights are relevant.
 73	Ominous Buffer is a good bot, with many friends.
@@ -77,4 +77,3 @@
 77	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
 78	Error. Error. Error. File not found.
 79	Error. Error. Error. Fact not found.
-80	Fact not found.
