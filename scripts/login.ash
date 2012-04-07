@@ -123,7 +123,7 @@ debug(56);
   string wintext="";
   for i from 1 to 5 if(userdata["*"].buffpacks contains ("winner"+i.to_string()))wintext+=userdata["*"].buffpacks["winner"+i.to_string()]+"::";
   set_property("winners",wintext);
-  chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_string()+",000 meat! See you again soon!");
+  chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
   books["thisLotto"]=books["nextLotto"]-1;
   books["nextLotto"]=1;  
