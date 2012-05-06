@@ -65,9 +65,30 @@ boolean impliedOB=false;
 int TPC=25;
 boolean raidlogRead=false;
 
+string glitch(string s){
+ matcher m;
+ int i;
+ m=create_matcher("12",s);
+ while(m.find()){
+  i=random(2);
+  switch(random(4)){
+   case 0: s=m.replace_first("TWELVE");
+   case 1: s=m.replace_first("tWeLve.");
+   case 2: s=m.replace_first("twlv");
+   default s=m.replace_first("twelve");
+  }
+  m=reset(s);
+ }
+ if(random(1000)<7){
+  m=create_matcher("I",s);
+  s=m.replace_all("i");
+ }
+ return s;
+}
+
 void chat(){
  if((prefix=="")||(prefix.char_at(0)=="/")){
-  chat_clan(prefix+response);
+  chat_clan(prefix+response.glitch());
   return;
  }
  if(prefix.char_at(0)==":"){
@@ -79,7 +100,7 @@ void chat(){
   print(response,"red");
   return;
  }
- chat_private(prefix,response);
+ chat_private(prefix,response.glitch());
 }
 void chat(string msg){
  response=msg;
@@ -380,7 +401,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  if(skillnum==6902){
   if(is_online("wangbot")){
-   chat("wangbot","target "+sender);
+   chat_private("wangbot","target "+sender);
   }else{
    claimResource("adventuring");
    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
