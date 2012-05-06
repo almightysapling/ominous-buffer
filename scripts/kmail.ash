@@ -16,7 +16,7 @@ string to_string(datetime d, string style){
  while(pi<length(style)){
   cc=style.char_at(pi);
   pi+=1;
-  while((pi<length(style))&&(char_at(pi)==cc)){
+  while((pi<length(style))&&(style.char_at(pi)==cc)){
    size+=1;
    pi+=1;
   }
