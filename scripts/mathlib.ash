@@ -857,7 +857,6 @@ void mathlibversion(){
  switch (get_property("_mathlibVersion")) {
   case thisver:
    return;
-   break;
   case "":
    print("Checking for Mathlib updates (Current  ver. "+thisver+")");
    page=visit_url("http://kolmafia.us/showthread.php?t="+thread);

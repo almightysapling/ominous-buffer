@@ -9,13 +9,44 @@ record datetime{
 
 string to_string(datetime d, string style){
  string s;
- matcher m=create_matcher("(\\w)\\1*",style);
- while (m.find()) switch (m.group()){
-  default:
-  s+=m.group();
-  break;
+ int pi=0;
+ string cc;
+ int size;
+ boolean escaped;
+ while(pi<length(style)){
+  cc=style.char_at(pi);
+  pi+=1;
+  while((pi<length(style))&&(char_at(pi)==cc)){
+   size+=1;
+   pi+=1;
+  }
+  if(escaped)switch(cc){
+   case "'":
+    while(size>1){
+     s+="'";
+     size-=2;
+    }
+    if(size==1)escaped=false;
+    break;
+   default:
+    while(size>0){
+     s+=cc;
+     size-=1;
+    }
+    break;
+  }else switch(cc){
+   case "'":
+    while(size>1){
+     s+="'";
+     size-=2;
+    }
+    if(size==1)escaped=true;
+    break;
+   case "Y":
+   default:
+    break;
+  }
  }
- return s;
 }
 
 string to_string(datetime d){

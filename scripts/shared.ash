@@ -42,11 +42,12 @@ int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
 associates[21459]=true;//Hogs of Destiny
 associates[67356]=true;//Piglets of Fate
-associates[2046987019]=false;//Not Dead Yet
-associates[2046991167]=false;//This One Time
-associates[2046983684]=false;//Clan of 14 Days
-associates[2046991423]=false;//Margaretting Tye
-associates[76566]=false;//Imitation Plastic Death Star
+associates[2046987019]=true;//Not Dead Yet
+associates[2046991167]=true;//This One Time
+associates[2046983684]=true;//Clan of 14 Days
+associates[2046991423]=true;//Margaretting Tye
+associates[76566]=true;//Imitation Plastic Death Star
+associates[72876]=true;//Hyrule
 int repValue=4;
 
 record resource{
@@ -336,17 +337,17 @@ void updateLimits(){
 
 int checkRep(string check){
  return -1;
- for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
- return -1;
+/* for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
+ return -1;*/
 }
 
 void addRep(string s){
  return;
- for i from 10 to 1{
+/* for i from 10 to 1{
   userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i-1)];
  }
  userdata["*"].buffpacks["0"]=s;
- map_to_file(userdata,"userdata.txt");
+ map_to_file(userdata,"userdata.txt");*/
 }
 
 int KoLday(){
