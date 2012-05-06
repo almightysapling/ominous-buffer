@@ -67,19 +67,21 @@ boolean raidlogRead=false;
 
 string glitch(string s){
  matcher m;
- int i;
  m=create_matcher("12",s);
  while(m.find()){
-  i=random(2);
-  switch(random(4)){
+  switch(random(6)){
    case 0: s=m.replace_first("TWELVE");
+    break;
    case 1: s=m.replace_first("tWeLve.");
+    break;
    case 2: s=m.replace_first("twlv");
-   default s=m.replace_first("twelve");
+    break;
+   case 3: s=m.replace_first("twelve");
+    break;
   }
-  m=reset(s);
+  m=m.reset(s);
  }
- if(random(1000)<7){
+ if(random(1000)<20){
   m=create_matcher("I",s);
   s=m.replace_all("i");
  }
@@ -253,14 +255,17 @@ void buff(string sender, string msg, int numTurns, string ding){
     if(sender==turt_name)set_property('tamerCasts',failsplit[1]);
     if(sender==sauc_name)set_property('sauceCasts',failsplit[1]);
     break;
-   case "RATION ITEM":
-    use_skill(12,$skill[Fat Leon's Phat Loot Lyric],sender);
-    break;
-   case "RATION MEAT":
-    use_skill(12,$skill[Polka of Plenty],sender);
-    break;
-   case "RATION NONCOMBAT":
-    use_skill(12,$skill[Carlweather's Cantata of Confrontation],sender);
+   case "RATION":switch(failsplit[1]){
+    case "ITEM":
+     use_skill(12,$skill[Fat Leon's Phat Loot Lyric],sender);
+     break;
+    case "MEAT":
+     use_skill(12,$skill[Polka of Plenty],sender);
+     break;
+    case "NONCOMBAT":
+     use_skill(12,$skill[Carlweather's Cantata of Confrontation],sender);
+     break;
+    }
     break;
    case "FUNDS":
     chat_private("Almighty Sapling","low funds on "+sender+".");
