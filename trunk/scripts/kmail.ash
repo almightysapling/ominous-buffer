@@ -47,6 +47,7 @@ string to_string(datetime d, string style){
     break;
   }
  }
+ return "";
 }
 
 string to_string(datetime d){
