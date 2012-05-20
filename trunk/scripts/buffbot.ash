@@ -410,6 +410,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   }else{
    claimResource("adventuring");
    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+   if(item_amount($item["WANG"])<1)cli_execute("buy wang");
    string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+sender);
    freeResource("adventuring");
   }
@@ -1202,6 +1203,10 @@ void clanTitle(string sender, string newt){
 void whitelistEdit(string oper){
  claimResource("adventuring");
  string cw=visit_url("clan_whitelist.php");
+ if(!cw.contains_text("<form>")){
+  chat("Oh, no. A horrible, awful, irrevocable thing has happened... You broke my heart. {Core Privelage Disabled}");
+  return;
+ }
  matcher action=create_matcher("(-)?(\\w[\\w\\d\\s_]*)\\s*([:=]\\s*.+?)?",oper);
  int i;
  if(!action.find()){
@@ -1592,7 +1597,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "whitelist":
    if(getUF(sender,isAdmin))whitelistEdit(oper);
-   else chat("You must be an admin to whitelist people to clan.");
+   else chat("You must be an admin to edit the clan whitelist.");
    return "x";
   case "whois":
    lookup(sender,oper);
@@ -2101,6 +2106,9 @@ void privateHandler(string sender, string msg){
 }
 
 boolean preHandled(string sender, string msg, string channel){
+ if(sender=="System Message"){
+  return true;
+ }
  if(!couldClaim("science")){
   if(channel=="")chat(sender,"You've got no use chatting, I've got science to do.");
   return true;

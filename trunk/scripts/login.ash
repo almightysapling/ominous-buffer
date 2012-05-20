@@ -66,7 +66,7 @@ void sendMeat(string who, int amount){
 
 void checkLotto(){
  int[string] books;
-debug(56);
+//debug(56);
  checkOut(books,"books.txt");
  int event=0;
  int time=minutesToRollover();
@@ -134,7 +134,7 @@ debug(56);
  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
-debug(130);
+//debug(130);
 }
 
 void makeRecords(){
@@ -449,7 +449,6 @@ void dailyBreakfast(){
 }
 
 void main(){try{
-debug();
  print("Starting Login...");
  claimResource("science");
  if(get_property("_thisBreakfast")=="")cleanPC();
@@ -470,7 +469,7 @@ debug();
   coreGameCycle();
   checkLotto();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
-  if(n>=(lastCheck+10)){
+  if(n>=lastCheck){
    lastCheck=n+10;
    if(lastCheck>1439)lastCheck-=1440;
    checkApps();
