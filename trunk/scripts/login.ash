@@ -193,6 +193,30 @@ void makeRecords(){
  freeResource("adventuring");
 }
 
+void doBounty(){
+ claimResource("adventuring");
+ string bounty=visit_url("bhh.php");
+ matcher m=create_matcher("(40 billy|5 burned|40 coal|5 discard|20 disint|11 non-E|5 sammich|6 bits of)",bounty);
+ if(!m.find())return;
+ int b;
+ switch(m.group(1)){
+  case "40 billy":b=2409;break;
+  case "5 burned":b=2106;break;
+  case "40 coal":b=2105;break;
+  case "5 discard":b=2415;break;
+  case "20 disint":b=2470;break;
+  case "11 non-E":b=2107;break;
+  case "5 sammich":b=2412;break;
+  case "6 bits of":b=2471;break;
+ }
+ visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
+ while((my_adventures()-get_property("rolladv").to_int()>0)&&(item_amount(b.to_item())<b.to_item().bounty_count)){
+  if(adventure(1,b.to_item().bounty)){}
+ }
+ visit_url("bhh.php");
+ freeResource("adventuring");
+}
+
 void burn(){
  int to_burn=my_mp()-800;
  if(to_burn<0)return;
@@ -423,8 +447,6 @@ void dailyBreakfast(){
  if(item_amount($item[Cheap toaster])>0)for i from 1 to 3 use(1,$item[Cheap toaster]);
  visit_url("volcanoisland.php?action=npc");
  if(item_amount($item[fisherman's sack])>1)use(1,$item[Fisherman's sack]);
- string bounty=visit_url("bhh.php");
- if(index_of(bounty,"discarded pacifiers")>0)visit_url("bhh.php?pwd="+my_hash()+"&action=takebounty&whichitem=2415");
  for i from 1 to 5 (!hermit(1, $item[Ten-leaf clover]));
  if(item_amount($item[supernova champagne])<6)retrieve_item(6,$item[supernova champagne]);
  if(item_amount($item[can of swiller])<1)retrieve_item(1,$item[can of swiller]);
@@ -489,6 +511,7 @@ void main(){try{
  }
  makeRecords();
  int burnTurns=150-to_int(get_property("rolladv"));
+ doBounty();
  if((my_adventures()-burnTurns)>0){
   burn();
   cli_execute("familiar "+meatfarm_fam);
@@ -500,7 +523,6 @@ void main(){try{
   burn();
  }
  updateDC();
- visit_url("bhh.php");
  clearBuffs();
  cli_execute("familiar "+stat_fam);
  cli_execute("outfit birthday suit");
