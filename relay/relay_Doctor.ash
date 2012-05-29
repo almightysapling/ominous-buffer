@@ -76,7 +76,8 @@ void update(){
 }
 
 void header(){
- writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
+ writeln("<!DOCTYPE html>");
+// writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
  opentag("html");
  opentag("head");
  opentag("style","type=\"text/css\"");
@@ -92,11 +93,13 @@ void header(){
  writeln("function convertInputs(){");
  writeln(" var allEs=document.getElementsByTagName(\"input\");");
  writeln(" for(var i=0;i<allEs.length;i++) if(allEs[i].className==\"unselected\"){");
+ writeln("  allEs[i].setAttribute(\"onfocus\",\"switchIn(this)\");");
+ writeln("  allEs[i].setAttribute(\"onblur\",\"switchOut(this)\");");
  writeln(" }");
- writlen("}");
+ writeln("}");
  writeln("function switchIn(e){ e.className=\"\";}");
  writeln("function switchOut(e){ e.className=\"unselected\";}");
- closetag();
+ closetag("head");
  opentag("body","onload=\"convertInputs()\"");
 }
 
@@ -107,7 +110,7 @@ void options(){
  ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\">");
  ntln("Stuff to put here: admins, lotto values");
  ntln("<span class=\"optGroup\">Current Host Only</span>");
- ntln("Host Name: <input type=\"text\" name=\"prop.hostName\" value=\""+get_property("hostName")+"\">");
+ ntln("Host Name: <input class=\"unselected\" type=\"text\" name=\"prop.hostName\" value=\""+get_property("hostName")+"\">");
  ntln("<input type=\"submit\" name=\"submit\" value=\"Save\" class=\"kolbut\">");
  closetag("form");
 }
