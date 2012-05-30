@@ -315,7 +315,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  int senderid=getId(sender);
  string mout;
  if(skillnum==62){
-  numTurns=TPC;
+  numTurns=1;
   switch(userdata["*"].buffs[skillnum]){
    case 1:
     mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" 1";
@@ -330,16 +330,6 @@ void buff(string sender, string msg, int numTurns, string ding){
     return;
   }
  }
- if((skillnum>2000)&&(skillnum<3000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(turt_name,mout);
-  return;
- }
- if((skillnum>4000)&&(skillnum<5000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(sauc_name,mout);
-  return;
- }
  //Assign default values if turns isn't specified.
  if(skillnum==6014) numTurns=TPC;//Ode
  if(numTurns==0){
@@ -349,6 +339,16 @@ void buff(string sender, string msg, int numTurns, string ding){
    if(userdata[sender].defaultCasts==0)userdata[sender].defaultCasts=200;
    numTurns=userdata[sender].defaultCasts;
   }
+ }
+ if((skillnum>2000)&&(skillnum<3000)){
+  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
+  chat_private(turt_name,mout);
+  return;
+ }
+ if((skillnum>4000)&&(skillnum<5000)){
+  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
+  chat_private(sauc_name,mout);
+  return;
  }
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
