@@ -14,6 +14,7 @@ record userinfo{
  string lastTrigger;
  int donated;
  int wallet;
+ int defaultCasts;
  string gHobopPassword;
  string sessionVars;
 };
