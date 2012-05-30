@@ -208,9 +208,11 @@ void doBounty(){
   case "11 non-E":b=2107;break;
   case "5 sammich":b=2412;break;
   case "6 bits of":b=2471;break;
+  default: freeResource("adventuring");return;
  }
+ int oldLucre=item_amount($item[filthy lucre]);
  visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
- while((my_adventures()-get_property("rolladv").to_int()>0)&&(item_amount(b.to_item())<b.to_item().bounty_count)){
+ while((my_adventures()-get_property("rolladv").to_int()>0)&&(item_amount($item[filthy lucre])==oldLucre)){
   if(adventure(1,b.to_item().bounty)){}
  }
  visit_url("bhh.php");

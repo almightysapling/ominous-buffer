@@ -345,7 +345,10 @@ void buff(string sender, string msg, int numTurns, string ding){
  if(numTurns==0){
   if(skillnum==6026) numTurns=125;//Donho
   else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028)) numTurns=25;//Limited buffs
-  else if(skillnum!=6014) numTurns=200;//Else
+  else if(skillnum!=6014){//Else
+   if(userdata[sender].defaultCasts==0)userdata[sender].defaultCasts=200;
+   numTurns=userdata[sender].defaultCasts;
+  }
  }
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
@@ -548,18 +551,27 @@ void mod(string sender, string msg){
  boolean adminonly=getUF(sender,isAdmin);
  if(sender==my_name())adminonly=true;
  matcher m=create_matcher("(.*)[., ;]*\\|\\|\\s*(.*)",msg);
- string cmdlist=msg;
+ string cmd=msg;
  string user=sender;
  if(m.find()){
-  cmdlist=m.group(1);
+  cmd=m.group(1);
   user=m.group(2);
  }
  if(!adminonly) user=sender;
- m=create_matcher("[., ;]+",cmdlist);
- cmdlist=replace_all(m," ");
- string[int]cmds=split_string(cmdlist," ");
+ m=create_matcher("[., ;]+",cmd);
+ cmd=replace_all(m," ");
+ string[int]cmds=split_string(cmd," ");
  checkOut(userdata,"userdata.txt");
- foreach i,cmd in cmds
+ string val;
+ foreach i,tcmd in cmds{
+  m=create_matcher("(.+?)=(.*)",tcmd);
+  if(m.find()){
+   cmd=m.group(1);
+   val=m.group(2);
+  }else{
+   cmd=tcmd;
+   val="0";
+  }
   switch(cmd){
    case "noLimit":
     if(adminonly){
@@ -576,6 +588,10 @@ void mod(string sender, string msg){
    case "nowarning":
     setUF(user,noFlag);
     chat(sender,user+"\'s warnings disabled.");
+    break;
+   case "default":
+    userdata[user].defaultCasts=val.to_int();
+    chat(sender,user+"\'s default cast amount set to "+val);
     break;
    case "warning":
     unSetUF(user,noFlag);
@@ -623,6 +639,7 @@ void mod(string sender, string msg){
     errorMessage(sender,cmd+" seems to be an invalid command.");
     break;
   }
+ }
  commit(userdata,"userdata.txt");
 }
 
