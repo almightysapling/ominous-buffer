@@ -1,4 +1,5 @@
 import<shared.ash>
+invokeResourceMan(__FILE__);
 string[string] fields=form_fields();
 //html properties
 boolean spaced=false;
@@ -64,14 +65,36 @@ void cycletag(string tag){
 
 void update(){
  loadSettings(ignorePile);
+ formProps();
+ checkOut(userdata,"userdata.txt");
  matcher m;
+ string name;
+ string[string,string] groups;
+ foreach i,s in split_string(get_property("admins"),"::") unsetUF(s,isAdmin);
  foreach var,val in fields{
-  m=create_matcher("(.+?)\\.(.+?)$",var);
+  m=create_matcher("(.+?)\\.(.*)",var);
   if(!m.find())continue;
+  name=m.group(2);
   switch(m.group(1)){
-   case "prop":set_property(m.group(2),val);break;
+   case "prop":
+    m=create_matcher("(.+?)\\.(.*)",name);
+    if(!m.find()){
+     set_property(name,val);
+     break;
+    }
+    groups[m.group(1),m.group(2)]=val;
+    break;
+   case "admins":
+    if(userdata contains val) setUF(val,isAdmin);
+    break;
   }
  }
+ foreach g in groups{
+  name="";
+  foreach i,v in groups[g] name+=v+"::";
+  set_property(g,name);
+ }
+ commit(userdata,"userdata.txt");
  saveSettings(earlySave);
 }
 
@@ -81,21 +104,55 @@ void header(){
  opentag("html");
  opentag("head");
  opentag("style","type=\"text/css\"");
+ writeln("#numAdmins {display: none}");
+ writeln("#adder {width: 12px; height: 12px; border: 2px dotted rgb(220,220,220); text-align: center;}");
+ writeln(".tmp {visibility: hidden; white-space: nowrap;}");
  writeln(".optGroup {font-weight: bold;}");
  writeln(".kolbut {border: 2px solid black; font-family:Arial,Helvetica,sans-serif; font-size:10pt; font-weight: bold; background-color: white;}");
  writeln(".righttable {text-align:right; width:80%; float:right; border:0px; background-color:white; padding: 0px; border-spacing:5px;}");
  writeln(".info {background-color:#F5E4DC;}");
  writeln(".good {background-color: rgb(110,250,130);}");
  writeln(".bad {background-color: rgb(250,110,130);}");
- writeln("input.unselected {background-color:#F5E4DC; border:0px; text-align:right; margin:2px}");
+ writeln(".okay {background-color: rgb(220,220,220);}");
+ writeln(".paran {font-size:0.8em; font-weight: bold;}");
+ writeln("input.unselected {background-color:#F5E4DC; border:0px; text-align:right; margin:2px 3px}");
  closetag();
  opentag("script","type=\"text/javascript\" language=\"javascript\"");
+ writeln("function renderWidth(e){");
+ writeln(" var tmp=document.createElement(\"span\");");
+ writeln(" tmp.className=\"tmp\";");
+ writeln(" tmp.innerHTML=\".\"+e.value+\".\";");
+ writeln(" document.body.appendChild(tmp);");
+ writeln(" var theWidth = tmp.scrollWidth;");
+ writeln(" document.body.removeChild(tmp);");
+ writeln(" return theWidth;");
+ writeln("}");
+ writeln("function resize(e){ e.style.width=Math.min(Math.max(5,renderWidth(e)),220)+'px';}");
  writeln("function convertInputs(){");
  writeln(" var allEs=document.getElementsByTagName(\"input\");");
- writeln(" for(var i=0;i<allEs.length;i++) if(allEs[i].className==\"unselected\"){");
- writeln("  allEs[i].setAttribute(\"onfocus\",\"switchIn(this)\");");
- writeln("  allEs[i].setAttribute(\"onblur\",\"switchOut(this)\");");
+ writeln(" for(var i=0;i<allEs.length;i++) {");
+ writeln("  if(allEs[i].className.indexOf(\"unselected\")!==-1){");
+ writeln("   resize(allEs[i]);");
+ writeln("   allEs[i].setAttribute(\"onfocus\",\"switchIn(this)\");");
+ writeln("   allEs[i].setAttribute(\"onblur\",\"switchOut(this)\");");
+ writeln("   allEs[i].setAttribute(\"onkeyup\",\"resize(this)\");");
+ writeln("  }");
  writeln(" }");
+ writeln("}");
+ writeln("function addMin(){");
+ writeln(" newI=document.createElement(\"input\");");
+ writeln(" numD=document.getElementById(\"numAdmins\");");
+ writeln(" newI.setAttribute(\"onfocus\",\"switchIn(this)\");");
+ writeln(" newI.setAttribute(\"onblur\",\"switchOut(this)\");");
+ writeln(" newI.setAttribute(\"onkeyup\",\"resize(this)\");");
+ writeln(" newI.type=\"text\";");
+ writeln(" newI.name=\"admins.\"+numD.innerHTML;");
+ writeln(" span=document.getElementById(\"adminbox\");");
+ writeln(" span.appendChild(document.createTextNode(\", \"));");
+ writeln(" span.appendChild(newI);");
+ writeln(" numD.innerHTML=Number(numD.innerHTML)+1;");
+ writeln(" resize(newI);");
+ writeln(" newI.focus();");
  writeln("}");
  writeln("function switchIn(e){ e.className=\"\";}");
  writeln("function switchOut(e){ e.className=\"unselected\";}");
@@ -104,14 +161,24 @@ void header(){
 }
 
 void options(){
+ int[string] books;
+ update(books,"books.txt");
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
- nln("<input type=\"hidden\" name=\"save\" value=\"yes\">");
+ nln("<input type=\"hidden\" name=\"save\" value=\"yes\" />");
  nln("<span class=\"optGroup\">Ominous Buffer</span>");
- ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\">");
- ntln("Stuff to put here: admins, lotto values");
+ ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\" />");
+ nln("<input type=\"hidden\" name=\"prop.books.1\" value=\""+books["Event1"]+"\" />");
+ nln("<input type=\"hidden\" name=\"prop.books.2\" value=\""+books["Event2"]+"\" />");
+ nln("<input type=\"hidden\" name=\"prop.books.3\" value=\""+books["Event3"]+"\" />");
+ ntln("Current Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.5\" value=\""+books["thisLotto"]+"\" />");
+ nln("Next Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.4\" value=\""+books["nextLotto"]+"\" />");
+ string[int] admins=split_string(get_property("admins"),"::");
+ n("<br/>Admins: <span id=\"adminbox\">");
+ foreach i,s in admins nln("<input class=\"unselected\" type=\"text\" name=\"admins."+i+"\" value=\""+s+"\" />"+(i==count(admins)-1?"</span><span id=\"numAdmins\">"+to_string(i+1)+"</span>.":", "));
+ nln("<span id=\"adder\" onclick=\"addMin();\">+</span>");
  ntln("<span class=\"optGroup\">Current Host Only</span>");
- ntln("Host Name: <input class=\"unselected\" type=\"text\" name=\"prop.hostName\" value=\""+get_property("hostName")+"\">");
- ntln("<input type=\"submit\" name=\"submit\" value=\"Save\" class=\"kolbut\">");
+ ntln("Host Name: <input class=\"unselected changesize\" type=\"text\" name=\"prop.hostName\" value=\""+get_property("hostName")+"\" />");
+ ntln("<input type=\"submit\" name=\"submit\" value=\"Save\" class=\"kolbut\" />");
  closetag("form");
 }
 
@@ -141,6 +208,11 @@ void info(){
   cycletag("td","class=\"bad\"");
   nln("No");
  }
+ cycletag("tr");
+ opentag("td","class=\"info\"");
+ nln("Meat <span class=\"paran\">(including DMS)</span>");
+ cycletag("td","class=\"okay\"");
+ nln(to_commad(my_meat()+my_closet_meat()+(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]))*1000));
 }
 
 void footer(){

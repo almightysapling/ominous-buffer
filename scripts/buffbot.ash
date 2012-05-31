@@ -1122,7 +1122,10 @@ void userDetails(string sender, string who){
    foreach pack, innards in userdata[who].buffpacks reply+="-"+pack+": "+innards+".\n";
   }
   if(userdata[who].donated>0) reply+="Donated: "+userdata[who].donated.to_string()+" meat.\n";
-  if(who==sender) reply+="Bank: "+userdata[who].wallet.to_string()+" meat.\n";
+  if(who==sender){
+   reply+="Bank: "+userdata[who].wallet.to_string()+" meat.\n";
+   reply+="Default Casts: "+userdata[who].defaultCasts.to_string()+"\n";
+  }
   cli_execute("csend to "+sender+"||"+reply);
  }else chat(sender,"No match found for "+who+".");
 }
@@ -2043,22 +2046,36 @@ void clanHandler(string sender, string msg){
 
 void slimetubeHandler(string sender, string msg){
  if((trueChannel=="")&&(metaParser(sender,msg)))return;
- if(sender=="Dungeon")return;
  prefix="/slimetube ";
+ if(sender=="Dungeon")return;
  publicChat(sender,msg);
 }
 
 void hobopolisHandler(string sender, string msg){
  if((trueChannel=="")&&(metaParser(sender,msg)))return;
- if(sender=="Dungeon")return;
  prefix="/hobo ";
+ if(sender=="Dungeon"){
+  matcher m=create_matcher("(.+?) has entered combat with (.*)",msg);
+  if(m.find()){//Start fight.
+   return;
+  }
+  m=create_matcher("(.+?) has defeated (.*)",msg);
+  if(m.find()){//Win fight.
+   return;
+  }
+  m=create_matcher("(.+?) defeated (.*)",msg);
+  if(m.find()){//Lose fight.
+   return;
+  }
+  return;
+ }
  publicChat(sender,msg);
 }
 
 void hauntedhouseHandler(string sender, string msg){
  if((trueChannel=="")&&(metaParser(sender,msg)))return;
- if(sender=="Dungeon")return;
  prefix="/hauntedhouse ";
+ if(sender=="Dungeon")return;
  publicChat(sender,msg);
 }
 
