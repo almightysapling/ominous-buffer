@@ -66,7 +66,6 @@ void sendMeat(string who, int amount){
 
 void checkLotto(){
  int[string] books;
-//debug(56);
  checkOut(books,"books.txt");
  int event=0;
  int time=minutesToRollover();
@@ -134,7 +133,6 @@ void checkLotto(){
  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
-//debug(130);
 }
 
 void makeRecords(){
@@ -197,7 +195,10 @@ void doBounty(){
  claimResource("adventuring");
  string bounty=visit_url("bhh.php");
  matcher m=create_matcher("(40 billy|5 burned|40 coal|5 discard|20 disint|11 non-E|5 sammich|6 bits of)",bounty);
- if(!m.find())return;
+ if(!m.find()){
+  freeResource("adventuring");
+  return;
+ }
  int b;
  switch(m.group(1)){
   case "40 billy":b=2409;break;
@@ -513,6 +514,9 @@ void main(){try{
  }
  makeRecords();
  int burnTurns=150-to_int(get_property("rolladv"));
+/* while(my_fullness()<10){
+  eatsilent();
+ }*/
  doBounty();
  if((my_adventures()-burnTurns)>0){
   burn();
