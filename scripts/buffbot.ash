@@ -443,8 +443,11 @@ void buff(string sender, string msg, int numTurns, string ding){
    case "Selected target is busy fighting.":
     errorMessage(sender,"I can't buff you while you're adventuring.");
     break;
-   default:
+   case "Selected target has the maximum number of AT buffs already.":
     errorMessage(sender,"You have too many songs in your head.");
+    break;
+   default:
+    errorMessage(sender,"Unknown Error: '"+last_skill_message()+"'");
   }
  }else{
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
