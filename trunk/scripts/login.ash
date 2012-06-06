@@ -476,6 +476,7 @@ void dailyBreakfast(){
 void main(){try{
  print("Starting Login...");
  claimResource("science");
+ run_combat();//Just in casies.
  if(get_property("_thisBreakfast")=="")cleanPC();
  claimResource("adventuring");
  set_property("chatbotScript",chatbotScript);
