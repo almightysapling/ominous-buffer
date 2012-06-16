@@ -412,8 +412,7 @@ void buff(string sender, string msg, int numTurns, string ding){
    chat_private("wangbot","target "+sender);
   }else{
    claimResource("adventuring");
-   if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
-   if(item_amount($item["WANG"])<1)cli_execute("buy wang");
+   if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
    string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+sender);
    freeResource("adventuring");
   }
