@@ -2128,6 +2128,11 @@ void privateHandler(string sender, string msg){
    multiplier=m.group(1).to_int();
    messages[i]=m.group(2);
   }
+  m.reset(messages[i]);
+  while(m.find()){
+   messages[i]=m.group(2);
+   m.reset(messages[i]);
+  }
   m=create_matcher("(\\d+)",messages[i]);
   if(m.find()){
    if(to_float(m.group(1))>1000)turnR=1000;
