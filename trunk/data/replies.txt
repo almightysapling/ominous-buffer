@@ -1,5 +1,9 @@
+AED?	Astral Energy Drink, $pnick.	3	say		
 alot	a lot*	0	say		
+apologize	It's too late to apologize.	4	say		
+APPROPRIATE APOSTROPHE	Its sad an apostrophe cannot defend it's appropriateness.	1	say		
 ascention	ascension*	0	say		
+attack!	pulls out his dagger and stabs a random person.	4	do		
 BBT?	Big Bang Theory, $pnick.	3	say		
 CAB?	Combat Action Bar, $pnick.	3	say		
 CS?	Collector's Score, $pnick.	3	say		
@@ -7,9 +11,13 @@ cuss at everyone	Fuck off. I have better things to do.	4	say
 definate	definite*	0	say		
 dissapear	disappear*	0	say		
 Finker	You mean Twinker, $pname.	0	say		
+goodnight	Sweet dreams $pnick!	8	say		
 HIMYM?	How I Met Your Mother, $pnick.	3	say		
+is being ignored	goes over and plays in the corner with $pnick	0	do		
 is chat dead	It has been $timedif minutes since someone last spoke.	16	say		
 MMJ?	Magical mystery juice, $pnick.	3	say		
+nickle	nickel*	0	say		
+noone	No one*	0	say		
 NPH?	Neil Patrick Harris, $pnick.	3	say		
 OB?	is OB, $pnick.	3	do		
 om nom nom	Much better, thank you.	0	say	$ptrigger	omnomnom
@@ -26,8 +34,8 @@ thank you	You're welcome, $pnick.	8	say
 thanks	You're welcome!	8	say		
 TPTB?	The powers that be, $pnick.	3	say		
 wake roly up	pokes Roly.	4	do		
+welcome back to the kingdom of loathing. noob.	Congratulations! Best of luck in your new life.	0	say		
 welcome our new members	Welcome, new members, to our facility.	4	say		
 what language	$pnick: ASH for KoLmafia.	8	say		
 where are my keys	Did you check your other jacket?	0	say		
-you shout "hi-keeba!" and deliver a fierce karate chop to the prism.	cheers for and then shoryukens $player.	16	do		
 YR?	Yellow Ray, $pnick.	3	say		
