@@ -128,7 +128,7 @@ void checkLotto(){
   books["nextLotto"]=1;  
  }else{
   print("No winner.");
-  chat_clan("Just what I thought. Everyone here is a loser. And probably an orphan as well.");
+  chat_clan("Just what I thought. Everyone here is a loser. And probably "+insultCore()+" as well.");
  }
  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
