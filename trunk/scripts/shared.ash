@@ -272,6 +272,20 @@ string to_commad(int i){
  return c;
 }
 
+string factCore(string type){
+ string[string,int] factList;
+ update(factList,"facts.txt");
+ return factList[type,random(count(factList[type]))+1];
+}
+
+string factCore(){
+ return factCore("F");
+}
+
+string insultCore(){
+ return factCore("I");
+}
+
 void updateDC(string list){
  if(list=="useCurrent")list=get_property("_currentDeals");
  else set_property("_currentDeals",list);

@@ -543,10 +543,7 @@ void pick(string options){
 }
 
 void fact(){
- string[int] list;
- file_to_map("facts.txt",list);
- int d=random(count(list));
- chat(list[d]);
+ chat(factCore());
 }
 
 void mod(string sender, string msg){
