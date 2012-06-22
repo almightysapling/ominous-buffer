@@ -7,8 +7,8 @@ int burnMinutes=40;
 boolean prompted=false;
 int farmbuff=0;
 
-string meatfarm_fam="leprechaun";
-string stat_fam="hovering sombrero";
+string meatFam="leprechaun";
+string statFam="hovering sombrero";
 int lastCheck=0;
 
 int minutesToRollover(){
@@ -237,9 +237,9 @@ void burn(){
    farmingbuff=$skill[Cantata of Confrontation];
    farmbuff=0;
  }
- int casts_to_use=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
- casts_to_use=max((casts_to_use/3),1);
- use_skill(casts_to_use,farmingbuff);
+ int numCasts=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
+ numCasts=max((numCasts/3),1);
+ use_skill(numCasts,farmingbuff);
 }
 
 void handleMeat(){
@@ -407,19 +407,9 @@ void clearBuffs(){
 
 void dailyBreakfast(){
  string rumpus=visit_url("clan_rumpus.php");
- int camp_mp_gain;
- int rollmp;
- int rolladv=numeric_modifier("adventures");
- camp_mp_gain=to_int(numeric_modifier("base resting mp")*(1+numeric_modifier("resting mp percent")/100.0));
- if(contains_text(rumpus,"rump1_1.gif")||contains_text(rumpus,"rump1_2.gif"))rolladv+=3;
- if(contains_text(rumpus,"rump2_3.gif"))rolladv+=5;
- if(contains_text(rumpus,"rump4_3.gif"))rolladv+=1;
  checkMail();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
- set_property("rolladv",rolladv);
- rollmp = my_maxmp()-1000;
- set_property("rollmp",rollmp);
- cli_execute("familiar "+stat_fam);
+ cli_execute("familiar "+statFam);
  cli_execute("maximize exp, -1000combat");
  print("Visiting clan rumpus room.", "blue");
  if(contains_text(rumpus,"rump3_3.gif")){
@@ -456,8 +446,8 @@ void dailyBreakfast(){
  if(have_skill($skill[Lunch Break])) (!use_skill(1,$skill[Lunch Break]));
  clearBuffs();
  if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
- drink(6,$item[supernova champagne]);
- drink(1,$item[can of swiller]);
+ while(inebriety_limit()-my_inebriety()>2)drink(1,$item[supernova champagne]);
+ while(inebriety_limit()-my_inebriety()>0)drink(1,$item[can of swiller]);
  clearBuffs();
  if((have_skill($skill[Sonata of Sneakiness]))&&(have_effect($effect[Sonata of Sneakiness])<1))(!use_skill(1,$skill[Sonata of Sneakiness]));
  if((have_effect($effect[Dreams and Lights])<1)||((have_effect($effect[Dreams and Lights])<9)&&(have_effect($effect[Arcane in the Brain])<1))){
@@ -521,7 +511,7 @@ void main(){try{
  doBounty();
  if((my_adventures()-burnTurns)>0){
   burn();
-  cli_execute("familiar "+meatfarm_fam);
+  cli_execute("familiar "+meatFam);
   cli_execute("maximize meat, +1000combat, -tie");
   while(my_adventures()-burnTurns>0){
    if(adventure(1,$location[giant's castle])){}
@@ -531,7 +521,7 @@ void main(){try{
  }
  updateDC();
  clearBuffs();
- cli_execute("familiar "+stat_fam);
+ cli_execute("familiar "+statFam);
  cli_execute("outfit birthday suit");
  cli_execute("maximize mp");
  freeResource("adventuring");

@@ -244,7 +244,7 @@ boolean sendRecord(int skillId, string sender){
 
 void buff(string sender, string msg, int numTurns, string ding){
  //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
- if((to_lower_case(sender)==turt_name)||(to_lower_case(sender)==sauc_name)){
+ if((sender==turtleBot)||(sender==sauceBot)){
   string[int] failsplit = split_string(msg,"\\s");
   if(index_of("ARLNS",failsplit[0])>-1){
    sender=to_playerName(failsplit[1].to_int());
@@ -252,8 +252,8 @@ void buff(string sender, string msg, int numTurns, string ding){
   }
   switch(failsplit[0]){
    case "CASTRQ":
-    if(sender==turt_name)set_property('tamerCasts',failsplit[1]);
-    if(sender==sauc_name)set_property('sauceCasts',failsplit[1]);
+    if(sender==turtleBot)set_property('tamerCasts',failsplit[1]);
+    if(sender==sauceBot)set_property('sauceCasts',failsplit[1]);
     break;
    case "RATION":switch(failsplit[1]){
     case "ITEM":
@@ -275,6 +275,9 @@ void buff(string sender, string msg, int numTurns, string ding){
     break;
    case "R":
     errorMessage(sender,"I can't buff you if you're in Hardcore or Ronin!");
+    break;
+   case "U":
+    errorMessage(sender,"Unknown error. Must be a problem with the lesser bots.");
     break;
    case "L":
     errorMessage(failsplit[2],"I'm sorry, but you've reached your daily limit for "+failsplit[3].to_int().to_skill().to_string()+".");
@@ -319,11 +322,11 @@ void buff(string sender, string msg, int numTurns, string ding){
   switch(userdata["*"].buffs[skillnum]){
    case 1:
     mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" 1";
-    chat_private(turt_name,mout);
+    chat_private(turtleBot,mout);
     return;
    case 2:
     mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" 1";
-    chat_private(sauc_name,mout);
+    chat_private(sauceBot,mout);
     return;
    case 3:
     errorMessage(sender,"I'm sorry, but I'm all out of "+messageNew+" for today.");
@@ -342,12 +345,12 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  if((skillnum>2000)&&(skillnum<3000)){
   mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(turt_name,mout);
+  chat_private(turtleBot,mout);
   return;
  }
  if((skillnum>4000)&&(skillnum<5000)){
   mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(sauc_name,mout);
+  chat_private(sauceBot,mout);
   return;
  }
  casts=ceil(numTurns/(TPC*1.0));
@@ -893,14 +896,6 @@ string replyParser(string sender, string msg){
  }
  variable=create_matcher("\\\\\\$",msg);
  msg=replace_all(variable,"$");
- return msg;
-}
-
-string chatFilter(string sender, string msg){
- if(msg.contains_text("fuck")){
-  chat(sender,"Try again, fuckwad.");
-  return "x";
- }
  return msg;
 }
 
@@ -1525,7 +1520,7 @@ string predicateFilter(string sender, string msg){
    logout(sender,oper);
    return "x";
   case "market":
-   if(!analyze_md(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
+   if(!analyzeMD(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
    return "x";
   case "math":
    oper=performMath(sender,oper);
@@ -1537,7 +1532,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "nick":
    first=create_matcher("([\\w ']*)",oper);
-   if(first.find()) oper=first.group(1);
+   if(first.find())oper=first.group(1);
    else{
     chat(sender,"Sorry, that's not a valid nickname.");
     return "x";
@@ -1546,7 +1541,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "pack":
   case "set":
-   first=create_matcher("(\\d+)\\s*:\\s*(.*)",oper);
+   first=create_matcher("(\\d+)\\s*:?\\s*(.*)",oper);
    pred="";
    if(first.find()){
     pred=first.group(1);
@@ -1560,8 +1555,8 @@ string predicateFilter(string sender, string msg){
    } 
    return pred+":"+r;
   case "ping":
-   chat(turt_name,"PING "+sender);
-   chat(sauc_name,"PING "+sender);
+   chat(turtleBot,"PING "+sender);
+   chat(sauceBot,"PING "+sender);
    chat(sender,"Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
@@ -1594,7 +1589,7 @@ string predicateFilter(string sender, string msg){
    checkApps();
    checkMail();
    checkData();
-   return "x";   
+   return "x";
   case "roll":
    roll(sender,oper);
    return "x";
@@ -1641,7 +1636,7 @@ void nopredpass(string sender, string msg, boolean addressed){
  if(ref.find())referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
- responses the_one;
+ responses r;
  string th="";
  foreach testcase,reply in botdata{
   th=testcase;
@@ -1660,7 +1655,7 @@ void nopredpass(string sender, string msg, boolean addressed){
    foundmatch=false;
    continue;
   }
-  the_one=reply;
+  r=reply;
   break;
  }
  if(foundmatch){
@@ -1669,10 +1664,10 @@ void nopredpass(string sender, string msg, boolean addressed){
   userdata["*"].lastTrigger=th;
   addRep(th);
   commit(userdata,"userdata.txt");
-  switch(the_one.method){
-   case "say":chat(replyParser(sender,the_one.reply));
+  switch(r.method){
+   case "say":chat(replyParser(sender,r.reply));
     break;
-   case "do":chat("/em "+replyParser(sender,the_one.reply));
+   case "do":chat("/em "+replyParser(sender,r.reply));
     break;
   }
  }
@@ -1797,7 +1792,7 @@ boolean mathSTP(string data){
  vector b;
  vector c;
  matcher m=create_matcher("<(.+?)>\\s?<(.+?)>\\s?<(.+?)>",data);
- if(!m.find()) return false;
+ if(!m.find())return false;
  a=m.group(1).to_vector();
  b=m.group(2).to_vector();
  c=m.group(3).to_vector();
@@ -1987,7 +1982,7 @@ void publicChat(string sender, string msg){
    if(addressed)fact();
    return;
   case "market":
-   analyze_md("!","link "+oper);
+   analyzeMD("!","link "+oper);
    return;
   case "roll":
    if(addressed)roll(sender,oper);
@@ -2098,11 +2093,9 @@ void privateHandler(string sender, string msg){
  if(getUF(sender,noFlag))errorMsg=false;
  if(gameType()==gameWordshot)msg=wordshot(sender,msg);
  if(msg=="x")return;
- msg=chatFilter(sender,msg);
- if(msg=="x")return;
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if((sender==turt_name)||(sender==sauc_name)){
+ if((sender==turtleBot)||(sender==sauceBot)){
   buff(sender,msg,0,sender);
   return;
  }
@@ -2181,7 +2174,7 @@ string applySUE(string sender,string channel){
 
 string applySUE(string channel){
  if(channel!="")return channel;
- impliedOB=true;
+ if(trueUser!="MesaChat")impliedOB=true;
  trueChannel=channel;
  string s=getSessionVar(trueUser,"schannel");
  if(s=="")return s;

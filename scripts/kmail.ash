@@ -129,18 +129,18 @@ boolean is_newer(datetime a, datetime b){
 }
 
 record message{
-	string sender;
-	int senderId;
-	datetime date;
-	int messageId;
-	string text;
-	int meat;
-	int[item] things;
-    boolean out;
-    boolean archive;
-    boolean unread;
-    string box;
-    string fakebox;
+ string sender;
+ int senderId;
+ datetime date;
+ int messageId;
+ string text;
+ int meat;
+ int[item] things;
+ boolean out;
+ boolean archive;
+ boolean unread;
+ string box;
+ string fakebox;
 };
 
 int kmail(string to, string message, int meat, int[item] stuff){
@@ -148,8 +148,8 @@ int kmail(string to, string message, int meat, int[item] stuff){
   print("Not enough meat to send.");
   return 3;
  }
- string itemstring = "";
- int j = 0;
+ string itemstring="";
+ int j=0;
  string[int] itemstrings;
  foreach i in stuff{
   if (is_tradeable(i)||is_giftable(i)){
@@ -213,27 +213,27 @@ string adjustLinks(string start){
   rep="<"+count(link).to_string()+">";
   start=replace_first(m,rep);
   i=index_of(start,rep)+length(rep);
-  while (a>0){
-   if (char_at(start,i)!=" ") a-=1;
+  while(a>0){
+   if(char_at(start,i)!=" ")a-=1;
    start=substring(start,0,i)+substring(start,i+1);
   }
   m=m.reset(start);
  }
- foreach in,l in link {
+ foreach in,l in link{
   m=create_matcher("<"+in.to_string()+">",start);
-  if (!m.find()) continue;
+  if(!m.find())continue;
   start=replace_first(m,"<a target=_blank href=\""+l+"\"><font color=\"blue\">"+l+"</font></a>");
  }
  return start;
 }
 
 string substring(string source, string start, string end){
- if (start!=""){
-  if (!source.contains_text(start)) return "";
+ if(start!=""){
+  if(!source.contains_text(start))return "";
   source=substring(source,index_of(source,start)+length(start));
  }
- if (end=="") return source;
- if (!source.contains_text(end)) return "";
+ if(end=="")return source;
+ if(!source.contains_text(end))return "";
  return substring(source,0,index_of(source,end));
 }
 
@@ -242,7 +242,7 @@ message[int] parseMail(string box, int p){
  matcher m;
  string temp;
  int page;
- if (p==0) page=1;
+ if(p==0)page=1;
  else page=p;
  repeat{
   int c=count(parsedmail)+1;
@@ -276,7 +276,7 @@ message[int] parseMail(string box, int p){
   }
   if (p>0) break;
   page+=1;
- }until (false);
+ }until(false);
  return parsedmail;
 }
 message[int] parseMail(){
@@ -293,13 +293,13 @@ boolean deleteMail(message m){
 
 void junkMail(string dump){
  message[int] mail=parseMail();
- for i from 1 upto (count(mail)) if (mail[i].sender==dump) deleteMail(mail[i]);	
+ for i from 1 upto (count(mail)) if(mail[i].sender==dump)deleteMail(mail[i]);	
  return;
 }
 
 boolean saveMail(message m){
  string del=visit_url("messages.php?the_action=save&box="+m.box+"&pwd="+my_hash()+"&sel"+m.messageId+"=checked");
- if (contains_text(del,"1 message saved.")){
+ if(contains_text(del,"1 message saved.")){
   return true;
  }
  return false;
