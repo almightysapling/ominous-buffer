@@ -170,7 +170,7 @@ void main(string sender, string msg){
    case "PROPERTY":
     switch(pieces[1]){
      case "GET":
-      chat_private(sender, "PROPERTY "+pieces[2]+" "+get_property(pieces[2]);
+      chat_private(sender, "PROPERTY "+pieces[2]+" "+get_property(pieces[2]));
       return;
      case "SET":
       set_property(pieces[2],pieces[3]);
