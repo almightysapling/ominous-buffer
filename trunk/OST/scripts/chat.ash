@@ -77,8 +77,11 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
    case "Selected target cannot receive buffs.":
     msg="R "+msg;
     break;
-   default:
+   case "Selected target is busy fighting.":
     msg="A "+msg;
+    break;
+   default:
+    msg="U "+msg;
     break;
   }
   if(errorMsg)chat_private(settings["mainbot"],msg);
@@ -155,15 +158,25 @@ void main(string sender, string msg){
  }
  string[int] pieces=split_string(msg,"\\s");
  if (checkFlag(sender,isbuffer)){
-  if (msg=='CASTRQ'){
-   int[string] totals;
-   file_to_map(my_name()+"/tots.txt",totals);
-   chat_private(sender,'CASTRQ '+to_string(totals["*"]));
-   return;
-  }
-  if (pieces[0]=='PING'){
-   chat_private(substring(msg,msg.index_of(" ")+1),"Reply from "+settings["formalName"]+".");
-   return;
+  switch(pieces[0]){
+   case "CASTRQ":
+    int[string] totals;
+    file_to_map(my_name()+"/tots.txt",totals);
+    chat_private(sender,'CASTRQ '+to_string(totals["*"]));
+    return;
+   case "PING":
+    chat_private(substring(msg,msg.index_of(" ")+1),"Reply from "+settings["formalName"]+".");
+    return;
+   case "PROPERTY":
+    switch(pieces[1]){
+     case "GET":
+      chat_private(sender, "PROPERTY "+pieces[2]+" "+get_property(pieces[2]);
+      return;
+     case "SET":
+      set_property(pieces[2],pieces[3]);
+      return;
+    }
+    return;
   }
   if (count(pieces)!=5)return;
   requestMutex("_adventuring");
