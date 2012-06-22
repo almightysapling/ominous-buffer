@@ -62,6 +62,9 @@ void cycletag(string tag,string options){
 void cycletag(string tag){
  cycletag(tag,"");
 }
+void cycletag(){
+ cycletag(tagList[count(tagList)]);
+}
 
 void update(){
  loadSettings(ignorePile);
@@ -98,6 +101,27 @@ void update(){
  saveSettings(earlySave);
 }
 
+void manageOST(){
+ boolean sburn=false,tburn=false;
+ boolean slog=false,tlog=false;
+ boolean sadv=false,tadv=false;
+ string w;
+ foreach s,v in fields{
+  switch(s.char_at(0)){
+   case ".":
+    
+    break;
+   case "p":
+    w=s.substring(2);
+    if(v=="")break;
+    set_property(w,v);
+    if(w.char_at(1)=="s")chat_private("Ominous Sauceror","PROPERTY SET "+w.substring(2)+" "+v);
+    else if(w.char_at(1)=="t")chat_private("Ominous Tamer","PROPERTY SET "+w.substring(2)+" "+v);
+    break;
+  }
+ }
+}
+
 void header(){
  writeln("<!DOCTYPE html>");
 // writeln("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">");
@@ -109,12 +133,14 @@ void header(){
  writeln(".tmp {visibility: hidden; white-space: nowrap;}");
  writeln(".optGroup {font-weight: bold;}");
  writeln(".kolbut {border: 2px solid black; font-family:Arial,Helvetica,sans-serif; font-size:10pt; font-weight: bold; background-color: white;}");
- writeln(".righttable {text-align:right; width:80%; float:right; border:0px; background-color:white; padding: 0px; border-spacing:5px;}");
+ writeln(".righttable {text-align:right; width:50%; float:right; border:0px; background-color:white; padding: 0px; border-spacing:5px;}");
+ writeln(".lefttable {text-align:left; border:0px; background-color:white; padding: 0px; border-spacing: 5px;}");
+ writeln(".lefttable td {background-color:#F5E4DC;}");
  writeln(".info {background-color:#F5E4DC;}");
  writeln(".good {background-color: rgb(110,250,130);}");
  writeln(".bad {background-color: rgb(250,110,130);}");
  writeln(".okay {background-color: rgb(220,220,220);}");
- writeln(".paran {font-size:0.8em; font-weight: bold;}");
+ writeln(".paren {font-size:0.8em; font-weight: bold;}");
  writeln("input.unselected {background-color:#F5E4DC; border:0px; text-align:right; margin:2px 3px}");
  closetag();
  opentag("script","type=\"text/javascript\" language=\"javascript\"");
@@ -153,6 +179,15 @@ void header(){
  writeln(" numD.innerHTML=Number(numD.innerHTML)+1;");
  writeln(" resize(newI);");
  writeln(" newI.focus();");
+ writeln("}");
+ writeln("function freeRelease(checked, bound){");
+ writeln(" elem=document.getElementById(bound);");
+ writeln(" if(checked){");
+ writeln("  elem.disabled=false;");
+ writeln(" }else{");
+ writeln("  elem.checked=false;");
+ writeln("  elem.disabled=true;");
+ writeln(" }");
  writeln("}");
  writeln("function switchIn(e){ e.className=\"\";}");
  writeln("function switchOut(e){ e.className=\"unselected\";}");
@@ -210,9 +245,75 @@ void info(){
  }
  cycletag("tr");
  opentag("td","class=\"info\"");
- nln("Meat <span class=\"paran\">(including DMS)</span>");
+ nln("Meat <span class=\"paren\">(including DMS)</span>");
  cycletag("td","class=\"okay\"");
  nln(to_commad(my_meat()+my_closet_meat()+(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]))*1000));
+ closetag("table");
+}
+
+void OST(boolean show){
+ opentag("form","action=\""+__FILE__+"\" method=\"post\"");
+ nln("<input type=\"hidden\" name=\"control\" value=\"true\"/>");
+ opentag("table","class=\"lefttable\"");
+ opentag("tr");
+ opentag("th");
+ cycletag();
+ nln("OS");
+ cycletag();
+ nln("OT");
+ if(show){
+  cycletag("tr");
+  opentag("td");
+  cycletag();
+  nln("Sauce Shit!");
+  cycletag();
+  nln("Turtle Shit!");
+ }else{
+  cycletag("tr");
+  opentag("td","colspan=\"3\"");
+ // nln("<a href=\""+__FILE__+"?load=true\">Load OS/T information.</a><span class=\"paren\">(Takes time to load)</span>");
+  nln("Loading OS/T info currently unsupported.");
+  cycletag("tr");
+  opentag("td","colspan=\"3\"");
+  nln("<span class=\"paren\">Data here may be out of date.</span>");
+ }
+ cycletag("tr");
+ opentag("td");
+ nln("Burn");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".sb\" />");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".tb\" />");
+ cycletag("tr");
+ opentag("td");
+ nln("Logout");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".sl\" onClick=\"freeRelease(this.checked,'.sa');\" />");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".tl\" onClick=\"freeRelease(this.checked,'.ta');\" />");
+ cycletag("tr");
+ opentag("td");
+ nln("Max Adv");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".sa\" id=\".sa\" disabled=\"disabled\" />");
+ cycletag();
+ nln("<input type=\"checkbox\" name=\".ta\" id=\".ta\" disabled=\"disabled\" />");
+ cycletag("tr");
+ opentag("td");
+ nln("Nuns");
+ cycletag();
+ nln("<input type=\"text\" class=\"unselected\" name=\"p.os.nunsVisits\" value=\""+get_property("os.nunsVisits")+"\" />");
+ cycletag();
+ nln("<input type=\"text\" class=\"unselected\" name=\"p.ot.nunsVisits\" value=\""+get_property("ot.nunsVisits")+"\" />");
+ cycletag("tr");
+ opentag("td","colspan=\"3\"");
+ nln("<input type=\"submit\" name=\"submit\" value=\"Execute\" class=\"kolbut\" />");
+ closetag("form");
+ //"burn" run turns early.
+ //"halt" disable scripts, stay logged in.
+ //"logout" disable scripts, put on adv gear, log out.[Early end of night, use with burn]
+ //"abort" stop running script, leave chatbot running.
+ //"sleep" halt scripts, log out.
 }
 
 void footer(){
@@ -221,8 +322,11 @@ void footer(){
 
 void main(){
  if(fields contains "save") update();
+ if(fields contains "control") manageOST();
  header();
  options();
  info();
+ if(fields contains "load") OST(true);
+ else OST(false);
  footer();
 }

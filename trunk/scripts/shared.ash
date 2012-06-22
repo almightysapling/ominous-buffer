@@ -34,11 +34,11 @@ userinfo[string] userdata;
 file_to_map("userdata.txt",userdata);
 
 //Global variables
-string sauc_name="ominous sauceror";
-string turt_name="ominous tamer";
+string sauceBot="Ominous Sauceror";
+string turtleBot="Ominous Tamer";
 string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
-string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;rolladv;rollmp;_limitBuffs;_currentDeals;books;winners;admins";
-string ignorePile="_breakfast;_limitBuffs;nunsVisits;rolladv;rollmp;_currentDeals";
+string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
+string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;//F: 400 limit; T:in-clan limits
 associates[21459]=true;//Hogs of Destiny
@@ -233,18 +233,18 @@ int updateId(string user,boolean add){
  claimResource("adventuring");
  string searchstring=visit_url("searchplayer.php?searching=Yep.&searchstring="+user+"&hardcoreonly=0");
  freeResource("adventuring");
- matcher name_clan=create_matcher('(?i)(\\d*)">'+user+'</a></b> (?: \\(PvP\\))?(?:<br>\\(<a target=mainpane href="showclan\\.php\\?whichclan=(\\d*))?',searchstring);
- if(!find(name_clan))return 0;
+ matcher nameClan=create_matcher('(?i)(\\d*)">'+user+'</a></b> (?: \\(PvP\\))?(?:<br>\\(<a target=mainpane href="showclan\\.php\\?whichclan=(\\d*))?',searchstring);
+ if(!find(nameClan))return 0;
  checkOut(userdata,"userdata.txt");
- if(!add)return group(name_clan,1).to_int();
+ if(!add)return group(nameClan,1).to_int();
  userdata[user].gender=2;
- userdata[user].userid=group(name_clan,1).to_int();
+ userdata[user].userid=group(nameClan,1).to_int();
  unSetUF(user,inClan+inAssociate+highAssociate);
- if(group(name_clan,2).to_int()==clanid)setUF(user,inClan);
+ if(group(nameClan,2).to_int()==clanid)setUF(user,inClan);
  else unSetUF(user,inClan);
- if(associates contains group(name_clan,2).to_int()){
+ if(associates contains group(nameClan,2).to_int()){
   setUF(user,inAssociate);
-  if(associates[group(name_clan,2).to_int()]==true)setUF(user,highAssociate);
+  if(associates[group(nameClan,2).to_int()]==true)setUF(user,highAssociate);
  }
  if(!(getUF(user,inClan))){
   boolean wl=checkWhitelist(userdata[user].userid);

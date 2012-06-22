@@ -1,6 +1,6 @@
 int[int,int,int] DATA;
 
-string commad_num(string num){
+string humanNum(string num){
  int decimal=index_of(num,'.');
  if (decimal==-1)decimal=length(num);
  int p=decimal-3;
@@ -11,7 +11,7 @@ string commad_num(string num){
  return num;
 }
 
-boolean harvest_md(string itemname, int hours, int endtime){
+boolean harvestMD(string itemname, int hours, int endtime){
  string url="http://kol.coldfront.net/newmarket/export_csv.php?";
  if (hours>0){
   url+="start="+to_string(endtime-hours*3600)+"&";
@@ -36,7 +36,7 @@ boolean harvest_md(string itemname, int hours, int endtime){
  return true;
 }
 
-int unix_time(){
+int unixTime(){
  string n=visit_url("http://www.unixtimestamp.com/index.php");
  string e='<font color="#CC0000">';
  n=substring(n,index_of(n,e)+length(e));
@@ -44,7 +44,7 @@ int unix_time(){
  return n.to_int();
 }
 
-boolean market_details(string e, string req, int hours){
+boolean marketDetails(string e, string req, int hours){
  string thed="Market Data: ";
  if(hours>0) thed+="Last "+hours.to_string()+" Hours.\n";
  else thed+="All available data.\n";
@@ -72,9 +72,9 @@ boolean market_details(string e, string req, int hours){
   }
   avg=avg*1.0/total;
   gain=last-first;
-  thed+="Total Volume This Timeframe: "+total.to_string().commad_num()+"\n";
-  thed+="Average price: "+avg.to_string().commad_num()+"\n";
-  thed+="High/Low: "+max.to_string().commad_num()+"/"+min.to_string().commad_num()+"\n";
+  thed+="Total Volume This Timeframe: "+total.to_string().humanNum()+"\n";
+  thed+="Average price: "+avg.to_string().humanNum()+"\n";
+  thed+="High/Low: "+max.to_string().humanNum()+"/"+min.to_string().humanNum()+"\n";
   thed+="Net ";
   if(gain<0){
    gain=-1*gain;
@@ -82,17 +82,17 @@ boolean market_details(string e, string req, int hours){
   }else{
    thed+="Gain: ";
   }
-  thed+=gain.to_string().commad_num()+"\n";
+  thed+=gain.to_string().humanNum()+"\n";
  }
  cli_execute("kmail to "+req+" || "+thed);
  return true;
 }
 
-boolean market_compare(string e, string req, int hours){
+boolean marketCompare(string e, string req, int hours){
  return true;
 }
 
-boolean market_link(string req, int hours, string itemname, int endtime){
+boolean marketLink(string req, int hours, string itemname, int endtime){
  string url="http://kol.coldfront.net/newmarket/itemgraph.php?";
  if (hours>0){
   url+="starttime="+to_string(endtime-hours*3600)+"&";
@@ -105,8 +105,8 @@ boolean market_link(string req, int hours, string itemname, int endtime){
  return true;
 }
 
-boolean analyze_md(string requestee,string request){
- int timeNow=unix_time();
+boolean analyzeMD(string requestee,string request){
+ int timeNow=unixTime();
  string error="";
  request=to_lower_case(request);
  matcher parse=create_matcher("(det|cmp|link)(\\s*\\d*\\s*)(hours?|days?|all)? ?([\\s\\S]*)",request);
@@ -124,13 +124,13 @@ boolean analyze_md(string requestee,string request){
  string[int] items=split_string(request,"\\s*[|,;]\\s*");
 // print("Report Type: "+group(parse,1));
 // print("Time Frame (in hours): "+hours.to_string());
- if (group(parse,1)=="link") return market_link(requestee,hours,items[0],timeNow);
+ if (group(parse,1)=="link") return marketLink(requestee,hours,items[0],timeNow);
  foreach i in items {
  // print(items[i]);
-  if (!harvest_md(items[i],hours,timeNow))
+  if (!harvestMD(items[i],hours,timeNow))
    error+=items[i]+" not found.\n";
  }
- if (group(parse,1)=="det") return market_details(error,requestee,hours);
- else return market_compare(error,requestee,hours);
+ if (group(parse,1)=="det") return marketDetails(error,requestee,hours);
+ else return marketCompare(error,requestee,hours);
  return true;
 }
