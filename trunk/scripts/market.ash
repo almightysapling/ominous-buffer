@@ -38,11 +38,10 @@ boolean harvestMD(string itemname, int hours, int endtime){
 
 int unixTime(){
  string n=visit_url("http://www.unixtimestamp.com/index.php");
- string e='<font color="#CC0000">';
- n=substring(n,index_of(n,e)+length(e));
- n=substring(n,0,index_of(n,"<"));
- return n.to_int();
-}
+ matcher m=create_matcher("(\\d+) UTC",n);
+ if(!m.find())return -1;
+ return m.group(1).to_int();
+ }
 
 boolean marketDetails(string e, string req, int hours){
  string thed="Market Data: ";
