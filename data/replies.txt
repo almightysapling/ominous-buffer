@@ -1,5 +1,5 @@
 AED?	Astral Energy Drink, $pnick.	3	say		
-alot	a lot*	0	say		
+alot	a lot*	32	say		
 apologize	It's too late to apologize.	4	say		
 APPROPRIATE APOSTROPHE	Its sad an apostrophe cannot defend it's appropriateness.	1	say		
 ascention	ascension*	0	say		
