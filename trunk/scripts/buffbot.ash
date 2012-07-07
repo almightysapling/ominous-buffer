@@ -34,11 +34,12 @@ record responses{
  string cond1;
  string cond2;
 };
-int caseSensitive=1;
-int fullText=2;
-int mustAddress=4;
-int mustRefer=8;
-int repFree=16;
+int caseSensitive=1;//c
+int fullText=2;     //e
+int mustAddress=4;  //~default, disable with i
+int mustRefer=8;    //r
+int repFree=16;     //f
+int noPartials=32;  //p
 
 record timestamp{
  boolean lastChatterA;
@@ -910,11 +911,12 @@ void train(string trainer, string msg){
  string trig;
  matcher ff=create_matcher("(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
  if(ff.find()){
-  if(ff.group(1).contains_text("r")) newr.flags=mustRefer;
+  if(ff.group(1).contains_text("r")) newr.flags=mustRefer&(~mustAddress);
   if(ff.group(1).contains_text("c")) newr.flags|=caseSensitive;
-  if(ff.group(1).contains_text("n")) newr.flags&=~mustAddress;
-  if(ff.group(1).contains_text("o")) newr.flags|=fullText;
+  if(ff.group(1).contains_text("i")) newr.flags&=~mustAddress;
+  if(ff.group(1).contains_text("e")) newr.flags|=fullText;
   if(ff.group(1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
+  if(ff.group(1).contains_text("p")) newr.flags|=noPartials;
   if((ff.group(1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
   msg=replace_first(ff,"");
  }
@@ -1627,7 +1629,6 @@ string predicateFilter(string sender, string msg){
 }
 
 void nopredpass(string sender, string msg, boolean addressed){
- //print("yo");
  responses[string] botdata;
  update(botdata,"replies.txt");
  boolean foundmatch=false;
@@ -1650,6 +1651,12 @@ void nopredpass(string sender, string msg, boolean addressed){
   if(((reply.flags&fullText)==fullText)&&(msg!=testcase))continue;
   if(((reply.flags&caseSensitive)==caseSensitive)&&(!msg.contains_text(testcase)))continue;
   if(!msg.to_lower_case().contains_text(testcase.to_lower_case()))continue;
+  if((reply.flags&noPartial)==noPartial){
+   ref=create_matcher("\\\\E",testcase);
+   testcase=replace_all(ref,"\\E\\\\E\\Q");
+   ref=create_matcher("(?<!\w)\\Q"+testcase+"\\E(?!\w)",msg);
+   if(!msg.find())continue;
+  }
   foundmatch=true;
   if(replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
    foundmatch=false;
@@ -1983,6 +1990,9 @@ void publicChat(string sender, string msg){
    return;
   case "market":
    analyzeMD("!","link "+oper);
+   return;
+  case "mecho":
+   if(addressed)chat("/em "+replyParser(sender,oper));
    return;
   case "roll":
    if(addressed)roll(sender,oper);

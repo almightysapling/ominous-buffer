@@ -481,7 +481,7 @@ void main(){try{
  freeResource("science");
  print("Entering wait cycle.","green");
  int n;
- while(MinutesToRollover()>(burnMinutes+3)){
+ while(MinutesToRollover()>(burnMinutes)){
   coreGameCycle();
   checkLotto();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
@@ -494,7 +494,6 @@ void main(){try{
   }
   waitq(5);
  }
- if(MinutesToRollover()>burnMinutes)waitq(60);
  claimResource("science");
  claimResource("adventuring");
  print("Using excess adventures before rollover.","red");
