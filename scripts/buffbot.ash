@@ -1651,11 +1651,11 @@ void nopredpass(string sender, string msg, boolean addressed){
   if(((reply.flags&fullText)==fullText)&&(msg!=testcase))continue;
   if(((reply.flags&caseSensitive)==caseSensitive)&&(!msg.contains_text(testcase)))continue;
   if(!msg.to_lower_case().contains_text(testcase.to_lower_case()))continue;
-  if((reply.flags&noPartial)==noPartial){
+  if((reply.flags&noPartials)==noPartials){
    ref=create_matcher("\\\\E",testcase);
    testcase=replace_all(ref,"\\E\\\\E\\Q");
-   ref=create_matcher("(?<!\w)\\Q"+testcase+"\\E(?!\w)",msg);
-   if(!msg.find())continue;
+   ref=create_matcher(((reply.flags&caseSensitive)==caseSensitive?"":"(?i)")+"(?<!\\w)\\Q"+testcase+"\\E(?!\\w)",msg);
+   if(!ref.find())continue;
   }
   foundmatch=true;
   if(replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
