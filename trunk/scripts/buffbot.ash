@@ -911,11 +911,11 @@ void train(string trainer, string msg){
  string trig;
  matcher ff=create_matcher("(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
  if(ff.find()){
+  if(ff.group(1).contains_text("e")) newr.flags=fullText&(~mustAddress);
   if(ff.group(1).contains_text("r")) newr.flags=mustRefer&(~mustAddress);
-  if(ff.group(1).contains_text("c")) newr.flags|=caseSensitive;
   if(ff.group(1).contains_text("i")) newr.flags&=~mustAddress;
-  if(ff.group(1).contains_text("e")) newr.flags|=fullText;
   if(ff.group(1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
+  if(ff.group(1).contains_text("c")) newr.flags|=caseSensitive;
   if(ff.group(1).contains_text("p")) newr.flags|=noPartials;
   if((ff.group(1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
   msg=replace_first(ff,"");
