@@ -909,24 +909,24 @@ void train(string trainer, string msg){
  responses newr;
  newr.flags=mustAddress;
  string trig;
- matcher ff=create_matcher("(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
+ matcher ff=create_matcher("\\s?(?<!\\\\)\\[(\\w*)(?<!\\\\)]\\s?",msg);
  if(ff.find()){
   if(ff.group(1).contains_text("e")) newr.flags=fullText&(~mustAddress);
   if(ff.group(1).contains_text("r")) newr.flags=mustRefer&(~mustAddress);
-  if(ff.group(1).contains_text("i")) newr.flags&=~mustAddress;
   if(ff.group(1).contains_text("a")) newr.flags=(fullText|caseSensitive)&(~mustAddress);
+  if(ff.group(1).contains_text("i")) newr.flags&=~mustAddress;
   if(ff.group(1).contains_text("c")) newr.flags|=caseSensitive;
   if(ff.group(1).contains_text("p")) newr.flags|=noPartials;
   if((ff.group(1).contains_text("f"))&&((userdata[trainer].flags&isAdmin)==isAdmin)) newr.flags|=repFree;
   msg=replace_first(ff,"");
  }
- ff=create_matcher("(?<!\\\\)::(.+?)=(.+?)::",msg);
+ ff=create_matcher("\\s?(?<!\\\\)::(.+?)=(.+?)::\\s?",msg);
  if(ff.find()){
   newr.cond1=ff.group(1);
   newr.cond2=ff.group(2);
   msg=replace_first(ff,"");
  }
- ff=create_matcher("(.*)\\s?(?<!\\\\)<(\\w*?)(?<!\\\\)>\\s?(.*)",msg);
+ ff=create_matcher("(.+?)\\s?(?<!\\\\)<(\\w*?)(?<!\\\\)>\\s?(.*)",msg);
  if(ff.find()){
   newr.reply=ff.group(3);
   newr.method=ff.group(2).to_lower_case();
