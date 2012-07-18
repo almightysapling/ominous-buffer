@@ -36,9 +36,8 @@ boolean harvestMD(string itemname, int hours, int endtime){
  return true;
 }
 
-int unixTime(){
- string n=visit_url("http://www.unixtimestamp.com/");
- matcher m=create_matcher("(\\d+) UTC",n);
+int unixTime(){ //This website is really really fucking stupid.
+ matcher m=create_matcher("(\\d+) UTC",visit_url("http://www.unixtimestamp.com/index.php"));
  if(!m.find())return -1;
  return m.group(1).to_int();
  }
@@ -93,13 +92,13 @@ boolean marketCompare(string e, string req, int hours){
 
 boolean marketLink(string req, int hours, string itemname, int endtime){
  string url="http://kol.coldfront.net/newmarket/itemgraph.php?";
- if (hours>0){
+ if(hours>0){
   url+="starttime="+to_string(endtime-hours*3600)+"&";
  }else url+="starttime=1277924400&";
  url+="endtime="+to_string(endtime)+"&itemid=";
  url+=itemname.to_item().to_int().to_string();
- if (itemname.to_item()==$item[none]) return false;
- if (req=="!") chat_clan(url);
+ if(itemname.to_item()==$item[none])return false;
+ if(req=="!")chat_clan(url);
  else chat_private(req,url);
  return true;
 }
@@ -109,27 +108,30 @@ boolean analyzeMD(string requestee,string request){
  string error="";
  request=to_lower_case(request);
  matcher parse=create_matcher("(det|cmp|link)(\\s*\\d*\\s*)(hours?|days?|all)? ?([\\s\\S]*)",request);
- if (!find(parse))return false;
- if (group(parse)=="link"){
-  if (requestee=="!") chat_clan("http://kol.coldfront.net/index.php/content/view/1903/146/");
+ if(!find(parse))return false;
+ if(group(parse)=="link"){
+  if(requestee=="!")chat_clan("http://kol.coldfront.net/index.php/content/view/1903/146/");
   else chat_private(requestee,"http://kol.coldfront.net/index.php/content/view/1903/146/");
   return true;
  }
+ if(timeNow<0){
+  if(requestee=="!")chat_clan("Sorry, I'm not sure what time it is just now, so you'll have to hold off on that request.");
+  else chat_private(requestee,"Market error: unknown unixTime");
+ }
  int hours=group(parse,2).to_int();
- if ((group(parse,2)==" ")||(group(parse,2)=="")) hours=1;
- if ((group(parse,3)=="days")||(group(parse,3)=="day")) hours=hours*24;
- if (group(parse,3)=="all") hours=0;
+ if((group(parse,2)==" ")||(group(parse,2)==""))hours=1;
+ if((group(parse,3)=="days")||(group(parse,3)=="day"))hours=hours*24;
+ if(group(parse,3)=="all")hours=0;
  request=group(parse,4);
  string[int] items=split_string(request,"\\s*[|,;]\\s*");
 // print("Report Type: "+group(parse,1));
 // print("Time Frame (in hours): "+hours.to_string());
- if (group(parse,1)=="link") return marketLink(requestee,hours,items[0],timeNow);
+ if(group(parse,1)=="link")return marketLink(requestee,hours,items[0],timeNow);
  foreach i in items {
  // print(items[i]);
-  if (!harvestMD(items[i],hours,timeNow))
-   error+=items[i]+" not found.\n";
+  if(!harvestMD(items[i],hours,timeNow))error+=items[i]+" not found.\n";
  }
- if (group(parse,1)=="det") return marketDetails(error,requestee,hours);
+ if(group(parse,1)=="det")return marketDetails(error,requestee,hours);
  else return marketCompare(error,requestee,hours);
  return true;
 }
