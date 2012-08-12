@@ -647,9 +647,12 @@ void mod(string sender, string msg){
 }
 
 void fax(string sender, string msg){
- string[monster]m;
+ string[string]m;
  update(m,"faxnames.txt");
  switch(msg){
+  case "lfm":
+   msg="lobsterfrogman";
+   break;
   case "hipster":
    msg="peeved roomate";
    break;
@@ -677,10 +680,20 @@ void fax(string sender, string msg){
   case "slime":
    msg="slime1";
  }
- string nm=m[to_monster(msg)];
+ string nm=m[to_string(to_monster(msg))];
+ boolean found_monster;
  if(nm==""){
-  chat(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
-  nm=msg;
+  foreach name in m {
+   if(name.contains_text(msg)) {
+    nm=m[name];
+	found_monster = true;
+	continue;
+	}
+  }
+  if(!found_monster) {
+   chat(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
+   nm=msg;
+  }
  }
  print("Requesting "+msg+" ("+nm+") from FaxBot.");
  chat_private("FaxBot",nm);

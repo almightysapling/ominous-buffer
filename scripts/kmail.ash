@@ -219,8 +219,8 @@ string adjustLinks(string start){
   }
   m=m.reset(start);
  }
- foreach in,l in link{
-  m=create_matcher("<"+in.to_string()+">",start);
+ foreach tag,l in link{
+  m=create_matcher("<"+tag.to_string()+">",start);
   if(!m.find())continue;
   start=replace_first(m,"<a target=_blank href=\""+l+"\"><font color=\"blue\">"+l+"</font></a>");
  }
