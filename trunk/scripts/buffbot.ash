@@ -202,7 +202,7 @@ void logout(string sender,string options){
   return;
  }
  saveSettings(earlySave);
- if(options!="all")set_property("_bufferOnly","1");
+ if(options!="all")set_property("_shutdownBufferOnly","1");
  cli_execute("exit");
 }
 
@@ -647,8 +647,10 @@ void mod(string sender, string msg){
 }
 
 void fax(string sender, string msg){
- string[string]m;
+ string[string] m;
  update(m,"faxnames.txt");
+ m["Hobelf"]="hobo_elf";
+ m["Elf hobo"]="bathroom_elf";
  switch(msg){
   case "lfm":
    msg="lobsterfrogman";
@@ -677,23 +679,15 @@ void fax(string sender, string msg){
   case "cursed pirate":
    msg="scary pirate";
    break;
-  case "slime":
-   msg="slime1";
  }
- string nm=m[to_string(to_monster(msg))];
- boolean found_monster;
+ string nm=m[msg.to_monster().to_string()];
+ if(nm=="")foreach name in m if(name.contains_text(msg)){
+  nm=m[name];
+  break;
+ }
  if(nm==""){
-  foreach name in m {
-   if(name.contains_text(msg)) {
-    nm=m[name];
-	found_monster = true;
-	continue;
-	}
-  }
-  if(!found_monster) {
-   chat(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
-   nm=msg;
-  }
+  chat(sender,"My database couldn't make a direct match for that, so I'll send it straight to faxbot as is.");
+  nm=msg;
  }
  print("Requesting "+msg+" ("+nm+") from FaxBot.");
  chat_private("FaxBot",nm);
