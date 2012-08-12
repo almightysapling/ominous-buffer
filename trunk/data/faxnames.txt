@@ -1,110 +1,151 @@
-7-Foot Dwarf	miner
+7-Foot Dwarf Foreman	miner
 Alphabet Giant	alphabet
+ambulatory pirate	ambulatory_pirate
+ancient unspeakable bugbear	ancient_bugbear
+Angels of Avalon	avalon
+antique database server	database_server
 Astronomer	astronomer
+Baa'baa'bu'ran	baabaaburan
+Bad ASCII Art	ascii
 Bailey's Beetle	baileys
-Baseball Bat	baseball
-Batwinged Gremlin	batwinged
-Big Creepy Spider	spider
+baseball bat	baseball
+batwinged gremlin	batwinged
+black adder	black_adder
+black panther	black_panther
+black widow	black_widow
+Black-and-White-Ops Penguin	ops_penguin
+blazing bat	blazing_bat
 Blooper	blooper
-Blur	blur
-Black Widow	black_widow
+blur	blur
 Bob Racecar	bob
-Bolt-Cuttin' Elf	bolt_elf
+bolt-cuttin' elf	bolt_elf
 Booze Giant	booze
 Brainsweeper	brainsweeper
-C. H. U. M. Chieftain	chieftain
+butt	riff
+C. H. U. M. chieftain	chieftain
 Cement Cobbler Penguin	cement_penguin
-Claw-foot Bathtub	bathtub
-Cleanly Pirate	cleanly
-Creamy Pirate	creamy
-Curmudgeonly Pirate	curmudgeonly
-Dairy Goat	dairy_goat
-Demonic Icebox	icebox
-Dirty Hippy Jewelry Maker   prewar_hippy
-Dirty Thieving Brigand	brigand
-Elf Hobo	bathroom_elf
-Erudite Gremlin	erudite
-Five Skeleton Invaders	skeleton_invaders
+claw-foot bathtub	bathtub
+cleanly pirate	cleanly
+clod hopper	clodhopper
+completely different spider	spider
+creamy pirate	creamy
+curmudgeonly pirate	curmudgeonly
+dairy goat	dairy_goat
+demonic icebox	icebox
+dirty hippy jewelry maker	prewar_hippy
+dirty thieving brigand	brigand
+disease-in-the-box	disease
+Elite Beer Bongadier	beer_bongadier
+erudite gremlin	erudite
+evil spaghetti cult middle-manager	manager
+Fire Servant	fire_servant
+five skeleton invaders	skeleton_invaders
+four-shadowed mime	mime
 Fruit Golem	fruit_golem
+fudge weasel	fudge_weasel
 Furry Giant	furry
-Gang of Hobo Muggers	muggers
-Gaudy Pirate	gaudy
-Ghost	ghost
+G imp	g_imp
+gang of hobo muggers	muggers
+gaudy pirate	gaudy
+ghost	ghost
+gnarly gnome	gnarly_gnome
 Gnollish Crossdresser	crossdresser
 Gnollish Gearhead	gearhead
 Gnollish Tirejuggler	tirejuggler
 Goth Giant	goth
-Grungy Pirate	grungy
-Handsome Mariachi	handsomeness
-Harem Girl	harem_girl
+grungy pirate	grungy
+handsome mariachi	handsomeness
 Hellion	hellion
-Hellseal pup	hellpup
-Hobelf	hobo_elf
-Hung-Over Half-Orc Hobo	half_orc
-Hustled Spectre	hustled_spectre
-Irate Mariachi	irate
-Knight (Snake)	knight
+hellseal pup	hellpup
+Hobelf	bathroom_elf
+hung-over half-orc hobo	half_orc
+hustled spectre	hustled_spectre
+irate mariachi	irate
+knight	knight
+Knight in White Satin	white_knight
 Knob Goblin Elite Guard Captain	kge
+Knob Goblin Embezzler	embezzler
 Knob Goblin Harem Girl	harem_girl
-Large Kobold	kobold
-Lobsterfrogman	lobsterfrogman
-Lemon-In-The-Box	lemonbox
+Knob Goblin Master Chef	master_chef
+large kobold	kobold
+lemon-in-the-box	lemonbox
+lobsterfrogman	lobsterfrogman
+lollicat	lollicat
+lolligator	lolligator
+lollipede	lollipede
+lolliphaunt	lolliphaunt
+lolrus	lolrus
 MagiMechTech MechaMech	mech
-Mariachi Calavera	calavera
+mariachi calavera	calavera
+me4t begZ0r	begzor
+Mer-kin diver	merkin_diver
+Mer-kin raider	merkin
 Mesmerizing Penguin	mesmerizing
+Mob Penguin Arsonist	penguin_arsonist
 Mob Penguin Demolitionist	demolitionist
-Monkey Wrenchin' Elf	monkey_elf
-Neptune Flytrap	neptune_flytrap
+modern zmobie	modern_zmobie
+monkey wrenchin' elf	monkey_elf
+mountain man	mountain_man
+Neptune flytrap	neptune_flytrap
+ninja snowman assassin	ninja_assassin
 Ninja Snowman Janitor	janitor
 Orcish Frat Boy Spy	frat_spy
-Plaque of Locusts	locust
-Propaganda-Spewin' Elf	prop_elf
-Protagonist	protagonist
-Pygmy Assault Squad	pygmy_assault
-Pygmy Blowgunner	blowgunner
-Quantum Mechanic	mechanic
-Quiet Healer	healer
-Rampaging Adding Machine	adding_machine
-Raver Giant	raver
-Scary Pirate	cursed
-Screambat	screambat
-Sexy Sorority Zombie	sexy_zombie
-Shaky Clown	shaky
-Skeletal Sommelier	wine
-Skinflute	skinflute
-Sleepy Mariachi	sleepy_mariachi
-Slime1	slime
-Smarmy Pirate	smarmy
-Some Bad ASCII Art	ascii
-Some Zombie Waltzers	waltzers
-Spam Witch	spam_witch
-Spider Gremlin	spider_gremlin
-Sub-Assistant Knob Mad Scientist	firecracker
-Swarm of fudgewasps	fudge_wasps
-Swarm of Scarab Beatles	beatles
-The Angels of Avalon	avalon
-The Remains of a Jilted Mistress	jilted
-Toilet-papered Tree	tp_tree
-Tomb Rat	tomb_rat
-Tomb Servant	tomb_servant
-Triffid	triffid
-Undercover Penguin	undercover_penguin
-Unemployed Knob Goblin	beer_lens
-Unholy Diver	unholy_diver
-Vegetable Gremlin	vegetable
-W Imp	wimp
-War Hippy Fire Spinner	fire_spinner
-War Hippy Spy	war_hippy_spy
-White Lion	white_lion
-Whitesnake	white_snake
-Writing Desk	writing_desk
-XXX pr0n	pron
-clod hopper	clodhopper
 peeved roommate	hipster
+plaque of locusts	locust
+propaganda-spewin' elf	prop_elf
+Protagonist	protagonist
+pygmy assault squad	pygmy_assault
+pygmy blowgunner	blowgunner
+quantum mechanic	mechanic
+Quiet Healer	healer
+rampaging adding machine	adding_machine
+Raver Giant	raver
 reanimated baboon skeleton	reanim_baboon
 reanimated bat skeleton	reanim_bat
 reanimated demon skeleton	reanim_demon
 reanimated giant spider skeleton	reanim_spider
 reanimated serpent skeleton	reanim_serpent
 reanimated wyrm skeleton	reanim_wyrm
+remains of a jilted mistress	jilted
 rockfish	rockfish
+rotund duck	rotund
+scary pirate	cursed
+screambat	screambat
+sexy sorority ghost	sexy_ghost
+sexy sorority skeleton	sexy_skeleton
+sexy sorority vampire	sexy_vampire
+sexy sorority werewolf	sexy_werewolf
+sexy sorority zombie	sexy_zombie
+shaky clown	shaky
+skeletal sommelier	wine
+Skinflute	skinflute
+skullbat	skullbat
+sleepy mariachi	sleepy_mariachi
+Slime	slime
+smarmy pirate	smarmy
+snakefire in the grassfire	snakefire
+Spam Witch	spam_witch
+spider gremlin	spider_gremlin
+Sub-Assistant Knob Mad Scientist	firecracker
+swarm of fudgewasps	fudge_wasps
+swarm of scarab beatles	beatles
+toilet-papered tree	tp_tree
+tomb rat	tomb_rat
+tomb servant	tomb_servant
+toothy sklelton	toothy_sklelton
+trendy bugbear chef	bugbear_chef
+triffid	triffid
+Undercover Penguin	undercover_penguin
+unemployed knob goblin	beer_lens
+unholy diver	unholy_diver
+vegetable gremlin	vegetable
+W imp	wimp
+War Frat Mobile Grill Unit	grill_unit
+War Hippy Elite Fire Spinner	fire_spinner
+War Hippy Spy	war_hippy_spy
+whiny survivor	whiny_survivor
+white lion	white_lion
+whitesnake	white_snake
+writing desk	writing_desk
+XXX pr0n	pron
+zombie waltzers	waltzers

@@ -463,6 +463,20 @@ void dailyBreakfast(){
  set_property("_breakfast","1");
 }
 
+void updateFaxes()
+{
+ string[string] fax;
+ string faxes = visit_url("http://www.hogsofdestiny.com/faxbot/faxbot.xml");
+ matcher m = create_matcher("<actual_name>(.+?)</actual_name>\n<command>(.+?)</command>",faxes);
+ boolean found_list;
+ while(find(m)) {
+  fax[m.group(1)] = m.group(2);
+  found_list = true;
+ }
+ if(!found_list)
+  map_to_file(fax,"faxnames.txt");
+}
+
 void main(){try{
  print("Starting Login...");
  claimResource("science");
@@ -479,6 +493,7 @@ void main(){try{
  if(get_property("_checkedRaffle")=="")checkRaffle();
  freeResource("adventuring");
  freeResource("science");
+ updateFaxes();
  print("Entering wait cycle.","green");
  int n;
  while(MinutesToRollover()>(burnMinutes)){
