@@ -330,6 +330,20 @@ void handleMeat(){
  commit(books,"books.txt");
 }
 
+void updateFaxes(){
+ string[string] fax;
+ string faxes=visit_url("http://www.hogsofdestiny.com/faxbot/faxbot.xml");
+ matcher m=create_matcher("<actual_name>(.+?)</actual_name>\n<command>(.+?)</command>",faxes);
+ boolean hostFound=false; 
+ while(m.find()){
+  fax[m.group(1)]=m.group(2);
+  hostFound=true;
+ }
+ if(!hostFound)return;
+ claimResource("faxnames.txt");
+ commit(fax,"faxnames.txt");
+}
+
 void cleanPC(){
  cleanResources();
  int[string] lifetime;
@@ -352,6 +366,7 @@ void cleanPC(){
  books["Event3"]=0;
  commit(books,"books.txt");
  set_property("_thisBreakfast","1");
+ updateFaxes();
 }
 
 void processQuestData(boolean rp){
@@ -463,37 +478,22 @@ void dailyBreakfast(){
  set_property("_breakfast","1");
 }
 
-void updateFaxes()
-{
- string[string] fax;
- string faxes = visit_url("http://www.hogsofdestiny.com/faxbot/faxbot.xml");
- matcher m = create_matcher("<actual_name>(.+?)</actual_name>\n<command>(.+?)</command>",faxes);
- boolean found_list;
- while(find(m)) {
-  fax[m.group(1)] = m.group(2);
-  found_list = true;
- }
- if(!found_list)
-  map_to_file(fax,"faxnames.txt");
-}
-
 void main(){try{
  print("Starting Login...");
  claimResource("science");
  run_combat();//Just in casies.
- if(get_property("_thisBreakfast")=="")cleanPC();
+ if(get_property("_thisBreakfast")=="")cleanPC();//All once-per-PC functions should happen here.
  claimResource("adventuring");
  set_property("chatbotScript",chatbotScript);
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
- set_property("_bufferOnly","");
- if(get_property("_breakfast")=="")dailyBreakfast();
+ set_property("_shutdownBufferOnly","");
+ if(get_property("_breakfast")=="")dailyBreakfast();//All once-daily functions should happen here.
  cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
  freeResource("adventuring");
  freeResource("science");
- updateFaxes();
  print("Entering wait cycle.","green");
  int n;
  while(MinutesToRollover()>(burnMinutes)){
@@ -550,7 +550,7 @@ void main(){try{
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv -tie");
  saveSettings(nightlySave);
- set_property("_bufferOnly","1");
+ set_property("_shutdownBufferOnly","1");
  nightlyPaperwork();
  checkApps();
  set_property("chatbotScript","");
