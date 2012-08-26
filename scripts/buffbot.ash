@@ -197,13 +197,22 @@ string decodeHTML(string msg, boolean chat){
 }
 
 void logout(string sender,string options){
- if((userdata[sender].flags&isAdmin)!=isAdmin){
+ if(!getUF(sender,isAdmin)){
   chat(sender,"You do not have permission to use this command.");
   return;
  }
  saveSettings(earlySave);
  if(options!="all")set_property("_shutdownBufferOnly","1");
  cli_execute("exit");
+}
+
+void shutdown(string sender,string options){
+ if(!getUF(sender,isAdmin)){
+  chat(sender,"Haha, did you think it would be that easy?");
+  return;
+ }
+ if(options=="burn")set_property("_forceShutdown","burn");
+ else set_property("_forceShutdown","logout");
 }
 
 void createpack(string sender, string msg){
@@ -1539,6 +1548,9 @@ string predicateFilter(string sender, string msg){
   case "settings":
    mod(sender,oper);
    return "x";
+  case "shutdown":
+   shutdown(sender,oper);
+   return "x";
   case "nick":
    first=create_matcher("([\\w ']*)",oper);
    if(first.find())oper=first.group(1);
@@ -2043,6 +2055,12 @@ boolean metaParser(string sender, string msg){
 }
 
 void clanHandler(string sender, string msg){
+ if(sender=="relay"){
+  matcher m=create_matcher("\\[([a-zA-Z][\\w ]{1,29})\\]\\s?(.*)",msg);
+  if(!m.find())return;
+  sender=m.group(1);
+  msg=m.group(2);
+ }
  if((trueChannel=="")&&(metaParser(sender,msg)))return;
  prefix="";
  switch(gameType()){
@@ -2088,6 +2106,10 @@ void hauntedhouseHandler(string sender, string msg){
  prefix="/hauntedhouse ";
  if(sender=="Dungeon")return;
  publicChat(sender,msg);
+}
+
+void eventHandler(string msg){
+ //What to do here... hmm.
 }
 
 void privateHandler(string sender, string msg){
@@ -2218,6 +2240,9 @@ void main(string sender, string msg, string channel){try{
    break;
   case "/hauntedhouse":
    hauntedhouseHandler(sender,msg);
+   break;
+  case "Events":
+   eventHandler(msg);
    break;
   default:
    privateHandler(sender,msg);
