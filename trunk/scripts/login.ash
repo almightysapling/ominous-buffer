@@ -135,6 +135,16 @@ void checkLotto(){
  updateProfile();
 }
 
+void checkProperties(){
+ if(get_property("_forceShutdown")=="logout"){
+  burnMinutes=minutesToRollover();
+  logMinutes=minutesToRollover();
+ }
+ if(get_property("_forceShutdown")=="burn"){
+  burnMinutes=minutesToRollover();
+ }
+}
+
 void makeRecords(){
  claimResource("adventuring");
  print("Recording leftover music.");
@@ -489,6 +499,7 @@ void main(){try{
  updateLimits();
  updateDC();
  set_property("_shutdownBufferOnly","");
+ set_property("_forceShutdown","");
  if(get_property("_breakfast")=="")dailyBreakfast();//All once-daily functions should happen here.
  cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
@@ -496,9 +507,10 @@ void main(){try{
  freeResource("science");
  print("Entering wait cycle.","green");
  int n;
- while(MinutesToRollover()>(burnMinutes)){
+ while(minutesToRollover()>burnMinutes){
   coreGameCycle();
   checkLotto();
+  checkProperties();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n>=lastCheck){
    lastCheck=n+10;
