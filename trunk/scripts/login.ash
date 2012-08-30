@@ -83,6 +83,7 @@ void checkLotto(){
  remove inClan["Ominous Buffer"];
  remove inClan["MesaChat"];
  remove inClan["Acoustic_shadow"];
+ remove inClan["relay"];
  string[int] clannies;
  foreach name in inClan clannies[count(clannies)]=name;
  int num=count(clannies);
