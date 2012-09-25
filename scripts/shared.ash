@@ -351,24 +351,16 @@ void updateLimits(){
 }
 
 int checkRep(string check){
+// for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
  return -1;
-/* for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
- return -1;*/
 }
 
 void addRep(string s){
- return;
 /* for i from 10 to 1{
   userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i-1)];
  }
  userdata["*"].buffpacks["0"]=s;
  map_to_file(userdata,"userdata.txt");*/
-}
-
-int KoLday(){
- int daysSince=(now_to_string("yyyy").to_int()-2004)*366;
- int nowers=now_to_string("HH").to_int()*60;
- return 0;
 }
 
 void saveSettings(){
