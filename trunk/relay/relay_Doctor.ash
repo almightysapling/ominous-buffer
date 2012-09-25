@@ -236,7 +236,7 @@ void info(){
  opentag("td","class=\"info\"");
  nln("Whitelist Access");
  s=visit_url("clan_whitelist.php");
- if(s.contains_text("<form>")){
+ if(s.contains_text("<form")){
   cycletag("td","class=\"good\"");
   nln("Yes");
  }else{
