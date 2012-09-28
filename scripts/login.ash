@@ -424,11 +424,14 @@ void nightlyPaperwork(){
  commit(userdata,"backup/"+n+"u.txt");
 }
 
-void clearBuffs(){
+void clearBuffs(int skip){
  for i from 6000 to 6030{
-  if((i==6006)||(i==6010))continue;
+  if((i==6006)||(i==6010)||(i==skip))continue;
   if(i.to_skill().to_effect().have_effect()>0)cli_execute("uneffect "+i.to_skill().to_effect().to_string());
  }
+}
+void clearBuffs(){
+ clearBuffs(0);
 }
 
 void dailyBreakfast(){
@@ -467,14 +470,39 @@ void dailyBreakfast(){
  visit_url("volcanoisland.php?action=npc");
  if(item_amount($item[fisherman's sack])>1)use(1,$item[Fisherman's sack]);
  for i from 1 to 5 (!hermit(1, $item[Ten-leaf clover]));
- if(item_amount($item[supernova champagne])<6)retrieve_item(6,$item[supernova champagne]);
- if(item_amount($item[can of swiller])<1)retrieve_item(1,$item[can of swiller]);
  if(have_skill($skill[Lunch Break])) (!use_skill(1,$skill[Lunch Break]));
- clearBuffs();
+ while(item_amount($item[eggnog])<7)retrieve_item(1,$item[eggnog]);
+ while(item_amount($item[Ram's Face Lager])<1)retrieve_item(1,$item[Ram's Face Lager]);
+ clearBuffs(6014);
  if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
- while(inebriety_limit()-my_inebriety()>2)drink(1,$item[supernova champagne]);
- while(inebriety_limit()-my_inebriety()>0)drink(1,$item[can of swiller]);
+ while(inebriety_limit()-my_inebriety()>2)drink(1,$item[eggnog]);
+ while(inebriety_limit()-my_inebriety()>0)drink(1,$item[Ram's Face Lager]);
  clearBuffs();
+ while(item_amount($item[bunch of square grapes])<7)retrieve_item(1,$item[bunch of square grapes]);
+ while(item_amount($item[handful of nuts and berries])<1)retrieve_item(1,$item[handful of nuts and berries]);
+ while(item_amount($item[milk of magnesium])<1)retrieve_item(1,$item[milk of magnesium]);
+ use(1,$item[milk of magnesium]);
+ /* When $/adv>1400:
+ while(item_amount($item[Wrecked Generator])<4)retrieve_item(1,$item[Wrecked Generator]);
+ while(item_amount($item[Feliz Navidad])<2)retrieve_item(1,$item[Feliz Navidad]);
+ clearBuffs(6014);
+ if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
+ while(inebriety_limit()-my_inebriety()>4)drink(1,$item[Wrecked Generator]);
+ while(inebriety_limit()-my_inebriety()>1)drink(1,$item[Feliz Navidad]);
+ clearBuffs();
+ while(item_amount($item[coffee pixie stick])<4)retrieve_item(1,$item[coffee pixie stick);
+ while(item_amount($item[mojo filter])<1)retrieve_item(1,$item[mojo filter]);
+ use(3,$item[coffee pixie stick]);
+ use(1,$item[mojo filter]);
+ use(1,$item[coffee pixie stick]);
+ while(item_amount($item[queen's cookie])<1)retrieve_item(1,$item[queen's cookie]);
+ while(item_amount($item[spectral pickle]<3)retrieve_item(1,$item[spectral pickle]);
+ while(item_amount($item[super salad])<1)retrieve_item(1,$item[super salad]);
+ while(item_amount($item[handful of nuts and berries])<2)retrieve_item(1,$item[handful of nuts and berries]);
+ while(item_amount($item[milk of magnesium])<1)retrieve_item(1,$item[milk of magnesium]);
+ use(1,$item[milk of magnesium]);
+ eatsilent(1,$item[queen's cookie]); 
+ */ 
  if((have_skill($skill[Sonata of Sneakiness]))&&(have_effect($effect[Sonata of Sneakiness])<1))(!use_skill(1,$skill[Sonata of Sneakiness]));
  if((have_effect($effect[Dreams and Lights])<1)||((have_effect($effect[Dreams and Lights])<9)&&(have_effect($effect[Arcane in the Brain])<1))){
   while(have_effect($effect[Dreams and Lights])<9)(!adventure(1,$location[Haunted Gallery]));
@@ -532,9 +560,15 @@ void main(){try{
  }
  makeRecords();
  int burnTurns=150-to_int(get_property("rolladv"));
-/* while(my_fullness()<10){
-  eatsilent();
- }*/
+ if(my_fullness()<14){
+  while(14-my_fullness()>1)eatsilent(1,$item[bunch of square grapes]);
+  while(14-my_fullness()>0)eatsilent(1,$item[handful of nuts and berries]);
+  /* $/adv>1400:
+  while(14-my_fullness()>3)eatsilent(1,$item[spectral pickle]);
+  while(14-my_fullness()>2)eatsilent(1,$item[super salad]);
+  while(14-my_fullness()>0)eatsilent(1,$item[handful of nuts and berries]);
+  */
+ }
  doBounty();
  if((my_adventures()-burnTurns)>0){
   burn();
@@ -567,6 +601,9 @@ void main(){try{
  nightlyPaperwork();
  checkApps();
  set_property("chatbotScript","");
+ clearBuffs(6014);
+ if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
+ drink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{
  print("Script Halted");
