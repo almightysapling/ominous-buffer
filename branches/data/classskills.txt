@@ -1,0 +1,75 @@
+3
+
+1	Liver of Steel	0	0	0
+3	The Smile of Mr. A.	4	5	40
+12	Torso Awaregness	0	0	0
+15	CLEESH	5	10	0
+19	Transcendent Olfaction	5	40	0
+
+46	Slimy Sinews	0	0	0
+47	Slimy Synapses	0	0	0
+48	Slimy Shoulders	0	0	0
+58	Fashionably Late	0	0	0
+59	Executive Narcolepsy	0	0	0
+60	Lunch Break	1	10	0
+62	Managerial Manipulation	4	5	20
+
+2007	Ghostly Shell	4	6	5	4
+2008	Reptilian Fortitude	4	10	5	9
+2009	Empathy of the Newt	4	15	5	8
+2010	Tenacity of the Snapper	4	8	5	6
+2012	Astral Shell	4	10	5	12
+2025	Jingle Bells	4	5	5
+2026	Curiosity of Br'er Tarrypin	4	10	5
+
+4007	Elemental Saucesphere	4	10	5	4
+4008	Jalape&ntilde;o Saucesphere	4	5	5	7
+4011	Jaba&ntilde;ero Saucesphere	4	10	5	10
+4019	Scarysauce	4	10	5
+
+6003	Aloysius' Antiphon of Aptitude	4	40	5	11
+6004	The Moxious Madrigal	4	2	5	1
+6005	Cletus's Canticle of Celerity	4	4	5	3
+6006	The Polka of Plenty	4	7	5	5
+6007	The Magical Mojomuscular Melody	4	3	5	2
+6008	The Power Ballad of the Arrowsmith	4	5	5	4
+6009	Brawnee's Anthem of Absorption	4	13	5	8
+6010	Fat Leon's Phat Loot Lyric	4	11	5	7
+6011	The Psalm of Pointiness	4	15	5	9
+6012	Jackasses' Symphony of Destruction	4	9	5	6
+6013	Stevedave's Shanty of Superiority	4	30	5	10
+6014	The Ode to Booze	4	50	5	12
+6015	The Sonata of Sneakiness	4	20	5	13
+6016	Carlweather's Cantata of Confrontation	4	20	5	14
+6017	Ur-Kel's Aria of Annoyance	4	30	5	15
+6018	Dirge of Dreadfulness	4	9	5
+6020	The Ballad of Richie Thingfinder	4	50	5
+6021	Benetton's Medley of Diversity	4	50	5
+6022	Elron's Explosive Etude	4	50	5
+6023	Chorale of Companionship	4	50	5
+6024	Prelude of Precision	4	50	5
+6026	Donho's Bubbly Ballad	4	75	5
+6027	Cringle's Curative Carol	4	5	5
+6028	Inigo's Incantation of Inspiration	4	100	5
+
+6901	Time's Arrow Adventures	0	0	0
+6902	Wang	0	0	0
+
+7008	Moxious Maneuver	5	0	0
+7040	Tunnel Upwards	5	0	0
+7041	Tunnel Downwards	5	0	0
+
+9062	Employee of the Month	4	5	20
+
+9209	Familiar Weight	4	15	5	8
+9226	Familiar Experience	4	10	5
+
+9605	Initiative	4	4	5	3
+9606	Meat	4	7	5	5
+9609	Brawnee's Anthem of Absorbtion Damage Reduction	4	13	5	8
+9610	Items	4	11	5	7
+9612	Weapon Damage Spell Damage	4	9	5	6
+9615	Noncombat	4	20	5	13
+9616	Combat	4	20	5	14
+9617	Monster Level	4	30	5	15
+9628	Crafting	4	100	5
