@@ -62,7 +62,7 @@ string someoneDefined="";
 string[string] chatVars;
 string trueUser="";
 string trueChannel="";
-boolean impliedOB=false;
+boolean impliedBS=false;
 int TPC=25;
 boolean raidlogRead=false;
 
@@ -253,59 +253,6 @@ boolean sendRecord(int skillId, string sender){
 }
 
 void buff(string sender, string msg, int numTurns, string ding){
- //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
- if((sender==turtleBot)||(sender==sauceBot)){
-  string[int] failsplit = split_string(msg,"\\s");
-  if(index_of("ARLNS",failsplit[0])>-1){
-   sender=to_playerName(failsplit[1].to_int());
-   ding=to_playerName(failsplit[2].to_int());
-  }
-  switch(failsplit[0]){
-   case "CASTRQ":
-    if(sender==turtleBot)set_property('tamerCasts',failsplit[1]);
-    if(sender==sauceBot)set_property('sauceCasts',failsplit[1]);
-    break;
-   case "RATION":switch(failsplit[1]){
-    case "ITEM":
-     use_skill(12,$skill[Fat Leon's Phat Loot Lyric],sender);
-     break;
-    case "MEAT":
-     use_skill(12,$skill[Polka of Plenty],sender);
-     break;
-    case "NONCOMBAT":
-     use_skill(12,$skill[Carlweather's Cantata of Confrontation],sender);
-     break;
-    }
-    break;
-   case "FUNDS":
-    chat_private("Almighty Sapling","low funds on "+sender+".");
-    break;
-   case "A":
-    errorMessage(sender,"I can't buff you while you're adventuring!");
-    break;
-   case "R":
-    errorMessage(sender,"I can't buff you if you're in Hardcore or Ronin!");
-    break;
-   case "U":
-    errorMessage(sender,"Unknown error. Must be a problem with the lesser bots.");
-    break;
-   case "L":
-    errorMessage(failsplit[2],"I'm sorry, but you've reached your daily limit for "+failsplit[3].to_int().to_skill().to_string()+".");
-    break;
-   case "N":
-    errorMessage(failsplit[2],"The cake is a lie. So is that thing you asked for, since it wasn't a buff.");
-    break;
-   case "S":
-    checkOut(userdata,"userdata.txt");
-    userdata[ding].buffs[failsplit[3].to_int()]+=1;
-    userdata["*"].buffs[failsplit[3].to_int()]+=1;
-    commit(userdata,"userdata.txt");
-    updateDC("useCurrent");
-    updateLimits();
-    break;
-  }
-  return;
- }
  skill messageNew;
  messageNew=to_skill(msg);
  int casts;
@@ -321,27 +268,14 @@ void buff(string sender, string msg, int numTurns, string ding){
   case 7008: skillnum=6004; break;//Correct for Moxious Maneuver
   case 7040:case 7041: return;
  }
- //Forward skill requests to relay bots when necessary
  if(getUF(ding,inAssociate))max=400;
  if((max==400)&&(getUF(ding,highAssociate)))max=700;
  if(getUF(ding,inClan)||getUF(ding,whitelist))max=700;
  int senderid=getId(sender);
  string mout;
- if(skillnum==62){
-  numTurns=1;
-  switch(userdata["*"].buffs[skillnum]){
-   case 1:
-    mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" 1";
-    chat_private(turtleBot,mout);
-    return;
-   case 2:
-    mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" 1";
-    chat_private(sauceBot,mout);
-    return;
-   case 3:
-    errorMessage(sender,"I'm sorry, but I'm all out of "+messageNew+" for today.");
-    return;
-  }
+ if((skillnum==62)&&(userdata["*"].buffs[skillnum]>0)){
+  errorMessage(sender,"I'm sorry, but I'm all out of "+messageNew+" for today.");
+  return;
  }
  //Assign default values if turns isn't specified.
  if(skillnum==6014) numTurns=TPC;//Ode
@@ -352,16 +286,6 @@ void buff(string sender, string msg, int numTurns, string ding){
    if(userdata[sender].defaultCasts==0)userdata[sender].defaultCasts=200;
    numTurns=userdata[sender].defaultCasts;
   }
- }
- if((skillnum>2000)&&(skillnum<3000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(turtleBot,mout);
-  return;
- }
- if((skillnum>4000)&&(skillnum<5000)){
-  mout=to_string(senderid)+" "+to_string(getId(ding))+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,noLimit)?"0":to_string(max));
-  chat_private(sauceBot,mout);
-  return;
  }
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
@@ -629,14 +553,14 @@ void mod(string sender, string msg){
     if(adminonly){
      updateId(user,true);
      setUF(user,whitelist);
-     chat(sender,user+" has been whitelisted to OB.");
+     chat(sender,user+" has been whitelisted to BS.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    case "blacklist":
     if(adminonly){
      updateId(user,true);
      setUF(user,blacklist);
-     chat(sender,user+" has been blacklisted from OB.");
+     chat(sender,user+" has been blacklisted from BS.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    case "reset":
@@ -1106,9 +1030,9 @@ void userDetails(string sender, string who){
  if(who=="")who=sender;
  string reply;
  string t;
- if((who=="ob")||(who=="ominous buffer")){
-  reply="User: Ominous Buffer\n";
-  reply+="Known Multis: Ominous Tamer, Ominous Sauceror\nGoes by: OB\n";
+ if((who=="bs")||(who=="buffsphere")){
+  reply="User: BuffSphere\n";
+  reply+="Goes by: BS\n";
   reply+="Gender neutral.\n\n";
   reply+="Currently casting for the following clans: Black Mesa";
   foreach pId in associates{
@@ -1576,9 +1500,7 @@ string predicateFilter(string sender, string msg){
    } 
    return pred+":"+r;
   case "ping":
-   chat(turtleBot,"PING "+sender);
-   chat(sauceBot,"PING "+sender);
-   chat(sender,"Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
+   chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
    if(oper=="")return "x";
@@ -1652,7 +1574,7 @@ void nopredpass(string sender, string msg, boolean addressed){
  update(botdata,"replies.txt");
  boolean foundmatch=false;
  boolean referred=addressed;
- matcher ref=create_matcher("(?i)(\\WOB\\W|\\WOminous Buffer\\W)",msg);
+ matcher ref=create_matcher("(?i)(\\WBS\\W|\\WBuffSphere\\W|\\WBuff Sphere\\W)",msg);
  if(ref.find())referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
@@ -1946,14 +1868,14 @@ void publicChat(string sender, string msg){
  chatVars["time"]=now_to_string("HH:mm:ss z");
  boolean addressed=false;
  boolean referred=false;
- m=create_matcher("(?i)(^|\\. ?)(ominous buffer|ob)[:,]\\s?",msg);
+ m=create_matcher("(?i)(^|\\. ?)(buffsphere|buff sphere|bs)[:,]\\s?",msg);
  if(m.find()){
   addressed=true;
   msg=substring(msg,end(m));
  }
- m=create_matcher("(?i)(ominous buffer|\\Wob\\W)",msg);
+ m=create_matcher("(?i)(buffsphere|buff sphere|\\Wbs\\W)",msg);
  if(m.find())referred=true;
- if(impliedOB)addressed=true;
+ if(impliedBS)addressed=true;
  m=create_matcher("([\\w\\d]*):?\\s?(.*)",msg);
  string pred;
  string oper;
@@ -2113,7 +2035,7 @@ void eventHandler(string msg){
 }
 
 void privateHandler(string sender, string msg){
- if(sender=="Ominous Buffer")systemHandler(msg);
+ if(sender==my_name())systemHandler(msg);
  if(sender=="MesaChat"){
   matcher m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
@@ -2134,11 +2056,7 @@ void privateHandler(string sender, string msg){
  if(msg=="x")return;
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if((sender==turtleBot)||(sender==sauceBot)){
-  buff(sender,msg,0,sender);
-  return;
- }
- if((sender=="chatbot")||(sender==my_name()))return;
+ if(sender=="chatbot")return;
  matcher m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
@@ -2213,7 +2131,7 @@ string applySUE(string sender,string channel){
 
 string applySUE(string channel){
  if(channel!="")return channel;
- if(trueUser!="MesaChat")impliedOB=true;
+ if(trueUser!="MesaChat")impliedBS=true;
  trueChannel=channel;
  string s=getSessionVar(trueUser,"schannel");
  if(s=="")return s;

@@ -34,9 +34,7 @@ userinfo[string] userdata;
 file_to_map("userdata.txt",userdata);
 
 //Global variables
-string sauceBot="Ominous Sauceror";
-string turtleBot="Ominous Tamer";
-string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
+string nightlySave="totalDaysCasting;totalCastsEver;books;winners";
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
 int clanid=2046994401;//Black Mesa
@@ -302,18 +300,18 @@ void updateDC(string list){
   print(deals,"olive");
   deals="Current deals in mall:\n"+deals+"\n";
  } 
- int served=get_property('sauceCasts').to_int()+get_property('tamerCasts').to_int()+get_property('totalCastsEver').to_int();
+ int served=get_property('totalCastsEver').to_int();
  int days=get_property('totalDaysCasting').to_int()+1;
  string avg=to_string(served*1.0/days);
  if(index_of(avg,'.')+3<length(avg))avg=substring(avg,0,index_of(avg,'.')+3);
  string s="managecollection.php?action=changetext&pwd&newtext=";
- s+="Over "+to_commad(served)+" casts served since 2011!\n";
+ s+="Over "+to_commad(served)+" casts served since 2013!\n";
  s+="Daily Avg: "+avg+"\n\n";
  s+="More information on buffs offered can be found on the following page:\n";
  s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
- s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
+ s+="Managerial Manipulation: "+to_int(1-userdata["*"].buffs[62])+"\n";
  claimResource("adventuring");
  visit_url(s);
  freeResource("adventuring");
@@ -535,7 +533,7 @@ void checkMail(){
   break;
  }
  foreach i,m in mail{
-  if((m.sender=="smashbot")||(m.sender=="ominous tamer")||(m.sender=="ominous sauceror")){
+  if(m.sender=="smashbot"){
    deleteMail(m);
    continue;
   }

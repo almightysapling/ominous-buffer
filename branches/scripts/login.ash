@@ -80,7 +80,7 @@ void checkLotto(){
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
  boolean[string] inClan=who_clan();
- remove inClan["Ominous Buffer"];
+ remove inClan["BuffSphere"];
  remove inClan["MesaChat"];
  remove inClan["Acoustic_shadow"];
  remove inClan["relay"];
@@ -307,8 +307,7 @@ void handleMeat(){
  }
  checkOut(userdata,"userdata.txt");
  int totspent=0;
- foreach name,user in userdata if( ((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest))) &&
-  ((name!="Ominous Buffer")&&(name!="Ominous Tamer")&&(name!="Ominous Sauceror")) ){
+ foreach name,user in userdata if(((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest)))&&(name!="BuffSphere")){
   user.wallet+=100;
   totspent+=100;
  }
@@ -358,7 +357,7 @@ void updateFaxes(){
 void cleanPC(){
  cleanResources();
  int[string] lifetime;
- checkOut(lifetime,"OB_lifetime.txt");
+ checkOut(lifetime,"lifetime.txt");
  checkOut(userdata,"userdata.txt");
  foreach name in userdata{
   foreach skilln,amt in userdata[name].buffs lifetime[skilln.to_string()]+=amt;
@@ -369,7 +368,7 @@ void cleanPC(){
  commit(userdata,"userdata.txt");
  lifetime["*"]=0;
  foreach skilln in lifetime if(skilln!="*")lifetime["*"]+=lifetime[skilln];
- commit(lifetime,"OB_lifetime.txt");
+ commit(lifetime,"lifetime.txt");
  int[string]books;
  checkOut(books,"books.txt");
  books["Event1"]=0;
@@ -587,8 +586,6 @@ void main(){try{
  cli_execute("maximize mp");
  freeResource("adventuring");
  freeResource("science");
- chat_private("Ominous Tamer","CASTRQ");
- chat_private("Ominous Sauceror","CASTRQ");
  checkApps();
  waitq((MinutesToRollover()-logMinutes-5)*60);
  chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
