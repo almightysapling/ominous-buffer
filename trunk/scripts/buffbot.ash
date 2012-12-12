@@ -1063,7 +1063,7 @@ void lookup(string sender, string who){
   yetfound=0;
   if(userdata[user].nick.to_lower_case().contains_text(who)){
    yetfound=2;
-   reply+=user+"goes by "+userdata[user].nick;
+   reply+=user+" goes by "+userdata[user].nick;
   }
   if(user.to_lower_case().contains_text(who)&&(yetfound==0)){
    yetfound=1;
