@@ -482,6 +482,8 @@ void dailyBreakfast(){
  retrieve_item(1,$item[handful of nuts and berries]);
  retrieve_item(1,$item[milk of magnesium]);
  use(1,$item[milk of magnesium]);
+ eatsilent(7,$item[bunch of square grapes]);
+ eatsilent(1,$item[handful of nuts and berries]);
  /* When $/adv>1400:
  retrieve_item(4,$item[Wrecked Generator]);
  retrieve_item(2,$item[Feliz Navidad]);
@@ -495,13 +497,16 @@ void dailyBreakfast(){
  use(3,$item[coffee pixie stick]);
  use(1,$item[mojo filter]);
  use(1,$item[coffee pixie stick]);
- retrieve_item(1,$item[queen's cookie]);
- retrieve_item(3,$item[spectral pickle]);
- retrieve_item(1,$item[super salad]);
- retrieve_item(2,$item[handful of nuts and berries]);
- retrieve_item(1,$item[milk of magnesium]);
+// retrieve_item(1,$item[queen's cookie]);
+// retrieve_item(3,$item[spectral pickle]);
+// retrieve_item(1,$item[super salad]);
+// retrieve_item(2,$item[handful of nuts and berries]);
+// retrieve_item(1,$item[milk of magnesium]);
  use(1,$item[milk of magnesium]);
  eatsilent(1,$item[queen's cookie]); 
+ eatsilent(3,$item[spectral pickle]); 
+ eatsilent(1,$item[super salad]); 
+ eatsilent(1,$item[handful of nuts and berries]); 
  */ 
  if((have_skill($skill[Sonata of Sneakiness]))&&(have_effect($effect[Sonata of Sneakiness])<1))(!use_skill(1,$skill[Sonata of Sneakiness]));
  if((have_effect($effect[Dreams and Lights])<1)||((have_effect($effect[Dreams and Lights])<9)&&(have_effect($effect[Arcane in the Brain])<1))){
@@ -603,7 +608,7 @@ void main(){try{
  set_property("chatbotScript","");
  clearBuffs(6014);
  if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
- drink(1,$item[eggnog]);
+ overdrink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{
  print("Script Halted");
