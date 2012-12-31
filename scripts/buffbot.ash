@@ -236,11 +236,11 @@ void createAlias(string sender, string msg){
  chat(sender,"Your alias has been saved: "+aliasname+" => "+expansion);
 }
 
-void delpack(string sender, string packname){
+void removeAlias(string sender, string aliasname){
  checkOut(userdata,"userdata.txt");
- string s=remove userdata[sender].aliases[packname];
- if(s!="")chat(sender,"Pack removed.");
+ string s=remove userdata[sender].aliases[aliasname];
  commit(userdata,"userdata.txt");
+ if(s!="")chat(sender,"Alias removed.");
 }
 
 boolean sendRecord(int skillId, string sender){
@@ -1504,7 +1504,7 @@ string predicateFilter(string sender, string msg){
    if((userdata[sender].flags&isAdmin)==isAdmin)updateDC(oper);
    return "x";
   case "delpack":
-   delpack(sender,oper);
+   removeAlias(sender,oper);
    return "x";
   case "details":
    userDetails(sender,oper);
@@ -1610,6 +1610,9 @@ string predicateFilter(string sender, string msg){
    checkApps();
    checkMail();
    checkData();
+   return "x";
+  case "remove":
+   removeAlias(sender,oper);
    return "x";
   case "roll":
    roll(sender,oper);
