@@ -215,32 +215,32 @@ void shutdown(string sender,string options){
  else set_property("_forceShutdown","logout");
 }
 
-void createpack(string sender, string msg){
+void createAlias(string sender, string msg){
  matcher namem=create_matcher("(\\S*)\\s?(.*)",msg);
- string packname;
- string packdata;
+ string aliasname;
+ string expansion;
  if(namem.find()){
-  packname=namem.group(1);
-  packdata=namem.group(2);
+  aliasname=namem.group(1);
+  expansion=namem.group(2);
  }else{
   chat(sender,"You must supply the appropriate data for us to save that.");
   return;
  }
- if((count(userdata[sender].buffpacks)>9)&&(!(userdata[sender].buffpacks contains packname))){
-  chat(sender,"You already have 10 buffpacks, to have more would be ridiculous; not even funny.");
+ if((count(userdata[sender].aliases)>36)&&(!(userdata[sender].aliases contains aliasname))){
+  chat(sender,"You already have 37 aliases (in a row!?), try not to make any more aliases on your way through the parking lot.");
   return;
  }
- chat(sender,"Your buffpack has been saved.");
  checkOut(userdata,"userdata.txt");
- userdata[sender].buffpacks[packname]=packdata;
+ userdata[sender].aliases[aliasname]=expansion;
  commit(userdata,"userdata.txt");
+ chat(sender,"Your alias has been saved: "+aliasname+" => "+expansion);
 }
 
-void delpack(string sender, string packname){
+void removeAlias(string sender, string aliasname){
  checkOut(userdata,"userdata.txt");
- string s=remove userdata[sender].buffpacks[packname];
- if(s!="")chat(sender,"Pack removed.");
+ string s=remove userdata[sender].aliases[aliasname];
  commit(userdata,"userdata.txt");
+ if(s!="")chat(sender,"Alias removed.");
 }
 
 boolean sendRecord(int skillId, string sender){
@@ -972,7 +972,7 @@ void clearData(string what){
    break;
   case "filter":
    checkOut(userdata,"userdata.txt");
-   for i from 0 to 6 userdata["*"].buffpacks[i.to_string()]="";
+   for i from 0 to 6 userdata["*"].aliases[i.to_string()]="";
    commit(userdata,"userdata.txt");
    break;
  }
@@ -987,7 +987,7 @@ void lookup(string sender, string who){
   yetfound=0;
   if(userdata[user].nick.to_lower_case().contains_text(who)){
    yetfound=2;
-   reply+=user+"goes by "+userdata[user].nick;
+   reply+=user+" goes by "+userdata[user].nick;
   }
   if(user.to_lower_case().contains_text(who)&&(yetfound==0)){
    yetfound=1;
@@ -1053,9 +1053,9 @@ void userDetails(string sender, string who){
   if((userdata[who].nick!=who)&&(userdata[who].nick!="")) reply+="Goes by: "+userdata[who].nick+"\n";
   reply+="Gender: "+genderString(userdata[who])+"\n";
   if(userdata[who].lastTime!="") reply+="Last Time Spoken: "+userdata[who].lastTime+"\n";
-  if((who==sender)&&(count(userdata[who].buffpacks)>0)){
-   reply+="Buffpacks Defined:\n";
-   foreach pack, innards in userdata[who].buffpacks reply+="-"+pack+": "+innards+".\n";
+  if((who==sender)&&(count(userdata[who].aliases)>0)){
+   reply+="aliases Defined:\n";
+   foreach pack, innards in userdata[who].aliases reply+="-"+pack+": "+innards+".\n";
   }
   if(userdata[who].donated>0) reply+="Donated: "+userdata[who].donated.to_string()+" meat.\n";
   if(who==sender){
@@ -1389,8 +1389,7 @@ string predicateFilter(string sender, string msg){
  }else return msg;
  switch(pred){
   case "alias":
-  case "createpack":
-   createpack(sender,oper);
+   createAlias(sender,oper);
    return "x";
   case "alt":
   case "multi":
@@ -1426,9 +1425,6 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "deals":
    if((userdata[sender].flags&isAdmin)==isAdmin)updateDC(oper);
-   return "x";
-  case "delpack":
-   delpack(sender,oper);
    return "x";
   case "details":
    userDetails(sender,oper);
@@ -1484,21 +1480,6 @@ string predicateFilter(string sender, string msg){
    }
    setNick(sender,oper);
    return "x";
-  case "pack":
-  case "set":
-   first=create_matcher("(\\d+)\\s*:?\\s*(.*)",oper);
-   pred="";
-   if(first.find()){
-    pred=first.group(1);
-    oper=first.group(2);
-   }
-   string r=userdata[sender].buffpacks[oper];
-   if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*"].buffpacks[oper];
-   if(r==""){
-    errorMessage(sender,"That buffpack does not exist.");
-    return "x";
-   } 
-   return pred+":"+r;
   case "ping":
    chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
@@ -1532,6 +1513,9 @@ string predicateFilter(string sender, string msg){
    checkApps();
    checkMail();
    checkData();
+   return "x";
+  case "remove":
+   removeAliase(sender,oper);
    return "x";
   case "roll":
    roll(sender,oper);
@@ -2054,6 +2038,10 @@ void privateHandler(string sender, string msg){
  if(getUF(sender,noFlag))errorMsg=false;
  if(gameType()==gameWordshot)msg=wordshot(sender,msg);
  if(msg=="x")return;
+ string[string] aliasList;
+ aliasList=userdata["*"].aliases;
+ foreach a,v in userdata[sender].aliases aliasList[a]=v;
+ if(aliasList contains msg)msg=aliasList[msg];
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
  if(sender=="chatbot")return;

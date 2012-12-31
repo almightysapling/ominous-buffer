@@ -117,11 +117,11 @@ void checkLotto(){
   chat_clan("A winner!");
   waitq(7);
   checkOut(userdata,"userdata.txt");
-  for i from 5 downto 2 if(userdata["*"].buffpacks contains ("winner"+to_string(i-1)))userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
-  userdata["*"].buffpacks["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
+  for i from 4 downto 1 if(userdata["*"].aliases contains ("winner"+i.to_string()))userdata["*"].aliases["winner"+to_string(i+1)]=userdata["*"].aliases["winner"+i.to_string()];
+  userdata["*"].aliases["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
   commit(userdata,"userdata.txt");
   string wintext="";
-  for i from 1 to 5 if(userdata["*"].buffpacks contains ("winner"+i.to_string()))wintext+=userdata["*"].buffpacks["winner"+i.to_string()]+"::";
+  for i from 1 to 5 if(userdata["*"].aliases contains ("winner"+i.to_string()))wintext+=userdata["*"].aliases["winner"+i.to_string()]+"::";
   set_property("winners",wintext);
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
@@ -364,7 +364,7 @@ void cleanPC(){
   clear(userdata[name].buffs);
   userdata[name].lastTrigger="";
  }
- for i from 1 to 6 {remove userdata["*"].buffpacks[i.to_string()];}
+ for i from 1 to 6 {remove userdata["*"].aliases[i.to_string()];}
  commit(userdata,"userdata.txt");
  lifetime["*"]=0;
  foreach skilln in lifetime if(skilln!="*")lifetime["*"]+=lifetime[skilln];
@@ -405,7 +405,7 @@ void processQuestData(boolean rp){
  m=create_matcher("(\\d+)>[^>]+?\\((\\d+)\\s*/",limits);
  while(m.find()) userdata["*"].buffs[m.group(1).to_int()]=m.group(2).to_int();
  string[int] wintext=split_string(get_property("winners"),"::");
- foreach i,s in wintext if(length(s)>1)userdata["*"].buffpacks["winner"+s.char_at(0)]=s.substring(2);
+ foreach i,s in wintext if(length(s)>1)userdata["*"].aliases["winner"+s.char_at(0)]=s.substring(2);
  wintext=split_string(get_property("admins"),"::");
  foreach i,s in wintext if(s.length()>0)setUF(s,isAdmin);
  commit(userdata,"userdata.txt");
@@ -481,6 +481,8 @@ void dailyBreakfast(){
  retrieve_item(1,$item[handful of nuts and berries]);
  retrieve_item(1,$item[milk of magnesium]);
  use(1,$item[milk of magnesium]);
+ eatsilent(7,$item[bunch of square grapes]);
+ eatsilent(1,$item[handful of nuts and berries]);
  /* When $/adv>1400:
  retrieve_item(4,$item[Wrecked Generator]);
  retrieve_item(2,$item[Feliz Navidad]);
@@ -494,13 +496,16 @@ void dailyBreakfast(){
  use(3,$item[coffee pixie stick]);
  use(1,$item[mojo filter]);
  use(1,$item[coffee pixie stick]);
- retrieve_item(1,$item[queen's cookie]);
- retrieve_item(3,$item[spectral pickle]);
- retrieve_item(1,$item[super salad]);
- retrieve_item(2,$item[handful of nuts and berries]);
- retrieve_item(1,$item[milk of magnesium]);
+// retrieve_item(1,$item[queen's cookie]);
+// retrieve_item(3,$item[spectral pickle]);
+// retrieve_item(1,$item[super salad]);
+// retrieve_item(2,$item[handful of nuts and berries]);
+// retrieve_item(1,$item[milk of magnesium]);
  use(1,$item[milk of magnesium]);
  eatsilent(1,$item[queen's cookie]); 
+ eatsilent(3,$item[spectral pickle]); 
+ eatsilent(1,$item[super salad]); 
+ eatsilent(1,$item[handful of nuts and berries]); 
  */ 
  if((have_skill($skill[Sonata of Sneakiness]))&&(have_effect($effect[Sonata of Sneakiness])<1))(!use_skill(1,$skill[Sonata of Sneakiness]));
  if((have_effect($effect[Dreams and Lights])<1)||((have_effect($effect[Dreams and Lights])<9)&&(have_effect($effect[Arcane in the Brain])<1))){
@@ -600,7 +605,7 @@ void main(){try{
  set_property("chatbotScript","");
  clearBuffs(6014);
  if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
- drink(1,$item[eggnog]);
+ overdrink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{
  print("Script Halted");

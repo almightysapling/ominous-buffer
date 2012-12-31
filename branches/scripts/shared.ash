@@ -7,7 +7,7 @@ record userinfo{
  boolean[string] multis;
  int gender;//see gengers[] definition comments
  int flags;//see flag bits
- string[string] buffpacks;
+ string[string] aliases;
  int[int] buffs;
  float lastMath;
  string lastTime;
@@ -53,13 +53,6 @@ record resource{
  string owner;
  int depth;
 };
-int noHold=0;
-int inWait=1;
-int locked=2;
-record resourceManagerItem{
- int status;
-};
-resourceManagerItem[string] resourceMan;
 
 void invokeResourceMan(string newname){
  NAME_=newname;
@@ -67,7 +60,6 @@ void invokeResourceMan(string newname){
  file_to_map("resources.txt",resources);
  foreach n,res in resources if((res.owner==NAME_)||(res.depth==0)) remove resources[n];
  map_to_file(resources,"resources.txt");
- clear(resourceMan);
 }
 
 void debug(int i){
@@ -89,18 +81,13 @@ void debug(){
 void cleanResources(){ //Remove all holds
  resource[string]blank;
  map_to_file(blank,"resources.txt");
- clear(resourceMan);
 }
 
 void releaseResources(){ //Remove all holds of a certain script
  resource[string] resources;
  file_to_map("resources.txt",resources);
- foreach name,res in resources if(res.owner==NAME_){
-  resources[name].owner="";
-  resources[name].depth=0;
- }
+ foreach name,res in resources if(res.owner==NAME_)remove resources[name];
  map_to_file(resources,"resources.txt");
- clear(resourceMan);
 }
 
 boolean claimResource(string resourceName){ //Lock a symbol
@@ -110,7 +97,6 @@ boolean claimResource(string resourceName){ //Lock a symbol
   waitq(1);
   file_to_map("resources.txt",resources);
  }
- resourceMan[resourceName].status=locked;
  resources[resourceName].owner=NAME_;
  resources[resourceName].depth+=1;
  map_to_file(resources,"resources.txt");
@@ -121,10 +107,9 @@ string freeResource(string resourceName){ //Free a symbol without saving
  resource[string] resources;
  file_to_map("resources.txt",resources);
  string owner=resources[resourceName].owner;
- if(resourceMan contains resourceName)remove resourceMan[resourceName];
  if(owner==NAME_){
   resources[resourceName].depth-=1;
-  if(resources[resourceName].depth==0)resources[resourceName].owner="";
+  if(resources[resourceName].depth==0)remove resources[resourceName];
   map_to_file(resources,"resources.txt");
  }
  return owner;
@@ -137,13 +122,11 @@ string commit(string resourceName){ //Free a symbol without saving
 aggregate checkOut(aggregate data, string resourceName){ //Lock a symbol and load its contents
  claimResource(resourceName);
  file_to_map(resourceName,data);
-// resourceMan[resourceName].data=data;
  return data;
 }
 
 aggregate update(aggregate data, string resourceName){ //Load a symbol, but don't get permission to save
  file_to_map(resourceName,data);
-// resourceMan[resourceName].data=data;
  return data;
 }
 
@@ -155,10 +138,7 @@ string commit(aggregate data, string resourceName, boolean freeR){ //Save data t
   map_to_file(data,resourceName);
   if(freeR){
    resources[resourceName].depth-=1;
-   if(resources[resourceName].depth==0){
-    resources[resourceName].owner="";
-    remove resourceMan[resourceName];
-   }
+   if(resources[resourceName].depth==0)remove resources[resourceName];
    map_to_file(resources,"resources.txt");
   }
  }
@@ -349,15 +329,15 @@ void updateLimits(){
 }
 
 int checkRep(string check){
-// for i from 0 to repValue if(userdata["*"].buffpacks[i.to_string()]==check)return i;
+// for i from 0 to repValue if(userdata["*"].aliases[i.to_string()]==check)return i;
  return -1;
 }
 
 void addRep(string s){
 /* for i from 10 to 1{
-  userdata["*"].buffpacks[i.to_string()]=userdata["*"].buffpacks[to_string(i-1)];
+  userdata["*"].aliases[i.to_string()]=userdata["*"].aliases[to_string(i-1)];
  }
- userdata["*"].buffpacks["0"]=s;
+ userdata["*"].aliases["0"]=s;
  map_to_file(userdata,"userdata.txt");*/
 }
 
@@ -457,9 +437,9 @@ void checkApps(){
 
 void checkData(){
  update(userdata,"userdata.txt");
- if(!(userdata["*"].buffpacks contains "boss")){
+ if(!(userdata["*"].aliases contains "boss")){
   checkOut(userdata,"userdata.txt");
-  userdata["*"].buffpacks["boss"]="25 phat loot, 25 thingfinder, 25 chorale";
+  userdata["*"].aliases["boss"]="25 phat loot, 25 thingfinder, 25 chorale";
   commit(userdata,"userdata.txt");
   chat_private("Sentrion","I am error.");
   chat_private("Almighty Sapling","I am error.");
