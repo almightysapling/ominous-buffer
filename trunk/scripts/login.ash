@@ -117,11 +117,11 @@ void checkLotto(){
   chat_clan("A winner!");
   waitq(7);
   checkOut(userdata,"userdata.txt");
-  for i from 5 downto 2 if(userdata["*"].buffpacks contains ("winner"+to_string(i-1)))userdata["*"].buffpacks["winner"+i.to_string()]=userdata["*"].buffpacks["winner"+to_string(i-1)];
-  userdata["*"].buffpacks["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
+  for i from 4 downto 1 if(userdata["*"].aliases contains ("winner"+i.to_string()))userdata["*"].aliases["winner"+to_string(i+1)]=userdata["*"].aliases["winner"+i.to_string()];
+  userdata["*"].aliases["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
   commit(userdata,"userdata.txt");
   string wintext="";
-  for i from 1 to 5 if(userdata["*"].buffpacks contains ("winner"+i.to_string()))wintext+=userdata["*"].buffpacks["winner"+i.to_string()]+"::";
+  for i from 1 to 5 if(userdata["*"].aliases contains ("winner"+i.to_string()))wintext+=userdata["*"].aliases["winner"+i.to_string()]+"::";
   set_property("winners",wintext);
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
@@ -365,7 +365,7 @@ void cleanPC(){
   clear(userdata[name].buffs);
   userdata[name].lastTrigger="";
  }
- for i from 1 to 6 {remove userdata["*"].buffpacks[i.to_string()];}
+ for i from 1 to 6 {remove userdata["*"].aliases[i.to_string()];}
  commit(userdata,"userdata.txt");
  lifetime["*"]=0;
  foreach skilln in lifetime if(skilln!="*")lifetime["*"]+=lifetime[skilln];
@@ -406,7 +406,7 @@ void processQuestData(boolean rp){
  m=create_matcher("(\\d+)>[^>]+?\\((\\d+)\\s*/",limits);
  while(m.find()) userdata["*"].buffs[m.group(1).to_int()]=m.group(2).to_int();
  string[int] wintext=split_string(get_property("winners"),"::");
- foreach i,s in wintext if(length(s)>1)userdata["*"].buffpacks["winner"+s.char_at(0)]=s.substring(2);
+ foreach i,s in wintext if(length(s)>1)userdata["*"].aliases["winner"+s.char_at(0)]=s.substring(2);
  wintext=split_string(get_property("admins"),"::");
  foreach i,s in wintext if(s.length()>0)setUF(s,isAdmin);
  commit(userdata,"userdata.txt");
