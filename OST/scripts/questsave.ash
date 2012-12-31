@@ -5,7 +5,7 @@ void saveSettings(){
 void loadSettings(string postRO){
  string ls=visit_url("questlog.php?which=4");
  matcher notef=create_matcher(";'\\>([\\s\\S]*)\\</text",ls);
- find(notef);
+ if(!notef.find())return;
  string[int] setting=split_string(group(notef,1),'\\r?\\n|\\s=\\s');
  int x=count(setting)/2;
  if (x==0) return;
