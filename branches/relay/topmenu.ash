@@ -178,7 +178,7 @@ void options(){
  int[string] books;
  update(books,"books.txt");
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
- nln("<input type=\"hidden\" name=\"save\" value=\"yes\" />");
+ nln("<input type=\"hidden\" name=\"cp\" value=\"save\" />");
  nln("<span class=\"optGroup\">BuffSphere</span>");
  ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\" />");
  nln("<input type=\"hidden\" name=\"prop.books.1\" value=\""+books["Event1"]+"\" />");
@@ -234,9 +234,18 @@ void footer(){
  closetag("html");
 }
 
+void topMenu(){
+ string tm=visit_url();
+ int i=tm.index_of("&nbsp;</div>");
+ write(tm.substring(0,i+6)+"<a target=mainpane href=\"topmenu.php?cp=1\">control panel</a>"+tm.substring(i));
+}
+
 void main(){
- if(fields contains "save") update();
- if(fields contains "control") manageOST();
+ switch(fields["cp"]){
+  case "":topMenu();return;
+  case "save":update();break;
+  case "control":manageOST();break;
+ }
  header();
  options();
  info();

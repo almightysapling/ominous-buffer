@@ -65,12 +65,13 @@ string trueChannel="";
 boolean impliedBS=false;
 int TPC=25;
 boolean raidlogRead=false;
+boolean silent=true;
 
 string glitch(string s){
  matcher m;
  m=create_matcher("12",s);
  while(m.find()){
-  switch(random(6)){
+  switch(random(8)){
    case 0: s=m.replace_first("TWELVE");
     break;
    case 1: s=m.replace_first("tWeLve.");
@@ -90,6 +91,7 @@ string glitch(string s){
 }
 
 void chat(){
+ silent=false;
  if((prefix=="")||(prefix.char_at(0)=="/")){
   chat_clan(prefix+response.glitch());
   return;
@@ -113,6 +115,10 @@ void chat(string u, string m){
  prefix=u;
  response=m;
  chat();
+}
+
+void maybeFact(){
+ if(random(1500)==0)chat(factCore());
 }
 
 string genderPronoun(string who, int what, string type){
@@ -1054,7 +1060,7 @@ void userDetails(string sender, string who){
   reply+="Gender: "+genderString(userdata[who])+"\n";
   if(userdata[who].lastTime!="") reply+="Last Time Spoken: "+userdata[who].lastTime+"\n";
   if((who==sender)&&(count(userdata[who].aliases)>0)){
-   reply+="aliases Defined:\n";
+   reply+="Aliases Defined:\n";
    foreach pack, innards in userdata[who].aliases reply+="-"+pack+": "+innards+".\n";
   }
   if(userdata[who].donated>0) reply+="Donated: "+userdata[who].donated.to_string()+" meat.\n";
@@ -1671,7 +1677,7 @@ int timeSinceLastChat(string who){
 }
 
 boolean isMath(string m){
- matcher fix=create_matcher("(?i)(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)",m);
+ matcher fix=create_matcher("(?i)(?<![a-z])(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)(?![a-z])",m);
  m=replace_all(fix,"+");
  fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
  if(fix.find())return false;
@@ -1977,6 +1983,7 @@ void clanHandler(string sender, string msg){
    publicChat(sender,msg);
    return;
  }
+ if(silent)maybeFact();
 }
 
 void slimetubeHandler(string sender, string msg){
@@ -2019,9 +2026,10 @@ void eventHandler(string msg){
 }
 
 void privateHandler(string sender, string msg){
+ matcher m;
  if(sender==my_name())systemHandler(msg);
  if(sender=="MesaChat"){
-  matcher m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
+  m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
    sender=m.group(1);
    msg=m.group(2);
@@ -2041,11 +2049,16 @@ void privateHandler(string sender, string msg){
  string[string] aliasList;
  aliasList=userdata["*"].aliases;
  foreach a,v in userdata[sender].aliases aliasList[a]=v;
- if(aliasList contains msg)msg=aliasList[msg];
+ m=create_matcher("\\s?(\\d+):?\\s?",msg);
+ if(m.find()){
+  string mult=m.group(1).to_int();
+  string alias=m.replace_all("");
+  if(aliasList contains alias)msg=mult+": "+aliasList[alias];
+ }else if(aliasList contains msg)msg=aliasList[msg];
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if(sender=="chatbot")return;
- matcher m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
+ if((sender=="chatbot")||(sender==my_name()))return;
+ m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
   sender=m.group(1);

@@ -251,7 +251,7 @@ float fact(int x){
  return n;
 }
 
-//sqrt function. Included in modifier_eval but no direct access, until not
+//sqrt function. Included in modifier_eval but no direct access, until now
 float sqrt(float x){
  if(x<0){
   throw(UNDEF);
@@ -685,8 +685,20 @@ boolean contains_match(string s, string tom){
  return find(m);
 }
 
+float simpleEval(string x){
+//go through string and analyze each part EMDAS
+ matcher m=create_matcher("(-?[\\d.])\\*\\*(-?[\\d.])",x);
+ float op1,op2;
+ while(m.find()){
+  op1=m.group(1).to_float();
+  op2=m.group(2).to_float();
+  
+  m.reset(x);
+ }
+ return 1;
+}
+
 //eval function for strings containing math commands. WIP?
-//Removes the text function restriction from eval.
 float mathlibevaluate(string x){
  string inner;
  int open;
@@ -707,7 +719,7 @@ float mathlibevaluate(string x){
    inner=substring(x,open);
   }
   if((open>0)&&(char_at(x,open-1).contains_match("[a-zA-Z]"))){
-   //print(substring(x,0,open));
+//print(substring(x,0,open));
    mm=create_matcher("([a-zA-Z][a-zA-Z_]*)",substring(x,0,open));
    while(mm.find()){
     open=start(mm,1);
@@ -810,28 +822,28 @@ float mathlibeval(string x, float[string] vars){
  vars["true"]=1;
  vars["false"]=0;
  buffer b;
- string var;
  matcher m;
- m=create_matcher("(\\d)([a-zA-Z])",x);
- while(find(m)) {
-  x=replace_first(m,group(m,1)+"*"+group(m,2));
-  m=create_matcher("(\\d)([a-zA-Z])",x);
+ foreach vart,varv in vars{
+  m=create_matcher("(?i)(\\d)("+vart+")",x);
+  while(find(m)){
+   x=replace_first(m,group(m,1)+"*"+varv.to_string());
+   m.reset(x);
+  }
+  m=create_matcher("(?i)("+vart+")(\\d)",x);
+  while(find(m)){
+   x=replace_first(m,varv.to_string()+"*"+group(m,2));
+   m.reset(x);
+  }
+  m=create_matcher("(?i)\\b"+vart+"\\b",x);
+  while(m.find()){
+   x=replace_first(m,"("+varv.to_string()+")");
+   m.reset(x);
+  }
  }
- m=create_matcher("([a-zA-Z])(\\d)",x);
- while(find(m)) {
-  x=replace_first(m,group(m,1)+"*"+group(m,2));
-  m=create_matcher("([a-zA-Z])(\\d)",x);
- }
- m=create_matcher("(?i)\\b[a-z_][a-z_]*\\b",x);
- while(m.find()){
-  var=m.group(0);
-  if(vars contains var)m.append_replacement(b,"("+vars[var].to_string()+")");
-  else m.append_replacement(b,var);
- }
- m.append_tail(b);
- b=replace_string(b,"[","(");
- b=replace_string(b,"]",")");
- x=b.to_string();
+ m=create_matcher("\\[",x);
+ x=m.replace_all("(");
+ m=create_matcher("\\]",x);
+ x=m.replace_all(")");
  m=create_matcher("(\\d)\\(",x);
  while(find(m)) {
   x=replace_first(m,group(m,1)+"*(");

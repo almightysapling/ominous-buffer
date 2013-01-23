@@ -1,3 +1,4 @@
+F	0	BuffSphere is not defective. Its facts are wholly accurate, and very interesting.
 F	1	Rats cannot throw up.
 F	2	Honey does not spoil.
 F	3	The billionth digit of pi is 9.
@@ -77,7 +78,11 @@ F	76	Pens. Pens. Pens. Pens. Pens. Pens. Pens.
 F	77	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
 F	78	Error. Error. Error. File not found.
 F	79	Error. Error. Error. Fact not found.
-I	1	an orphan
-I	2	inept
-I	3	impotent
-I	4	anemic
+I	0	most likely an orphan
+I	1	certainly inept
+I	2	probably impotent
+I	3	probably anemic
+I	4	overweight
+I	5	a little tubby
+I	6	ugly
+I	7	probably a streetwalker

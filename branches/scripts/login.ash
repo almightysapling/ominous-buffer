@@ -129,7 +129,7 @@ void checkLotto(){
   books["nextLotto"]=1;  
  }else{
   print("No winner.");
-  chat_clan("Just what I thought. Everyone here is a loser. And probably "+insultCore()+" as well.");
+  chat_clan("Just what I thought. Everyone here is a loser. And "+insultCore()+" as well.");
  }
  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
@@ -343,7 +343,7 @@ void handleMeat(){
 void updateFaxes(){
  string[string] fax;
  string faxes=visit_url("http://www.hogsofdestiny.com/faxbot/faxbot.xml");
- matcher m=create_matcher("<name>(.+?)</name>\n<actual_name>.+?</actual_name>\n<command>(.+?)</command>",faxes);
+ matcher m=create_matcher("<name>([^<]+?)</name>\n<actual_name>.+?</actual_name>\n<command>(.+?)</command>",faxes);
  boolean hostFound=false; 
  while(m.find()){
   fax[to_lower_case(m.group(1))]=m.group(2);
