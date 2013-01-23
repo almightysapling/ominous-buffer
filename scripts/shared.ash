@@ -255,7 +255,7 @@ string to_commad(int i){
 string factCore(string type){
  string[string,int] factList;
  update(factList,"facts.txt");
- return factList[type,random(count(factList[type]))+1];
+ return factList[type,random(count(factList[type]))];
 }
 
 string factCore(){
