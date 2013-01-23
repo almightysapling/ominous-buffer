@@ -65,12 +65,13 @@ string trueChannel="";
 boolean impliedOB=false;
 int TPC=25;
 boolean raidlogRead=false;
+boolean silent=true;
 
 string glitch(string s){
  matcher m;
  m=create_matcher("12",s);
  while(m.find()){
-  switch(random(6)){
+  switch(random(8)){
    case 0: s=m.replace_first("TWELVE");
     break;
    case 1: s=m.replace_first("tWeLve.");
@@ -90,6 +91,7 @@ string glitch(string s){
 }
 
 void chat(){
+ silent=false;
  if((prefix=="")||(prefix.char_at(0)=="/")){
   chat_clan(prefix+response.glitch());
   return;
@@ -113,6 +115,10 @@ void chat(string u, string m){
  prefix=u;
  response=m;
  chat();
+}
+
+void maybeFact(){
+ if(random(1500)==0)chat(factCore());
 }
 
 string genderPronoun(string who, int what, string type){
@@ -2074,6 +2080,7 @@ void clanHandler(string sender, string msg){
    publicChat(sender,msg);
    return;
  }
+ if(silent)maybeFact();
 }
 
 void slimetubeHandler(string sender, string msg){
