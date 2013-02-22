@@ -580,7 +580,7 @@ void main(){try{
   cli_execute("familiar "+meatFam);
   cli_execute("maximize meat, +1000combat, -tie");
   while(my_adventures()-burnTurns>0){
-   if(adventure(1,$location[giant's castle])){}
+   if(adventure(1,$location[giant's castle (top floor)])){}
    if(my_adventures()-burnTurns>12)burn();
   }
   burn();

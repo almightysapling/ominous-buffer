@@ -2078,9 +2078,9 @@ void clanHandler(string sender, string msg){
    return;
   default:
    publicChat(sender,msg);
+   if(silent)maybeFact();
    return;
  }
- if(silent)maybeFact();
 }
 
 void slimetubeHandler(string sender, string msg){
