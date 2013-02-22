@@ -95,9 +95,9 @@ void main(){try{
   if(get_property("sidequestOrchardCompleted")!="none")visit_url("store.php?whichstore=h");
   if(get_property("sidequestArenaCompleted")!="none")visit_url("postwarisland.php?action=concert&pwd&option=2");
   retrieve_item(6,$item[supernova champagne]);
-  drink(6,$item[supernova champagne]);
+  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[supernova champagne]);
   retrieve_item(1,$item[can of swiller]);
-  drink(1,$item[can of swiller]);  
+  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[can of swiller]);
   set_property("_breakfast","1");
  }
  cli_execute("maximize mp, 200mp regen max -tie");
@@ -125,7 +125,7 @@ void main(){try{
   cli_execute("familiar "+meatfarm_fam);
   print("Daily Adventuring","red");
   while(my_adventures()>130){
-   adventure(1,$location[giant's castle]);
+   adventure(1,$location[giant's castle (top floor)]);
    while((my_mp()+get_property("campmp"))>get_property("rollmp")){
     if((have_skill($skill[empathy of the newt]))&&(have_effect($effect[empathy])<1000))use_skill(1,$skill[empathy of the newt]);
     if(my_class()==$class[Sauceror])break;
