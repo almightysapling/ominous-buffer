@@ -313,9 +313,8 @@ void handleMeat(){
   totspent+=100;
  }
  commit(userdata,"userdata.txt");
- cli_execute("use 0 warm subject gift certificate");
- cli_execute("autosell 0 thin black candle, 0 heavy d, 0 original g, 0 disturbing fanfic, 0 furry fur, 0 awful poetry journal, 0 chaos butterfly, 0 plot hole, 0 probability potion, 0 procrastination potion, 0 angry farmer candy, 0 mick's icyvapohotness rub");
- cli_execute("csend 0 wolf mask, 0 rave whistle, 0 giant needle, 0 twinkly nugget to smashbot || wads");
+ cli_execute("mallsell 0 snow queen crown @ 400");
+ cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face loger, 0 ram horns, 0 ram stick, 0 yeti fur");
  int totalDMS=floor(my_meat()/1000)-500;
  if(totalDMS>0){
   string exe="make "+to_string(totalDMS)+" dense meat stack";
@@ -543,7 +542,7 @@ void main(){try{
  int n;
  while(minutesToRollover()>burnMinutes){
   coreGameCycle();
-  checkLotto();
+//  checkLotto();
   checkProperties();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n>=lastCheck){
@@ -565,22 +564,13 @@ void main(){try{
  }
  makeRecords();
  int burnTurns=150-to_int(get_property("rolladv"));
- if(my_fullness()<14){
-  while(14-my_fullness()>1)eatsilent(1,$item[bunch of square grapes]);
-  while(14-my_fullness()>0)eatsilent(1,$item[handful of nuts and berries]);
-  /* $/adv>1400:
-  while(14-my_fullness()>3)eatsilent(1,$item[spectral pickle]);
-  while(14-my_fullness()>2)eatsilent(1,$item[super salad]);
-  while(14-my_fullness()>0)eatsilent(1,$item[handful of nuts and berries]);
-  */
- }
  doBounty();
  if((my_adventures()-burnTurns)>0){
   burn();
   cli_execute("familiar "+meatFam);
   cli_execute("maximize meat, +1000combat, -tie");
   while(my_adventures()-burnTurns>0){
-   if(adventure(1,$location[giant's castle (top floor)])){}
+   if(adventure(1,$location[Icy Peak])){}
    if(my_adventures()-burnTurns>12)burn();
   }
   burn();
@@ -607,7 +597,7 @@ void main(){try{
  checkApps();
  set_property("chatbotScript","");
  clearBuffs(6014);
- if(have_skill($skill[ode to booze])) (!use_skill(1,$skill[ode to booze]));
+ if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
  overdrink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{

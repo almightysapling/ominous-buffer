@@ -35,7 +35,7 @@ void stabilize(){
  if (get_property("nunsVisits")!=3){
   if ((my_adventures()<130)||(my_mp()<60)) cli_execute("nuns");
  }
- while((my_mp()<300)&&(my_adventures()!=0))adventure(1,$location[giant's castle]);
+ while((my_mp()<300)&&(my_adventures()!=0))adventure(1,$location[Icy Peak]);
 }
 
 void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, string msg){
