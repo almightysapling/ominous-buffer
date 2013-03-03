@@ -29,14 +29,8 @@ void earlyOut(){
 
 void cashMeat(){
  cli_execute("cleanup");
- item needle=$item[giant needle];
- string smashBot="csend "+to_string(item_amount(needle))+" "+to_string(needle);
- foreach castle in $items[wolf mask, rave whistle, twinkly nugget]
- smashBot+=", "+to_string(item_amount(castle))+" "+to_string(castle);
- smashBot+=" to smashbot || wad";
- needle=$item[Warm Subject Gift Certificate];
- use(item_amount(needle),needle);
- cli_execute(smashBot);
+ cli_execute("csend 0 snow queen crown to Ominous Buffer || ");
+ cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face loger, 0 ram horns, 0 ram stick, 0 yeti fur");
  int meatGained=my_meat()-500000;
  int totalDMS;
  if(meatGained<0){
@@ -49,9 +43,8 @@ void cashMeat(){
   if(totalDMS==0)return;
   string exe="make "+to_string(totalDMS)+" dense meat stack";
   cli_execute(exe);
-  if(totalDMS<15)take_closet(15-totalDMS,$item[dense meat stack]);
-  else put_closet(totalDMS-15,$item[dense meat stack]);
-  cli_execute("kmail 15 dense meat stack to Ominous Buffer || ");
+  if(totalDMS>15)put_closet(totalDMS-15,$item[dense meat stack]);
+  if(totalDMS>0)cli_execute("kmail "+min(15,totalDMS)+" dense meat stack to Ominous Buffer || ");
  }
  if(my_meat()<490000) chat_private(settings["mainbot"],"FUNDS");
 }
@@ -125,7 +118,7 @@ void main(){try{
   cli_execute("familiar "+meatfarm_fam);
   print("Daily Adventuring","red");
   while(my_adventures()>130){
-   adventure(1,$location[giant's castle (top floor)]);
+   adventure(1,$location[icy peak]);
    while((my_mp()+get_property("campmp"))>get_property("rollmp")){
     if((have_skill($skill[empathy of the newt]))&&(have_effect($effect[empathy])<1000))use_skill(1,$skill[empathy of the newt]);
     if(my_class()==$class[Sauceror])break;
