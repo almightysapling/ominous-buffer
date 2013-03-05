@@ -314,7 +314,7 @@ void handleMeat(){
  }
  commit(userdata,"userdata.txt");
  cli_execute("mallsell 0 snow queen crown @ 400");
- cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face loger, 0 ram horns, 0 ram stick, 0 yeti fur");
+ cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face lager, 0 ram horns, 0 ram stick, 0 yeti fur");
  int totalDMS=floor(my_meat()/1000)-500;
  if(totalDMS>0){
   string exe="make "+to_string(totalDMS)+" dense meat stack";
