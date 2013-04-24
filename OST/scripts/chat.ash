@@ -1,5 +1,4 @@
-import <mutex.ash>
-import <questsave.ash>
+import <shared.ash>
 
 int noflag=1;
 int isadmin=2;
@@ -26,21 +25,21 @@ boolean checkFlag(string sender,int flag){
 }
 boolean checkFlag(int sender,int flag){
  string alias=settings["alias:"+to_string(sender)];
- if (alias=="") alias="*";
+ if(alias=="")alias="*";
  return checkFlag(alias,flag);
 }
 
 void stabilize(){
  cli_execute("maximize mp, 1000 mp regen max -tie");
- if (get_property("nunsVisits")!=3){
-  if ((my_adventures()<130)||(my_mp()<60)) cli_execute("nuns");
+ if(get_property("nunsVisits")!=3){
+  if((my_adventures()<130)||(my_mp()<60))cli_execute("nuns");
  }
  while((my_mp()<300)&&(my_adventures()!=0))adventure(1,$location[Icy Peak]);
 }
 
 void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, string msg){
  //Buff Precheck
- if (isbuff[skillnum]!=1){
+ if(isbuff[skillnum]!=1){
   //NONEXIST ERROR
   msg="N "+msg;
   if(errorMsg)chat_private(settings["mainbot"],msg);
@@ -59,21 +58,18 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
  }
 
  if (casts<1){
-  //OVER LIMIT ERROR
-  msg="L "+msg;
+  msg="L "+msg; //Over-limit error
   if(errorMsg)chat_private(settings["mainbot"],msg);
   return;
  }
- //This is the actual casting function.
- if (use_skill(casts,msgNew,to_string(castee))==true){
-  if (skillnum==62) chat_private(settings["mainbot"],"S "+msg);
+ if(use_skill(casts,msgNew,to_string(castee))==true){ //This is the actual casting function
+  if(skillnum==62)chat_private(settings["mainbot"],"S "+msg);
   dailybuffs[sender,skillnum]+=casts;
   dailybuffs[10,skillnum]+=casts;
   save(skillnum,casts);
   map_to_file(dailybuffs,my_name()+"/dailybuffs.txt");
  }else{
-  //BUFFFAIL ERROR
-  switch (last_skill_message()){
+  switch(last_skill_message()){ //Buff fail errors
    case "Selected target cannot receive buffs.":
     msg="R "+msg;
     break;
@@ -91,18 +87,91 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
  if (my_mp()<525) stabilize();
 }
 
-void main(string sender, string msg){
+void makePots(){
+ int diddly;
+ int scrum;
+ int imin;
+ int[item] stuff;
+ int[item] excess;
+ int excess_meat;
+ string errors;
+ boolean attachments;
+ message[int] parsedmail=parseMail();
+ cli_execute("refresh inv");
+ foreach x,msg in parsedmail{
+  if(msg.sender=="smashbot")continue;
+  attachments=false;
+  foreach thing in msg.things attachments=true;
+  if(msg.meat>0)attachments=true;
+  if(!attachments){
+   kmail(msg.sender,"I am a bot. Your kmail could not be understood, so has been forwarded to an appropriate player.");
+   kmail("Sentrion","From: "+msg.sender+"\n\n"+msg.text);
+   deleteMail(msg);
+   continue;
+  }
+  if(msg.meat>0)diddly=to_int(floor(msg.meat/1000));
+  scrum=msg.things[$item[scrumptious reagent]];
+  if(diddly>scrum){
+   diddly=scrum;
+   errors="You included less reagents than you did meat to convert them.";
+  }
+  if(diddly>0)cli_execute("use "+diddly+" delectable catalyst");
+  excess_meat=msg.meat-(diddly*1000);
+  scrum-=diddly;
+  diddly+=msg.things[$item[scrumdiddlyumptious solution]];
+  remove msg.things[$item[scrumptious reagent]]);
+  remove msg.things[$item[scrumdiddlyumptious solution]]);
+  if((scrum<1)&&(diddly<1)){
+   deleteMail(msg);
+   continue;
+  }
+  foreach ingred in msg.things{
+   if(saucePots contains ingred)stuff[ingred]=msg.things[ingred];
+   else excess[ingred]=msg.things[ingred];
+  }
+  foreach ingred in stuff{
+   if(saucePots[ingred].scrumdiddly){
+    imin=min(stuff[ingred],diddly);
+    craft("cook",imin,ingred,$item[scrumdiddlyumptious solution]);
+    diddly-=imin;
+   }else{
+    imin=min(stuff[ingred],scrum);
+    craft("cook",imin,ingred,$item[scrumptious reagent]);
+    scrum-=imin;
+   }
+   excess[saucePot[ingred].result]+=imin*saucePot[ingred].volume;
+   stuff[ingred]-=imin;
+   excess[ingred]+=stuff[ingred];
+   remove stuff[ingred];
+  }
+  if(scrum>0)excess[$item[scrumptious reagent]]=scrum;
+  if(diddly>0)excess[$item[scrumdiddlyumptious solution]]=diddly;
+  kmail(msg.sender,errors,excess_meat,excess);
+  deleteMail(msg);
+ }
+ return;
+}
+
+void doEvent(string sender, string msg){
+ if((my_class=$class[sauceror])&&(msg.contains_text("New message received")))makePots();
+}
+
+void main(string sender, string msg, string channel){
+ if(channel=="Events"){
+  doEvent(sender,msg);
+  return;
+ }
  if (msg.char_at(0)=="!"){
   errorMsg=false;
   msg=substring(msg,1);
  }
  string remain="";
  string outbound="";
- if (!checkFlag(sender,noflag)){
+ if(!checkFlag(sender,noflag)){
   chat_private(sender, "This account does not handle individual user requests. Please visit Ominous Buffer's profile for usage instructions. (#1767127)");
   exit;
  }
- if (checkFlag(sender,isadmin)){
+ if(checkFlag(sender,isadmin)){
   if(msg=="burn"){ //Run Adventure Burn sequence early.
    unlockMutex("_logoutNow");
    exit;
@@ -136,13 +205,13 @@ void main(string sender, string msg){
    cli_execute("exit");
    exit;
   }
-  if(length(msg)>4) if(substring(msg,0,4)=="cli "){
+  if(length(msg)>4)if(substring(msg,0,4)=="cli "){
    cli_execute(substring(msg,4));
    exit;
   }
-  if(length(msg)>6) if(substring(msg,0,6)=="count "){
+  if(length(msg)>6)if(substring(msg,0,6)=="count "){
    remain=substring(msg,6);
-   if (remain=="meat"){
+   if(remain=="meat"){
     outbound="Liquid: "+to_string(my_meat())+"; DMS: ";
     outbound+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
    }else{
@@ -157,7 +226,7 @@ void main(string sender, string msg){
   }
  }
  string[int] pieces=split_string(msg,"\\s");
- if (checkFlag(sender,isbuffer)){
+ if(checkFlag(sender,isbuffer)){
   switch(pieces[0]){
    case "CASTRQ":
     int[string] totals;
@@ -178,7 +247,7 @@ void main(string sender, string msg){
     }
     return;
   }
-  if (count(pieces)!=5)return;
+  if(count(pieces)!=5)return;
   requestMutex("_adventuring");
   print("Request Processing","red");
   buff(to_int(pieces[0]),to_int(pieces[1]),to_int(pieces[2]),to_int(pieces[3]),to_int(pieces[4]),msg);
