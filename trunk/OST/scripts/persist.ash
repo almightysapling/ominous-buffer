@@ -1,5 +1,4 @@
-import <mutex.ash>
-import <questsave.ash>
+import <shared.ash>
 
 string[string] settings;
 file_to_map(my_name()+"/settings.txt",settings);
@@ -49,50 +48,85 @@ void cashMeat(){
  if(my_meat()<490000) chat_private(settings["mainbot"],"FUNDS");
 }
 
+void machineBreakfast(){
+ loadSettings("nunsVisits;_autod");
+ string meatfarm_ccs="default";
+ string meatfarm_fam="leprechaun";
+ int[int,int] dailybuffs;
+ file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
+ clear(dailybuffs);
+ map_to_file(dailybuffs,my_name()+"/dailybuffs.txt");
+ item[item,string,item,item] concs;
+ file_to_map("concoctions.txt",concs);
+ foreach i,j,k,l in concs{
+  if(!contains_text(j,"SAUCE"))continue;
+  switch(k){
+   case $item[scrumptious reagent]:
+    saucePots[l].result=i;
+    saucePots[l].scrumdiddly=false;
+    saucePots[l].volume=(j.contains_text("SX3")?3:1);
+    break;
+   case $item[scrumdiddlyumptious solution]:
+    saucePots[l].result=i;
+    saucePots[l].scrumdiddly=true;
+    saucePots[l].volume=(j.contains_text("SX3")?3:1);
+    break;
+  }
+  switch(l){
+   case $item[scrumptious reagent]:
+    saucePots[k].result=i;
+    saucePots[k].scrumdiddly=false;
+    saucePots[k].volume=(j.contains_text("SX3")?3:1);
+    break;
+   case $item[scrumdiddlyumptious solution]:
+    saucePots[k].result=i;
+    saucePots[k].scrumdiddly=true;
+    saucePots[k].volume=(j.contains_text("SX3")?3:1);
+    break;
+  }
+ }
+ map_to_file(saucePots,"saucePots.txt");
+ set_property("_mbreakfast","1");
+}
+
+void accountBreakfast(){
+ string rumpus = visit_url("clan_rumpus.php");
+ if(contains_text(rumpus,"rump3_3")){
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
+ }
+ if(contains_text(rumpus,"rump3_1")){
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+  visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
+ }
+ if(contains_text(rumpus,"rump1_4"))visit_url("clan_rumpus.php?action=click&spot=1&furni=4");
+ if(contains_text(rumpus,"rump4_2"))visit_url("clan_rumpus.php?action=click&spot=4&furni=2");
+ if(contains_text(rumpus,"rump9_3"))visit_url("clan_rumpus.php?action=click&spot=9&furni=3");
+ if(contains_text(rumpus,"rump4_1"))visit_url("clan_rumpus.php?action=click&spot=4&furni=1");
+ if(contains_text(rumpus,"rump3_2"))visit_url("clan_rumpus.php?preaction=jukebox&whichsong=1");
+ if(contains_text(rumpus,"rump9_2")){
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=1");
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=2");
+  visit_url("clan_rumpus.php?preaction=buychips&whichbag=3");
+ }
+ if(contains_text(rumpus,"ballpit"))visit_url("clan_rumpus.php?action=click&spot=7");
+ if(get_property("sidequestOrchardCompleted")!="none")visit_url("store.php?whichstore=h");
+ if(get_property("sidequestArenaCompleted")!="none")visit_url("postwarisland.php?action=concert&pwd&option=2");
+ retrieve_item(6,$item[supernova champagne]);
+ while(inebriety_limit()-my_inebriety()>2)drink(1,$item[supernova champagne]);
+ retrieve_item(1,$item[can of swiller]);
+ while(inebriety_limit()-my_inebriety()>0)drink(1,$item[can of swiller]);
+ set_property("_breakfast","1");
+}
+
 void main(){try{
  print("Starting Bot","red");
  unlockMutex("_adventuring");
  lockMutex("_abortNow");
- loadSettings("nunsVisits;_breakfast;_autod");
- string meatfarm_ccs="default";
- string meatfarm_fam="leprechaun";
- if(get_property("_breakfast")==""){
-  int[int,int] dailybuffs;
-  file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
-  clear(dailybuffs);
-  map_to_file(dailybuffs,my_name()+"/dailybuffs.txt");
-  string rumpus = visit_url("clan_rumpus.php");
-  set_property("campmp",floor(numeric_modifier("base resting mp")*(numeric_modifier("resting mp percent")/100.0+1)));
-  set_property("rollmp",my_mp());
-  if(contains_text(rumpus,"rump3_3")){
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
-  }
-  if(contains_text(rumpus,"rump3_1")){
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-   visit_url("clan_rumpus.php?action=click&spot=3&furni=1");
-  }
-  if(contains_text(rumpus,"rump1_4"))visit_url("clan_rumpus.php?action=click&spot=1&furni=4");
-  if(contains_text(rumpus,"rump4_2"))visit_url("clan_rumpus.php?action=click&spot=4&furni=2");
-  if(contains_text(rumpus,"rump9_3"))visit_url("clan_rumpus.php?action=click&spot=9&furni=3");
-  if(contains_text(rumpus,"rump4_1"))visit_url("clan_rumpus.php?action=click&spot=4&furni=1");
-  if(contains_text(rumpus,"rump3_2"))visit_url("clan_rumpus.php?preaction=jukebox&whichsong=1");
-  if(contains_text(rumpus,"rump9_2")){
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=1");
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=2");
-   visit_url("clan_rumpus.php?preaction=buychips&whichbag=3");
-  }
-  if(contains_text(rumpus,"ballpit"))visit_url("clan_rumpus.php?action=click&spot=7");
-  if(get_property("sidequestOrchardCompleted")!="none")visit_url("store.php?whichstore=h");
-  if(get_property("sidequestArenaCompleted")!="none")visit_url("postwarisland.php?action=concert&pwd&option=2");
-  retrieve_item(6,$item[supernova champagne]);
-  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[supernova champagne]);
-  retrieve_item(1,$item[can of swiller]);
-  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[can of swiller]);
-  set_property("_breakfast","1");
- }
+ if(get_property("_mbreakfast")=="")machineBreakfast();
+ if(get_property("_breakfast")=="")accountBreakfast();
  cli_execute("maximize mp, 200mp regen max -tie");
  lockMutex("_forcedOut");
  lockMutex("_logoutNow");

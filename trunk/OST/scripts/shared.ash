@@ -1,3 +1,13 @@
+import <questsave.ash>
+import <kmail.ash>
+
+record saucePot{
+ item result;
+ boolean scrumdiddly;
+ int volume;
+};
+saucePot[item] saucePots;
+
 boolean lockMutex(string mutex){
  if (get_property(mutex)==""){
   set_property(mutex,"L");
