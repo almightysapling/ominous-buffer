@@ -28,8 +28,8 @@ void earlyOut(){
 
 void cashMeat(){
  cli_execute("cleanup");
- cli_execute("csend 0 snow queen crown to Ominous Buffer || ");
- cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face loger, 0 ram horns, 0 ram stick, 0 yeti fur");
+ cli_execute("csend 0 yeti fur, 0 ram's face lager, 0 insanely spicy bean burrito, 0 bag of cheat-os to Ominous Buffer || ");
+ cli_execute("autosell 0 snow queen crown, 0 ga-ga radio, 0 crazy little turkish delight, 0 unrefined mountain stream syrup, 0 ram horns, 0 ram stick");
  int meatGained=my_meat()-500000;
  int totalDMS;
  if(meatGained<0){
