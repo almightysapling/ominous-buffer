@@ -93,7 +93,7 @@ void makePots(){
  int imin;
  int[item] stuff;
  int[item] excess;
- int excess_meat;
+ int meatX;
  string errors;
  boolean attachments;
  message[int] parsedmail=parseMail();
@@ -116,7 +116,7 @@ void makePots(){
    errors="You included less reagents than you did meat to convert them.";
   }
   if(diddly>0)cli_execute("use "+diddly+" delectable catalyst");
-  excess_meat=msg.meat-(diddly*1000);
+  meatX=msg.meat-(diddly*1000);
   scrum-=diddly;
   diddly+=msg.things[$item[scrumdiddlyumptious solution]];
   remove msg.things[$item[scrumptious reagent]]);
@@ -146,7 +146,7 @@ void makePots(){
   }
   if(scrum>0)excess[$item[scrumptious reagent]]=scrum;
   if(diddly>0)excess[$item[scrumdiddlyumptious solution]]=diddly;
-  kmail(msg.sender,errors,excess_meat,excess);
+  kmail(msg.sender,errors,meatX,excess);
   deleteMail(msg);
  }
  return;

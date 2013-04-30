@@ -1,4 +1,6 @@
 import <shared.ash>
+string meatfarm_ccs="default";
+string meatfarm_fam="leprechaun";
 
 string[string] settings;
 file_to_map(my_name()+"/settings.txt",settings);
@@ -50,8 +52,6 @@ void cashMeat(){
 
 void machineBreakfast(){
  loadSettings("nunsVisits;_autod");
- string meatfarm_ccs="default";
- string meatfarm_fam="leprechaun";
  int[int,int] dailybuffs;
  file_to_map(my_name()+"/dailybuffs.txt",dailybuffs);
  clear(dailybuffs);
