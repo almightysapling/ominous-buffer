@@ -153,9 +153,17 @@ void main(){try{
   print("Daily Adventuring","red");
   while(my_adventures()>130){
    adventure(1,$location[icy peak]);
-   while((my_mp()+get_property("campmp"))>get_property("rollmp")){
-    if((have_skill($skill[empathy of the newt]))&&(have_effect($effect[empathy])<1000))use_skill(1,$skill[empathy of the newt]);
-    if(my_class()==$class[Sauceror])break;
+   while(my_mp()>0.9*my_maxmp()) switch(my_class()){
+    case $class[sauceror]:
+     use_skill(3,$skill[elemental saucesphere],"Ominous Buffer");
+     use_skill(3,$skill[elemental saucesphere],"Ominous Tamer");
+     use_skill(3,$skill[elemental saucesphere]);
+     break;
+    case $class[turtle tamer]:
+     use_skill(3,$skill[empathy of the newt],"Ominous Buffer");
+     use_skill(3,$skill[empathy of the newt],"Ominous Sauceror");
+     use_skill(3,$skill[empathy of the newt]);
+     break;
    }
   }
   cli_execute("maximize mp, 200mp regen max -tie");

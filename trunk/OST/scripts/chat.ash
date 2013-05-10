@@ -88,6 +88,7 @@ void buff (int castee, int sender, int skillnum, int numTurns, int maxTurns, str
 }
 
 void makePots(){
+ file_to_map("saucePots.txt",saucePots);
  int diddly;
  int scrum;
  int imin;
@@ -99,7 +100,10 @@ void makePots(){
  message[int] parsedmail=parseMail();
  cli_execute("refresh inv");
  foreach x,msg in parsedmail{
-  if(msg.sender=="smashbot")continue;
+  if(msg.sender=="smashbot"){
+   deleteMail(msg);
+   continue;
+  }
   attachments=false;
   foreach thing in msg.things attachments=true;
   if(msg.meat>0)attachments=true;
@@ -113,15 +117,16 @@ void makePots(){
   scrum=msg.things[$item[scrumptious reagent]];
   if(diddly>scrum){
    diddly=scrum;
-   errors="You included less reagents than you did meat to convert them.";
+   errors="You included more meat than reagents to convert. ";
   }
   if(diddly>0)cli_execute("use "+diddly+" delectable catalyst");
   meatX=msg.meat-(diddly*1000);
   scrum-=diddly;
   diddly+=msg.things[$item[scrumdiddlyumptious solution]];
-  remove msg.things[$item[scrumptious reagent]]);
-  remove msg.things[$item[scrumdiddlyumptious solution]]);
+  remove msg.things[$item[scrumptious reagent]];
+  remove msg.things[$item[scrumdiddlyumptious solution]];
   if((scrum<1)&&(diddly<1)){
+   kmail(msg.sender,errors+"You need to include reagents. ",meatX,msg.things);
    deleteMail(msg);
    continue;
   }
@@ -139,7 +144,7 @@ void makePots(){
     craft("cook",imin,ingred,$item[scrumptious reagent]);
     scrum-=imin;
    }
-   excess[saucePot[ingred].result]+=imin*saucePot[ingred].volume;
+   excess[saucePots[ingred].result]+=imin*saucePots[ingred].volume;
    stuff[ingred]-=imin;
    excess[ingred]+=stuff[ingred];
    remove stuff[ingred];
@@ -153,7 +158,7 @@ void makePots(){
 }
 
 void doEvent(string sender, string msg){
- if((my_class=$class[sauceror])&&(msg.contains_text("New message received")))makePots();
+ if((my_class()==$class[sauceror])&&(msg.contains_text("New message received")))makePots();
 }
 
 void main(string sender, string msg, string channel){
