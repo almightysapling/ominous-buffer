@@ -438,7 +438,7 @@ void dailyBreakfast(){
  checkMail();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
  cli_execute("familiar "+statFam);
- cli_execute("maximize exp, -1000combat");
+ cli_execute("maximize exp, -100 combat");
  print("Visiting clan rumpus room.", "blue");
  if(contains_text(rumpus,"rump3_3.gif")){
   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
@@ -568,7 +568,7 @@ void main(){try{
  if((my_adventures()-burnTurns)>0){
   burn();
   cli_execute("familiar "+meatFam);
-  cli_execute("maximize meat, +1000combat, -tie");
+  cli_execute("maximize 2 meat, item, 100 combat, -tie");
   while(my_adventures()-burnTurns>0){
    if(adventure(1,$location[Icy Peak])){}
    if(my_adventures()-burnTurns>12)burn();
@@ -590,7 +590,7 @@ void main(){try{
  checkApps();
  waitq((MinutesToRollover()-logMinutes)*60);
  chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
- cli_execute("maximize adv -tie");
+ cli_execute("maximize adv, -tie");
  saveSettings(nightlySave);
  set_property("_shutdownBufferOnly","1");
  nightlyPaperwork();
