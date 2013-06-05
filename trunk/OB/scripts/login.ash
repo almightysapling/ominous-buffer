@@ -542,7 +542,7 @@ void main(){try{
  int n;
  while(minutesToRollover()>burnMinutes){
   coreGameCycle();
-//  checkLotto();
+  checkLotto();
   checkProperties();
   n=now_to_string("HH").to_int()*60+now_to_string("mm").to_int();
   if(n>=lastCheck){
