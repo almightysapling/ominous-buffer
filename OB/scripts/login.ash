@@ -568,7 +568,7 @@ void main(){try{
  if((my_adventures()-burnTurns)>0){
   burn();
   cli_execute("familiar "+meatFam);
-  cli_execute("maximize 2 meat, item, 100 combat, -tie");
+  cli_execute("maximize 2 meat, item, 100 combat, equip C.H.U.M. knife, -tie");
   while(my_adventures()-burnTurns>0){
    if(adventure(1,$location[Icy Peak])){}
    if(my_adventures()-burnTurns>12)burn();
