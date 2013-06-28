@@ -531,7 +531,6 @@ void main(){try{
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
- set_property("_shutdownBufferOnly","");
  set_property("_forceShutdown","");
  if(get_property("_breakfast")=="")dailyBreakfast();//All once-daily functions should happen here.
  cli_execute("maximize mp");
@@ -586,13 +585,12 @@ void main(){try{
  chat_private("Ominous Sauceror","CASTRQ");
  checkApps();
  waitq((MinutesToRollover()-logMinutes-5)*60);
- chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
+ if(MinutesToRollover()<10)chat_clan("Rollover's coming. If you still need buffs, please request them in the next five minutes.");
  checkApps();
  waitq((MinutesToRollover()-logMinutes)*60);
- chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
+ if(MinutesToRollover()<10)chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  cli_execute("maximize adv, -tie");
  saveSettings(nightlySave);
- set_property("_shutdownBufferOnly","1");
  nightlyPaperwork();
  checkApps();
  set_property("chatbotScript","");

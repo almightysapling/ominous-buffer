@@ -24,8 +24,7 @@ void earlyOut(){
  print_html("<b><font color=000000>Entering runlevel: </font><font color=FF0000>0</font></b>");
  set_property("chatbotScript","");
  cli_execute("maximize adv -tie");
- if(!(mutexFree("_abortNow")))cli_execute("exit");
- exit;
+ cli_execute("exit");
 }
 
 void cashMeat(){
@@ -124,7 +123,7 @@ void accountBreakfast(){
 void main(){try{
  print("Starting Bot","red");
  unlockMutex("_adventuring");
- lockMutex("_abortNow");
+ lockMutex("_aborted");
  if(get_property("_mbreakfast")=="")machineBreakfast();
  if(get_property("_breakfast")=="")accountBreakfast();
  cli_execute("maximize mp, 200mp regen max -tie");

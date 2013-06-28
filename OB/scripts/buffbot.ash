@@ -207,8 +207,12 @@ void logout(string sender,string options){
   chat(sender,"You do not have permission to use this command.");
   return;
  }
+ if(options=="all"){
+  chat_private(turtleBot,"logout");
+  chat_private(sauceBot,"logout");
+ }
  saveSettings(earlySave);
- if(options!="all")set_property("_shutdownBufferOnly","1");
+ set_property("chatbotScript","");
  cli_execute("exit");
 }
 
@@ -217,7 +221,16 @@ void shutdown(string sender,string options){
   chat(sender,"Haha, did you think it would be that easy?");
   return;
  }
- if(options=="burn")set_property("_forceShutdown","burn");
+ if(options.contains_text("all")){
+  if(options.contains_text("burn")){
+   chat_private(turtleBot,"burn");
+   chat_private(sauceBot,"burn");
+  }else{
+   chat_private(turtleBot,"shutdown");
+   chat_private(sauceBot,"shutdown");
+  }
+ }
+ if(options.contains_text("burn"))set_property("_forceShutdown","burn");
  else set_property("_forceShutdown","logout");
 }
 
