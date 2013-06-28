@@ -86,3 +86,10 @@ I	4	overweight
 I	5	a little tubby
 I	6	ugly
 I	7	probably a streetwalker
+I	8	seemingly inorganic
+I	9	irreparably human
+I	10	certifiably unintelligent
+I	11	as unique as a snowflake, and just as useful
+I	12	clearly suffering from mental instability
+I	13	likely a murderer
+I	14	unloved
