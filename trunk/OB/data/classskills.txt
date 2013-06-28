@@ -55,7 +55,6 @@
 6901	Time's Arrow Adventures	0	0	0
 6902	Wang	0	0	0
 
-7008	Moxious Maneuver	5	0	0
 7040	Tunnel Upwards	5	0	0
 7041	Tunnel Downwards	5	0	0
 

@@ -181,34 +181,26 @@ void main(string sender, string msg, string channel){
    unlockMutex("_logoutNow");
    exit;
   }
-  if(msg=="logout"){ //shut down scripts, if running
-   print("Logging Out","red");
-   saveSettings("nunsVisits;_breakfast;_autod;_buffstoday");
-   unlockMutex("_forcedOut"); //and log out.
-   unlockMutex("_logoutNow");
-   if(mutexFree("_abortNow")){
-    set_property("chatbotScript","");
-    cli_execute("exit"); //sleep duties
-   }
-   exit;
-  }
-  if(msg=="halt"){ //Shut down scrips, stay logged in.
-   unlockMutex("_abortNow");
-   unlockMutex("_forcedOut");
-   unlockMutex("_logoutNow");
-   exit;
-  }
-  if(msg=="abort"){ //Stop scripts NOW, stay logged in.
-   unlockMutex("_abortNow"); //chatbot stays active
-   abort("Scripts Halted");
-   exit;
-  }
-  if(msg=="sleep"){ //Stop scripts, don't perform logout duties, logout
+  if(msg=="logout"){ //save settings, disable chat, logout
    print("Logging Out","red");
    set_property("chatbotScript","");
    saveSettings("nunsVisits;_breakfast;_autod;_buffstoday");
    cli_execute("exit");
+  }
+  if(msg=="abort"){ //Kill persist.ash, stay logged in.
+   unlockMutex("_aborted"); //chatbot stays active
+   abort("Scripts Halted");
    exit;
+  }
+  if(msg=="shutdown"){ //burn turns, logout
+   print("Logging Out","red");
+   unlockMutex("_forcedOut");
+   unlockMutex("_logoutNow");
+   if(mutexFree("_aborted")){
+    saveSettings("nunsVisits;_breakfast;_autod;_buffstoday");
+    set_property("chatbotScript","");
+    cli_execute("exit");
+   }
   }
   if(length(msg)>4)if(substring(msg,0,4)=="cli "){
    cli_execute(substring(msg,4));
