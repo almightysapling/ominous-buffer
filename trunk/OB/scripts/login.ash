@@ -95,12 +95,13 @@ void checkLotto(){
  }
  float perc;
  if(num>7){
-  perc=1.4+(num/2)*0.24;
+  perc=1.4+0.12*num;
  }else{
   perc=0.4+num*2.0/(1.0+num);
  }
- if(perc>4) perc=4;
- if(books["thisLotto"]>2500)perc=min(5,perc+2);
+ if(perc>4)perc=4;
+ if(books["thisLotto"]>1500)perc=min(4.5,perc+1);
+ if(books["thisLotto"]>2500)perc=min(5,perc+1);
  int d=ceil((100/perc)*num);
  d=d+random(10)-random(10);
  print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string());
@@ -258,17 +259,19 @@ void resetEvents(int[string] books){
  e[1]=0;
  e[2]=0;
  e[3]=0;
- int limit=minutesToRollover()-15;
- foreach i in e e[i]=random(limit)+30;
- int tries=0;
- while((e[2]-e[1]<60)&&(e[1]-e[2]<60)&&(tries<10)){
-  e[2]=random(limit)+30;
-  tries+=1;
- }
- tries=0;
- while((tries<10)&&(((e[3]-e[1]<60)&&(e[1]-e[3]<60))||((e[3]-e[2]<60)&&(e[2]-e[3]<60)))){
-  e[3]=random(limit)+30;
-  tries+=1;
+ int limit=minutesToRollover()-30;
+ if(limit>2){
+  foreach i in e e[i]=random(limit)+15;
+  int tries=0;
+  while((e[2]-e[1]<60)&&(e[1]-e[2]<60)&&(tries<10)){
+   e[2]=random(limit)+15;
+   tries+=1;
+  }
+  tries=0;
+  while((tries<10)&&(((e[3]-e[1]<60)&&(e[1]-e[3]<60))||((e[3]-e[2]<60)&&(e[2]-e[3]<60)))){
+   e[3]=random(limit)+15;
+   tries+=1;
+  }
  }
  foreach i,v in e if(books["Event"+i]<0)books["Event"+i]=v;
 }
@@ -612,7 +615,7 @@ void main(){try{
  overdrink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{
- print("Script Halted");
+ print("Script Halting","red");
  saveSettings(earlySave);
  releaseResources();
 }}
