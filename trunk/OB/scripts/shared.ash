@@ -28,7 +28,6 @@ int whitelist=32;//for OB-use, not clan
 int inClan=64;
 int receivedCake=128;
 int inAssociate=256;
-int highAssociate=512;
 
 userinfo[string] userdata;
 file_to_map("userdata.txt",userdata);
@@ -40,7 +39,7 @@ string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
 int clanid=2046994401;//Black Mesa
-boolean[int] associates;//F: 400 limit; T:in-clan limits
+boolean[int] associates;
 associates[21459]=true;//Hogs of Destiny
 associates[67356]=true;//Piglets of Fate
 associates[2046987019]=true;//Not Dead Yet
@@ -219,12 +218,11 @@ int updateId(string user,boolean add){
  if(!add)return group(nameClan,1).to_int();
  userdata[user].gender=2;
  userdata[user].userid=group(nameClan,1).to_int();
- unSetUF(user,inClan+inAssociate+highAssociate);
+ unSetUF(user,inClan+inAssociate);
  if(group(nameClan,2).to_int()==clanid)setUF(user,inClan);
  else unSetUF(user,inClan);
  if(associates contains group(nameClan,2).to_int()){
   setUF(user,inAssociate);
-  if(associates[group(nameClan,2).to_int()]==true)setUF(user,highAssociate);
  }
  if(!(getUF(user,inClan))){
   boolean wl=checkWhitelist(userdata[user].userid);
@@ -541,14 +539,8 @@ void checkMail(){
    continue;
   }
   build="-";
-  mx=create_matcher("(?i)raffle\\s?(start|stop|cancel|add|\\+)?",m.text);
-  if(mx.find()){
-   build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
-  }
-  mx=create_matcher("(?i)(start|stop|cancel|add|\\+)?\\s?raffle",m.text);
-  if(mx.find()){
-   build=mx.group(1)==""?"start":mx.group(1).to_lower_case();
-  }
+  mx=create_matcher("(?i)(start|stop|cancel|add|\\+)?\\s?raffle\\s?(start|stop|cancel|add|\\+)?",m.text);
+  if(mx.find())build=mx.group(1)==""?mx.group(2).to_lower_case():mx.group(1).to_lower_case();
   if(build!="-"){
    deleteMail(m);
    checkOut(gamesavedata,"gameMode.txt");
@@ -623,8 +615,8 @@ raffle gameData{
       game.players[":meat"]=m.meat;
       mx=create_matcher("(?i)(?:message|text|quote):\\s\"(.+?)\"",m.text);
       if(mx.find())game.data[0]=mx.group(1);
-/*      gamesavedata["raffle"]=game;
-      raffleAnnounce(game); LEAVE OUT UNTIL READY TO ROLL*/
+      gamesavedata["raffle"]=game;
+      raffleAnnounce(game); //LEAVE OUT UNTIL READY TO ROLL
       break;
      case "stop":case "end":
       if(getUF(m.sender,isAdmin))chat_private(m.sender,"There is no raffle in play.");
