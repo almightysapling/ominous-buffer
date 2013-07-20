@@ -166,12 +166,13 @@ boolean buffable(string sender){
   chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
   return false;
  }
- if(getUF(sender,inClan)||getUF(sender,whitelist)||getUF(sender,inAssociate)){
+ return true;
+/* if(getUF(sender,inClan)||getUF(sender,whitelist)||getUF(sender,inAssociate)){
   return true;
  }else{
   chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are not in Black Mesa.");
   return false;
- }
+ }*/ //OB officially public.
 }
 
 string decodeHTML(string msg, boolean chat){
@@ -328,7 +329,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  skill messageNew;
  messageNew=to_skill(msg);
  int casts;
- int max;
+ int max=400;
  int skillnum=to_int(messageNew);
  if(skillnum>9000){
   skillnum-=9000;
@@ -336,14 +337,11 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
-  case 46:case 47:case 48:case 58:case 59:case 60: return;
-  case 7008: skillnum=6004; break;//Correct for Moxious Maneuver
+  case 46:case 47:case 48:case 58:case 59:case 60:
   case 7040:case 7041: return;
  }
  //Forward skill requests to relay bots when necessary
- if(getUF(ding,inAssociate))max=400;
- if((max==400)&&(getUF(ding,highAssociate)))max=700;
- if(getUF(ding,inClan)||getUF(ding,whitelist))max=700;
+ if(getUF(ding,inAssociate)||getUF(ding,inClan)||getUF(ding,whitelist))max=700;
  int senderid=getId(sender);
  string mout;
  if(skillnum==62){
@@ -384,33 +382,32 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  casts=ceil(numTurns/(TPC*1.0));
  //Assign buff limits by clan.
- if(getUF(ding,inClan)||getUF(ding,whitelist)||(getUF(ding,inAssociate)&&getUF(ding,highAssociate))){
+ if(getUF(ding,inClan)||getUF(ding,whitelist)||getUF(ding,inAssociate)){
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;//Limited buffs
   else if(skillnum==6014)max=5;//Ode
   else if(skillnum==6026)max=20;//Donho
-  else if(skillnum>6900)max=1;
+  else if(skillnum>6900)max=1;//Items (arrow and the like)
   else max=28;//Else
- }else if(getUF(ding,inAssociate)){
+ }else{
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
-  else if(skillnum==6014)max=3;
+  else if(skillnum==6014)max=5;
   else if(skillnum==6026)max=10;
-  else if(skillnum>6900)max=0;//Item skills
+  else if(skillnum>6900)max=1;//Item skills
   else max=16;
  }
  casts=min(casts,max);
  //Adjust casts to be within limits
- if(((userdata[sender].flags&noLimit)!=noLimit)&&(userdata[ding].buffs contains skillnum)){
-  if((casts+userdata[ding].buffs[skillnum])>max) casts=max-userdata[ding].buffs[skillnum];
- }
+ if(!getUF(ding,noLimit)&&(userdata[ding].buffs contains skillnum)
+  &&(casts+userdata[ding].buffs[skillnum])>max)casts=max-userdata[ding].buffs[skillnum];
  if(casts==0){
   errorMessage(ding,"I'm sorry, but you've reached your daily limit for that buff.");
   return;
  }
  //Quick check to see if limited buffs still available
- int maxnum = 999999;
- if((skillnum>6019)&&(skillnum<6025)) maxnum=10;
- else if(skillnum==6026) maxnum=50;
- else if(skillnum==6028) maxnum=5;
+ int maxnum=999999;
+ if((skillnum>6019)&&(skillnum<6025))maxnum=10;
+ else if(skillnum==6026)maxnum=50;
+ else if(skillnum==6028)maxnum=5;
  if((skillnum>6019)&&(skillnum<6029)){
   if(maxnum-userdata["*"].buffs[skillnum]<1){
    if(sendRecord(skillnum,sender)){
@@ -437,18 +434,6 @@ void buff(string sender, string msg, int numTurns, string ding){
   checkOut(userdata,"userdata.txt");
   userdata[ding].buffs[skillnum]+=1;
   commit(userdata,"userdata.txt");
-  return;
- }
- if(skillnum==6902){
-  if(is_online("wangbot")){
-   chat_private("wangbot","target "+sender);
-  }else{
-   claimResource("adventuring");
-   if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
-   string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+sender);
-   freeResource("adventuring");
-  }
-  set_property("_lastWang",sender);
   return;
  }
  claimResource("adventuring");
@@ -1497,7 +1482,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "clear":
    if(oper=="")return "x";
-   if((userdata[sender].flags&isAdmin)!=isAdmin){
+   if(!getUF(sender,isAdmin)){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
@@ -1505,7 +1490,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "count":
    if(oper=="")return "x";
-   if((userdata[sender].flags&isAdmin)!=isAdmin){
+   if(!getUF(sender,isAdmin)){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
@@ -1520,7 +1505,7 @@ string predicateFilter(string sender, string msg){
    }
    return "x";
   case "deals":
-   if((userdata[sender].flags&isAdmin)==isAdmin)updateDC(oper);
+   if(getUF(sender,isAdmin))updateDC(oper);
    return "x";
   case "delpack":
    removeAlias(sender,oper);
@@ -1601,7 +1586,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "pull":
    if(oper=="")return "x";
-   if((userdata[sender].flags&isAdmin)!=isAdmin){
+   if(!getUF(sender,isAdmin)){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
@@ -1621,7 +1606,7 @@ string predicateFilter(string sender, string msg){
    }
    return "x";
   case "recheck":
-   if((userdata[sender].flags&isAdmin)!=isAdmin){
+   if(!getUF(sender,isAdmin)){
     errorMessage(sender,"No, don't do that!");
     return "x";
    }
@@ -1648,13 +1633,25 @@ string predicateFilter(string sender, string msg){
   case "title":
    clanTitle(sender,oper);
    return "x";
-  case "unwhitelist":
-   if(getUF(sender,isAdmin))whitelistEdit("-"+oper);
-   else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
+  case "wang":
+   if(is_online("wangbot")){
+    chat_private("wangbot","target "+(oper==""?sender:oper));
+   }else{
+    claimResource("adventuring");
+    if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
+    if(item_amount($item["WANG"])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
+    else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(oper==""?sender:oper));
+    freeResource("adventuring");
+   }
+   set_property("_lastWang",(oper==""?sender:oper)+'|'+sender);
    return "x";
   case "whitelist":
    if(getUF(sender,isAdmin))whitelistEdit(oper);
    else chat("You must be an admin to edit the clan whitelist.");
+   return "x";
+  case "unwhitelist":
+   if(getUF(sender,isAdmin))whitelistEdit("-"+oper);
+   else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
    return "x";
   case "whois":
    lookup(sender,oper);
@@ -2225,7 +2222,11 @@ boolean preHandled(string sender, string msg, string channel){
   if(msg.contains_text("dried out")){
    claimResource("adventuring");
    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
-   string t=visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+get_property("_lastWang"));
+   matcher m=create_matcher("([^|]*)|(.*)",get_property("_lastWang"));
+   if(m.find()){
+    if(item_amount($item["WANG"])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
+    else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+m.group(1));
+   }
    freeResource("adventuring");
   }
   return true;
