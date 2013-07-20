@@ -95,12 +95,13 @@ void checkLotto(){
  }
  float perc;
  if(num>7){
-  perc=1.4+(num/2)*0.24;
+  perc=1.4+0.12*num;
  }else{
   perc=0.4+num*2.0/(1.0+num);
  }
- if(perc>4) perc=4;
- if(books["thisLotto"]>2500)perc=min(5,perc+2);
+ if(perc>4)perc=4;
+ if(books["thisLotto"]>1500)perc=min(4.5,perc+1);
+ if(books["thisLotto"]>2500)perc=min(5,perc+1);
  int d=ceil((100/perc)*num);
  d=d+random(10)-random(10);
  print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string());
@@ -253,6 +254,28 @@ void burn(){
  use_skill(numCasts,farmingbuff);
 }
 
+void resetEvents(int[string] books){
+ int[int] e;
+ e[1]=0;
+ e[2]=0;
+ e[3]=0;
+ int limit=minutesToRollover()-30;
+ if(limit>2){
+  foreach i in e e[i]=random(limit)+15;
+  int tries=0;
+  while((e[2]-e[1]<60)&&(e[1]-e[2]<60)&&(tries<10)){
+   e[2]=random(limit)+15;
+   tries+=1;
+  }
+  tries=0;
+  while((tries<10)&&(((e[3]-e[1]<60)&&(e[1]-e[3]<60))||((e[3]-e[2]<60)&&(e[2]-e[3]<60)))){
+   e[3]=random(limit)+15;
+   tries+=1;
+  }
+ }
+ foreach i,v in e if(books["Event"+i]<0)books["Event"+i]=v;
+}
+
 void handleMeat(){
  string today=now_to_string("MMMM d, yyyy");
  matcher mx=create_matcher("(\\w+) (\\d+), (\\d+)",today);
@@ -323,19 +346,11 @@ void handleMeat(){
  }
  int[string] books;
  checkOut(books,"books.txt");
- books[now_to_string("yDDD")+"ear"]=totalDMS-18;
- books[now_to_string("yDDD")+"div"]=totspent;
- int eventTimeCap=minutesToRollover();
- int event1=random(eventTimeCap-15)+30;
- int event2=random(eventTimeCap-15)+30;
- int event3=random(eventTimeCap-15)+30;
- if(minutesToRollover()>180){
-  while((event2-event1<60)&&(event1-event2<60))event2=random(eventTimeCap-35)+30;
-  while(((event3-event1<60)&&(event1-event3<60))||((event3-event2<60)&&(event2-event3<60)))event3=random(eventTimeCap-35)+30;
- }
- books["Event1"]=event1;
- books["Event2"]=event2;
- books["Event3"]=event3;
+ books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
+ books["Event1"]=-1;
+ books["Event2"]=-1;
+ books["Event3"]=-1;
+ resetEvents(books);
  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
 }
@@ -386,9 +401,10 @@ void processQuestData(boolean rp){
  matcher m=create_matcher("(\\d+)::(\\d+)::(\\d+)::(\\d+)::(\\d+)",get_property("books"));
  if(m.find()){
   if(!rp){
-   books["Event1"]=m.group(1).to_int();
-   books["Event2"]=m.group(2).to_int();
-   books["Event3"]=m.group(3).to_int();
+   books["Event1"]=(m.group(1).to_int()>0?-1:0);
+   books["Event2"]=(m.group(2).to_int()>0?-1:0);
+   books["Event3"]=(m.group(3).to_int()>0?-1:0);
+   resetEvents(books);
   }
   books["nextLotto"]=m.group(4).to_int();
   books["thisLotto"]=m.group(5).to_int();
@@ -405,7 +421,7 @@ void processQuestData(boolean rp){
  m=create_matcher("(\\d+)>[^>]+?\\((\\d+)\\s*/",limits);
  while(m.find()) userdata["*"].buffs[m.group(1).to_int()]=m.group(2).to_int();
  string[int] wintext=split_string(get_property("winners"),"::");
- foreach i,s in wintext if(length(s)>1)userdata["*"].aliases["winner"+s.char_at(0)]=s.substring(2);
+ foreach i,s in wintext if(length(s)>1)userdata["*"].aliases["winner"+to_string(i+1)]=s;
  wintext=split_string(get_property("admins"),"::");
  foreach i,s in wintext if(s.length()>0)setUF(s,isAdmin);
  commit(userdata,"userdata.txt");
@@ -606,7 +622,7 @@ void main(){try{
  overdrink(1,$item[eggnog]);
  cli_execute("exit");
 }finally{
- print("Script Halted");
+ print("Script Halting","red");
  saveSettings(earlySave);
  releaseResources();
 }}
