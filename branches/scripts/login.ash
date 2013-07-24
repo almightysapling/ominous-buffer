@@ -118,11 +118,11 @@ void checkLotto(){
   chat_clan("A winner!");
   waitq(7);
   checkOut(userdata,"userdata.txt");
-  for i from 4 downto 1 if(userdata["*"].aliases contains ("winner"+i.to_string()))userdata["*"].aliases["winner"+to_string(i+1)]=userdata["*"].aliases["winner"+i.to_string()];
-  userdata["*"].aliases["winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
+  for i from 4 downto 1 if(userdata["*"] contains ("winner"+i.to_string()))userdata["*","winner"+to_string(i+1)]=userdata["*","winner"+i.to_string()];
+  userdata["*","winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
   commit(userdata,"userdata.txt");
   string wintext="";
-  for i from 1 to 5 if(userdata["*"].aliases contains ("winner"+i.to_string()))wintext+=userdata["*"].aliases["winner"+i.to_string()]+"::";
+  for i from 1 to 5 if(userdata["*"] contains ("winner"+i.to_string()))wintext+=userdata["*","winner"+i.to_string()]+"::";
   set_property("winners",wintext);
   chat_clan(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
   sendMeat(clannies[d],books["thisLotto"]);
@@ -151,50 +151,50 @@ void makeRecords(){
  claimResource("adventuring");
  print("Recording leftover music.");
  checkOut(userdata,"userdata.txt");
- if(userdata["*"].buffs[6026]<50){//Donho
-  if(userdata["*"].buffs[6026]<25){
-   while(my_mp()<(25-userdata["*"].buffs[6026])*75)cli_execute("use mmj");
+ if(sysInt("#6026")<50){//Donho
+  if(sysInt("#6026")<25){
+   while(my_mp()<(25-sysInt("#6026"))*75)cli_execute("use mmj");
    visit_url("volcanoisland.php?action=tuba&pwd");
    visit_url("choice.php?whichchoice=409&option=1&pwd");
    visit_url("choice.php?whichchoice=410&option=2&pwd");
    visit_url("choice.php?whichchoice=412&option=3&pwd");
    visit_url("choice.php?whichchoice=418&option=3&pwd");
-   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(25-userdata["*"].buffs[6026])+"&option=1&pwd");
-   userdata["*"].buffs[6026]=25;
+   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(25-sysInt("#6026"))+"&option=1&pwd");
+   userdata["*","#6026"]="25";
    visit_url("choice.php?pwd&whichchoice=440&option=2");
   }
-  while(my_mp()<max(50-userdata["*"].buffs[6026],0)*75)cli_execute("use mmj");
+  while(my_mp()<max(50-sysInt("#6026"),0)*75)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
   visit_url("choice.php?whichchoice=409&option=1&pwd");
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-userdata["*"].buffs[6026])+"&option=1&pwd");
-  userdata["*"].buffs[6026]=50;
+  visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-sysInt("#6026"))+"&option=1&pwd");
+  userdata["*","#6026"]="50";
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
  print("Donho's complete");
- if(userdata["*"].buffs[6028]<5){//Inigo
-  while(my_mp()<(5-userdata["*"].buffs[6028])*100)cli_execute("use mmj");
+ if(sysInt("#6028")<5){//Inigo
+  while(my_mp()<(5-sysInt("#6028"))*100)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
   visit_url("choice.php?whichchoice=409&option=1&pwd");
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-userdata["*"].buffs[6028])+"&option=1&pwd");
-  userdata["*"].buffs[6028]=5;
+  visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-sysInt("#6028"))+"&option=1&pwd");
+  userdata["*","#6028"]=5;
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
  print("Inigo's complete");
- for song from 6020 to 6024 if(userdata["*"].buffs[song]<10){
-  while(my_mp()<(10-userdata["*"].buffs[song])*50)cli_execute("use mmj");
+ for song from 6020 to 6024 if(sysInt("#"+song)<10){
+  while(my_mp()<(10-sysInt("#"+song))*50)cli_execute("use mmj");
   visit_url("volcanoisland.php?action=tuba&pwd");
   visit_url("choice.php?whichchoice=409&option=1&pwd");
   visit_url("choice.php?whichchoice=410&option=2&pwd");
   visit_url("choice.php?whichchoice=412&option=3&pwd");
   visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-userdata["*"].buffs[song])+"&option=1&pwd");
-  userdata["*"].buffs[song]=10;
+  visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-sysInt("#"+song))+"&option=1&pwd");
+  userdata["*","#"+song]=10;
   visit_url("choice.php?pwd&whichchoice=440&option=2");
  }
  print("Hobopolis complete");
@@ -330,8 +330,8 @@ void handleMeat(){
  }
  checkOut(userdata,"userdata.txt");
  int totspent=0;
- foreach name,user in userdata if(((user.lastTime.contains_text(today))||(user.lastTime.contains_text(yest)))&&(name!="BuffSphere")){
-  user.wallet+=100;
+ foreach name in userdata if(((userdata[name,"lastTime"].contains_text(today))||(userdata[name,"lastTime"].contains_text(yest)))&&(name!="BuffSphere")){
+  userdata[name,"meat"]=to_string(userdata[name,"meat"]+100);
   totspent+=100;
  }
  commit(userdata,"userdata.txt");
@@ -375,14 +375,15 @@ void cleanPC(){
  checkOut(lifetime,"lifetime.txt");
  checkOut(userdata,"userdata.txt");
  foreach name in userdata{
-  foreach skilln,amt in userdata[name].buffs lifetime[skilln.to_string()]+=amt;
-  clear(userdata[name].buffs);
-  userdata[name].lastTrigger="";
+  foreach sk,amt in userdata[name] if(sk.char_at(0)=="#"){
+   if(name=="*")lifetime[sk]+=amt.to_int();
+   remove userdata[name,sk];
+  }
+  userdata[name,"lastTrigger"]="";
  }
- for i from 1 to 6 {remove userdata["*"].aliases[i.to_string()];}
  commit(userdata,"userdata.txt");
  lifetime["*"]=0;
- foreach skilln in lifetime if(skilln!="*")lifetime["*"]+=lifetime[skilln];
+ foreach sk in lifetime if(sk!="*")lifetime["*"]+=lifetime[sk];
  commit(lifetime,"lifetime.txt");
  int[string]books;
  checkOut(books,"books.txt");
@@ -414,16 +415,14 @@ void processQuestData(boolean rp){
  //Limited Buffs
  checkOut(userdata,"userdata.txt");
  string limits=get_property("_limitBuffs");
- if(limits!=""){
-  userdata["*"].buffs[62]=to_int(limits);
- }
+ if(limits!="")userdata["*","#62"]=limits;
  limits=visit_url("skills.php");
  m=create_matcher("(\\d+)>[^>]+?\\((\\d+)\\s*/",limits);
- while(m.find()) userdata["*"].buffs[m.group(1).to_int()]=m.group(2).to_int();
+ while(m.find())userdata["*","#"+m.group(1)]=m.group(2);
  string[int] wintext=split_string(get_property("winners"),"::");
- foreach i,s in wintext if(length(s)>1)userdata["*"].aliases["winner"+to_string(i+1)]=s;
+ foreach i,s in wintext if(length(s)>1)userdata["*","winner"+to_string(i+1)]=s;
  wintext=split_string(get_property("admins"),"::");
- foreach i,s in wintext if(s.length()>0)setUF(s,isAdmin);
+ foreach i,s in wintext if(s.length()>0)userdata[s,"permission"]="admin";
  commit(userdata,"userdata.txt");
  updateProfile();
 }
