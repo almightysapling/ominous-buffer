@@ -1159,18 +1159,18 @@ string addMulti(string n1, string n2){
  print("Multi added for "+n1,"blue");
  boolean[string] bigList;
  splitter=split_string(userdata[n1,"alts"],",");
- foreach i,s in splitter bigList[s]=true;
+ foreach i,s in splitter if(s!="")bigList[s]=true;
  splitter=split_string(userdata[n2,"alts"],",");
- foreach i,s in splitter bigList[s]=true;
+ foreach i,s in splitter if(s!="")bigList[s]=true;
  biglist[n1]=true;
  biglist[n2]=true;
  foreach name in bigList{
-  if(hasProp(name,"gender",",0,?"))gencarry=userdata[name,"gender"];
+  if(hasProp(name,"gender",",0,?,2"))gencarry=userdata[name,"gender"];
   if(userdata[name,"nick"]!="")ncarry=userdata[name,"nick"];
  }
  foreach mult in biglist{
   if(userdata[mult,"nick"]=="")userdata[mult,"nick"]=ncarry;
-  if(hasProp(mult,"gender",",0,?"))userdata[mult,"gender"]=gencarry;
+  if(hasProp(mult,"gender",",0,?,2"))userdata[mult,"gender"]=gencarry;
   userdata[mult,"alts"]="";
   foreach mult2 in bigList if(mult2!=mult)userdata[mult,"alts"]+=mult2+",";
  }
@@ -1209,7 +1209,6 @@ void setMulti(string sender, string newaltlist){
 }
 
 void setNick(string sender, string w){
- print("Nick set for "+sender,"blue");
  checkOut(userdata,"userdata.txt");
  userdata[sender,"nick"]=w;
  foreach i,alt in split_string(userdata[sender,"alts"],",")if((alt!="")&&(userdata[alt,"nick"]==""))userdata[alt,"nick"]=w;
@@ -1713,7 +1712,7 @@ void setGender(string sender, string gender){
  }
  checkOut(userdata,"userdata.txt");
  userdata[sender,"gender"]=gval.to_string();
- foreach i,m in split_string(userdata[sender,"alts"],",")if((m!="")&&(hasProp(m,"gender",",0,?")))userdata[m,"gender"]=gval.to_string();
+ foreach i,m in split_string(userdata[sender,"alts"],",")if((m!="")&&(hasProp(m,"gender",",0,?,2")))userdata[m,"gender"]=gval.to_string();
  commit(userdata,"userdata.txt");
 }
 
@@ -1966,7 +1965,6 @@ void publicChat(string sender, string msg){
  if(!addressed)m=create_matcher(genderMatcherString,msg);
  else m=create_matcher("(?i)"+genderMatcherString,msg);
  if(m.find()){
-  print("Gender set for "+sender,"blue");
   setGender(sender,m.group(1));
   return;
  }

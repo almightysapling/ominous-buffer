@@ -218,7 +218,7 @@ string updateId(string user,boolean add){
  if(!find(nameClan))return 0;
  checkOut(userdata,"userdata.txt");
  if(!add)return group(nameClan,1).to_int();
- userdata[user,"gender"]="?";
+ userdata[user,"gender"]="2";
  userdata[user,"ID#"]=group(nameClan,1);
  if(!hasProp(user,"membership","whitelist,blacklist"))userdata[user,"membership"]="none";
  if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
