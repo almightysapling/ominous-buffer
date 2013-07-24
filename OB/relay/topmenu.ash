@@ -1,4 +1,4 @@
-import<shared.ash>
+import <shared.ash>
 invokeResourceMan(__FILE__);
 string[string] fields=form_fields();
 //html properties
@@ -73,7 +73,7 @@ void update(){
  matcher m;
  string name;
  string[string,string] groups;
- foreach i,s in split_string(get_property("admins"),"::") unsetUF(s,isAdmin);
+ foreach i,s in split_string(get_property("admins"),"::") userdata[s,"admin"]="false";
  foreach var,val in fields{
   m=create_matcher("(.+?)\\.(.*)",var);
   if(!m.find())continue;
@@ -88,7 +88,7 @@ void update(){
     groups[m.group(1),m.group(2)]=val;
     break;
    case "admins":
-    if(userdata contains val) setUF(val,isAdmin);
+    if(userdata contains val)userdata[val,"admin"]="true";
     break;
   }
  }
@@ -321,6 +321,7 @@ void footer(){
 }
 
 void topMenu(){
+ print("topping");
  string tm=visit_url();
  int i=tm.index_of("&nbsp;</div>");
  write(tm.substring(0,i+6)+"<a target=mainpane href=\"topmenu.php?cp=1\">control panel</a>"+tm.substring(i));

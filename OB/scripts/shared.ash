@@ -1,35 +1,8 @@
 import <kmail.ash>
 import <games.ash>
 string NAME_=__FILE__;
-record userinfo{
- int userid;
- string nick;
- boolean[string] multis;
- int gender;//see gengers[] definition comments
- int flags;//see flag bits
- string[string] aliases;
- int[int] buffs;
- float lastMath;
- string lastTime;
- string lastTrigger;
- int donated;
- int wallet;
- int defaultCasts;
- string gHobopPassword;
- string sessionVars;
-};
-//flag bits
-int noFlag=1;//no error messages
-int isAdmin=2;
-int isBuffer=4;//no use, merely for OS/T
-int noLimit=8;
-int blacklist=16;
-int whitelist=32;//for OB-use, not clan
-int inClan=64;
-int receivedCake=128;
-int inAssociate=256;
 
-userinfo[string] userdata;
+string[string,string] userdata;
 file_to_map("userdata.txt",userdata);
 
 //Global variables
@@ -164,24 +137,53 @@ int permissionDepth(string resourceName){
  return -resources[resourceName].depth;
 }
 
-void setUF(string user, int f){
- userdata[user].flags|=f;
+boolean getUF(string user,string flag){
+ return userdata[user,flag].to_boolean();
 }
 
-void unSetUF(string user, int f){
- userdata[user].flags&=~f;
+boolean hasProp(string user,string setting,string prop){
+ string[int] props=split_string(prop,",");
+ foreach i,s in props{
+  if((userdata[user,setting]==s)&&(s!=""))return true;
+  if((s=="")&&(userdata[user,setting]==""))return true;
+ }
+ return false;
 }
 
-boolean getUF(string user, int f){
- return(userdata[user].flags&f)==f;
+/*void addProp(string user,string setting,string prop){
+ if(!hasProp(user,setting,prop))userdata[user,setting]+=","+prop;
 }
+
+void removeProp(string user,string setting,string prop){
+}*/
+
+int sysInt(string user,string prop){
+ return userdata[user,prop].to_int();
+}
+int sysInt(string prop){
+ return sysInt("*",prop);
+}
+
+void sysInc(string user,string prop,int amt){
+ userdata[user,prop]=to_string(userdata[user,prop].to_int()+amt);
+}
+void sysInc(string prop, int amt){
+ sysInc("*",prop,amt);
+}
+void sysInc(string user,string prop){
+ sysInc(user,prop,1);
+}
+void sysInc(string prop){
+ sysInc("*",prop,1);
+}
+
 
 //check clan whitelist for user if not in clan
-boolean checkWhitelist(int id){
+boolean checkWhitelist(string id){
  claimResource("adventuring");
  string page=visit_url("clan_whitelist.php");
  freeResource("adventuring");
- matcher m=create_matcher("(?i)="+id.to_string()+"'",page);
+ matcher m=create_matcher("(?i)="+id+"'",page);
  if(find(m))return true;
  return false;
 }
@@ -207,7 +209,7 @@ string to_clanName(int cId){
 }
 
 //request unknown user's id. if (add) then place them into the users file.
-int updateId(string user,boolean add){
+string updateId(string user,boolean add){
  if(user=="")return 0;
  claimResource("adventuring");
  string searchstring=visit_url("searchplayer.php?searching=Yep.&searchstring="+user+"&hardcoreonly=0");
@@ -216,27 +218,21 @@ int updateId(string user,boolean add){
  if(!find(nameClan))return 0;
  checkOut(userdata,"userdata.txt");
  if(!add)return group(nameClan,1).to_int();
- userdata[user].gender=2;
- userdata[user].userid=group(nameClan,1).to_int();
- unSetUF(user,inClan+inAssociate);
- if(group(nameClan,2).to_int()==clanid)setUF(user,inClan);
- else unSetUF(user,inClan);
- if(associates contains group(nameClan,2).to_int()){
-  setUF(user,inAssociate);
- }
- if(!(getUF(user,inClan))){
-  boolean wl=checkWhitelist(userdata[user].userid);
-  if(wl)setUF(user,inClan);
- }
+ userdata[user,"gender"]="?";
+ userdata[user,"ID#"]=group(nameClan,1);
+ if(!hasProp(user,"membership","whitelist,blacklist"))userdata[user,"membership"]="none";
+ if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
+ if(associates contains group(nameClan,2).to_int())userdata[user,"membership"]="associate";
+ if((!hasProp(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
  commit(userdata,"userdata.txt");
- return userdata[user].userid;
+ return userdata[user,"ID#"];
 }
 
 //return id for given username. If name not on file, request it.
-int getId(string sender){
+string getId(string sender){
  if(sender=="")return 0;
- int x=userdata[sender].userid;
- if(x==0)x=updateId(sender,false);
+ string x=userdata[sender,"ID#"];
+ if((x=="")||(x=="0"))x=updateId(sender,false);
  return x;
 }
 
@@ -291,7 +287,7 @@ void updateDC(string list){
  s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
- s+="Managerial Manipulation: "+to_int(3-userdata["*"].buffs[62])+"\n";
+ s+="Managerial Manipulation: "+to_int(3-sysInt("#62"))+"\n";
  claimResource("adventuring");
  visit_url(s);
  freeResource("adventuring");
@@ -305,40 +301,26 @@ void updateLimits(){
  string s;
  buffer n;
  claimResource("adventuring");
- if((50-userdata["*"].buffs[6026])>10){
+ if((50-sysInt("#6026"))>10){
   s="managecollection.php?action=modifyshelves&pwd&newname12=";
-  s+=to_string(50-userdata["*"].buffs[6026]);
+  s+=to_string(50-sysInt("#6026"));
   n=visit_url(s);
  }else{
   s="managecollection.php?action=modifyshelves&pwd&newname12=50";
   n=visit_url(s); 
  }
  s="managecollectionshelves.php?pwd&action=arrange";
- if ((50-userdata["*"].buffs[6026])<11) s+="&whichshelf4502="+to_string(max(51-userdata["*"].buffs[6026],1));
+ if((50-sysInt("#6026"))<11)s+="&whichshelf4502="+to_string(max(51-sysInt("#6026"),1));
  else s+="&whichshelf4502=12";
- s+="&whichshelf4503="+to_string(max(6-userdata["*"].buffs[6028],1));
- s+="&whichshelf4497="+to_string(max(11-userdata["*"].buffs[6020],1));
- s+="&whichshelf4498="+to_string(max(11-userdata["*"].buffs[6021],1));
- s+="&whichshelf4499="+to_string(max(11-userdata["*"].buffs[6022],1));
- s+="&whichshelf4500="+to_string(max(11-userdata["*"].buffs[6023],1));
- s+="&whichshelf4501="+to_string(max(11-userdata["*"].buffs[6024],1));
+ s+="&whichshelf4503="+to_string(max(6-sysInt("#6028"),1));
+ s+="&whichshelf4497="+to_string(max(11-sysInt("#6020"),1));
+ s+="&whichshelf4498="+to_string(max(11-sysInt("#6021"),1));
+ s+="&whichshelf4499="+to_string(max(11-sysInt("#6022"),1));
+ s+="&whichshelf4500="+to_string(max(11-sysInt("#6023"),1));
+ s+="&whichshelf4501="+to_string(max(11-sysInt("#6024"),1));
  n=visit_url(s);
- s=to_string(userdata["*"].buffs[62]);
- set_property("_limitBuffs",s);
+ set_property("_limitBuffs",userdata["*","#62"]);
  freeResource("adventuring");
-}
-
-int checkRep(string check){
-// for i from 0 to repValue if(userdata["*"].aliases[i.to_string()]==check)return i;
- return -1;
-}
-
-void addRep(string s){
-/* for i from 10 to 1{
-  userdata["*"].aliases[i.to_string()]=userdata["*"].aliases[to_string(i-1)];
- }
- userdata["*"].aliases["0"]=s;
- map_to_file(userdata,"userdata.txt");*/
 }
 
 void saveSettings(){
@@ -376,7 +358,7 @@ boolean loadSettings(){
 void formProps(){
  //admins
  string prop="";
- foreach u in userdata if(getUF(u,isAdmin))prop+=u+"::";
+ foreach u in userdata if(getUF(u,"admin"))prop+=u+"::";
  set_property("admins",prop);
 }
 
@@ -418,17 +400,22 @@ void checkApps(){
  if((appcheck.find())&&(acceptall)){
   matcher applicants=create_matcher("who=(\\d+)\">(.+?)<",visit_url("clan_applications.php"));
   while(applicants.find()){
+   if(hasProp(applicants.group(2),"membership","blacklist")){
+    print("blacklist "+applicants.group(2)+" wants in");
+    continue;
+   }
    print("Accepting "+applicants.group(2)+" into the clan.");
    visit_url("clan_applications.php?request"+applicants.group(1)+"=1&action=process");
    visit_url("clan_members.php?pwd="+my_hash()+"&action=modify&level"+applicants.group(1)+"=7&title"+applicants.group(1)+"=Cake&pids[]="+applicants.group(1));
-   if(getUF(applicants.group(2),receivedCake))continue;
+   if(getUF(applicants.group(2),"hasCake"))continue;
    retrieve_item(1,$item[black forest cake]);
    retrieve_item(1,$item[bulky buddy box]);
    /**/kmail(applicants.group(1),"Welcome to Black Mesa! I'm the clan's multi-purpose bot. When you get a chance, please hop into chat to say \"hello.\" If you're new to the game and don't know how to do this, please send a message to Sentrion or Twinkertoes, and they will get back to you as quickly as possible. Otherwise, if you have any questions, just ask in chat, and someone should be able to answer. Enjoy!",0,gift);
    chat_clan(applicants.group(2)+" has just been accepted into Black Mesa. If you see them around chat, be sure to give them a warm welcome!");
    checkOut(userdata,"userdata.txt");
-   userdata[group(applicants,2)].userid=group(applicants,1).to_int();
-   userdata[group(applicants,2)].flags|=(inClan|receivedCake);
+   userdata[applicants.group(2),"ID#"]=applicants.group(1);
+   if(!hasProp(applicants.group(2),"membership","whitelist"))userdata[applicants.group(2),"membership"]="clannie";
+   userdata[applicants.group(2),"hasCake"]="true";
    commit(userdata,"userdata.txt");
   }
  }
@@ -437,9 +424,11 @@ void checkApps(){
 
 void checkData(){
  update(userdata,"userdata.txt");
- if(!(userdata["*"].aliases contains "boss")){
+ if(!(userdata["*"] contains "~boss")){
   checkOut(userdata,"userdata.txt");
-  userdata["*"].aliases["boss"]="25 phat loot, 25 thingfinder, 25 chorale";
+  userdata["*","~boss"]="25 phat loot, 25 thingfinder, 25 chorale";
+  userdata["*","~s"]="100 elemental, 100 jalape, 100 jaba, 100 scarysauce";
+  userdata["*","~tt"]="100 astral, 100 ghostly, 100 tenacity, 100 empathy, 100 reptilian, 100 jingle";
   commit(userdata,"userdata.txt");
   chat_private("Sentrion","I am error.");
   chat_private("Almighty Sapling","I am error.");
@@ -496,7 +485,7 @@ void endRaffle(gameData g){
    send+="&fromwhere=0&action=Yep.";
    visit_url(send);
   }
-  userdata[g.data[numtix]].wallet+=g.players[":meat"];
+  userdata[g.data[numtix],"meat"]=to_string(userdata[g.data[numtix],"meat"]+g.players[":meat"]);
  }
  remove gamesavedata["raffle"];
  commit(gamesavedata,"gameMode.txt");
@@ -525,7 +514,7 @@ void checkMail(){
     m.meat+=m.things[$item[dense meat stack]]*1000;
     remove m.things[$item[dense meat stack]];
    }
-   userdata[m.sender].donated+=m.meat;
+   userdata[m.sender,"donated"]=to_string(userdata[m.sender,"donated"]+m.meat);
    build="";
    foreach it,amount in m.things if((it.to_int()>4496)&&(it.to_int()<4504))continue;
     else build+=amount+" "+it+", ";
@@ -582,7 +571,7 @@ void checkMail(){
       int numt=m.meat/game.intervals;
       m.meat=m.meat-(numt*game.intervals);
       if(m.meat>0)if(kmail(m.sender,"Considering the cost of tickets, this is what was left over.",m.meat)!=1){
-       userdata[m.sender].wallet+=m.meat;
+       userdata[m.sender,"meat"]=to_string(userdata[m.sender,"meat"].to_int()+m.meat);
        kmail(m.sender,"Your refund failed to send, so I'll hold it for you for now: "+m.meat.to_string()+" meat.");
       }
       game.issueTickets(m.sender,numt);
@@ -619,11 +608,11 @@ raffle gameData{
       raffleAnnounce(game); //LEAVE OUT UNTIL READY TO ROLL
       break;
      case "stop":case "end":
-      if(getUF(m.sender,isAdmin))chat_private(m.sender,"There is no raffle in play.");
+      if(getUF(m.sender,"admin"))chat_private(m.sender,"There is no raffle in play.");
       else chat_private(m.sender,"You don't have that privelage.");
       break;
      case "cancel":
-      if(getUF(m.sender,isAdmin))chat_private(m.sender,"There is no raffle in play.");
+      if(getUF(m.sender,"admin"))chat_private(m.sender,"There is no raffle in play.");
       else chat_private(m.sender,"You don't have that privelage.");
       break;
      case "add":case "+":
