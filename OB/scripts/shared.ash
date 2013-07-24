@@ -137,6 +137,15 @@ int permissionDepth(string resourceName){
  return -resources[resourceName].depth;
 }
 
+void defaultProp(string user,string prop){
+ if(userdata[":"] contains prop)userdata[user,prop]=userdata[":",prop];
+ else remove userdata[user,prop];
+}
+
+string defaultProp(string prop){
+ return userdata[":",prop];
+}
+
 boolean getUF(string user,string flag){
  return userdata[user,flag].to_boolean();
 }
@@ -156,6 +165,11 @@ boolean hasProp(string user,string setting,string prop){
 
 void removeProp(string user,string setting,string prop){
 }*/
+
+string sysString(string user, string prop){
+ if(userdata[user] contains prop)return userdata[user,prop];
+ return defaultProp(prop);
+}
 
 int sysInt(string user,string prop){
  return userdata[user,prop].to_int();
@@ -218,9 +232,8 @@ string updateId(string user,boolean add){
  if(!find(nameClan))return 0;
  checkOut(userdata,"userdata.txt");
  if(!add)return group(nameClan,1).to_int();
- userdata[user,"gender"]="2";
  userdata[user,"ID#"]=group(nameClan,1);
- if(!hasProp(user,"membership","whitelist,blacklist"))userdata[user,"membership"]="none";
+ if(!hasProp(user,"membership","whitelist,blacklist"))defaultProp(user,"membership");
  if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
  if(associates contains group(nameClan,2).to_int())userdata[user,"membership"]="associate";
  if((!hasProp(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
@@ -232,7 +245,7 @@ string updateId(string user,boolean add){
 string getId(string sender){
  if(sender=="")return 0;
  string x=userdata[sender,"ID#"];
- if((x=="")||(x=="0"))x=updateId(sender,false);
+ if(x=="")x=updateId(sender,false);
  return x;
 }
 
@@ -267,7 +280,7 @@ void updateDC(string list){
  matcher extra=create_matcher("\\s,\\s",list);
  list=replace_all(extra,",");
  string[int] names=split_string(list,",");
- foreach x in names deals+=names[x]+" (#"+getId(names[x]).to_int()+")\n";
+ foreach x in names deals+=names[x]+" (#"+getId(names[x])+")\n";
  if(deals==" (#0)\n"){
 //  print("No deals for DC","green");
   deals="";
