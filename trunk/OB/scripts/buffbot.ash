@@ -10,17 +10,15 @@ string[int] to_array(boolean[string] data){
 }
 
 string genderMatcherString="(?:I AM|I'M) (?:AN |A )?(WHO I AM|ME";
-string[int,int] genders;                //0        1      2        3            4     5       6
-genders[count(genders)]=to_array($strings[genders, third, unknown, androgynous, male, female, inanimate]);
-genders[count(genders)]=to_array($strings[*]);//WHO I AM
-genders[count(genders)]=to_array($strings[he, him, himself, his, his]);
-genders[count(genders)]=to_array($strings[they, them, themselves, theirs, their, ANGROGYNOUS|PLURAL|HERMAPHRODIT]);
-genders[count(genders)]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE|HE|HIM]);
-genders[count(genders)]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE|SHE|HER]);
-genders[count(genders)]=to_array($strings[it, it, itself, its, its, IT|INANIMATE|NEUTRAL|GENDERLESS]);
-//Genders[0] lists titles for Genders[]
-//Genders[1] is a place holder for third person.
-//Genders[2+] are as follows: subjective, objective, reflexive, possessive pronoun, possessive determiner. Optionally: Match string text
+string[string,int] genders;
+genders["list"]=to_array($strings[genders, third, unknown, androgynous, male, female, inanimate]);
+genders["third"]=to_array($strings[*]);//WHO I AM
+genders["unknown"]=to_array($strings[he, him, himself, his, his]);
+genders["androgynous"]=to_array($strings[they, them, themselves, theirs, their, ANGROGYNOUS|PLURAL|HERMAPHRODITE]);
+genders["male"]=to_array($strings[he, him, himself, his, his, BOY|MAN|MALE|HE|HIM|GUY|DUDE]);
+genders["female"]=to_array($strings[she, her, herself, hers, her, GIRL|WOMAN|FEMALE|SHE|HER|GAL|LADY]);
+genders["inanimate"]=to_array($strings[it, it, itself, its, its, IT|INANIMATE|NEUTRAL|GENDERLESS|ALIEN|(?:RO)?BOT]);
+//Pronouns: subjective, objective, reflexive, possessive pronoun, possessive determiner. Optionally: Match string text
 int gSub=0;
 int gObj=1;
 int gRefl=2;
@@ -121,43 +119,45 @@ void maybeFact(){
  if(random(1500)==0)chat(factCore());
 }
 
-string genderPronoun(string who, int what, string type){
+string genderPronoun(string who, int type){
+ string g=sysString(who,"gender");
+ string reply;
+ if(g!="third")reply=genders[g,type];
+ else{
+  reply=(userdata[who] contains "nick"?userdata[who,"nick"]:who);
+  if(type>2)reply+="'s";
+ }
+ return reply;
+}
+
+string genderPronoun(string who, string type){
+ string reply=who;
  boolean cap=false;
  if(type.contains_text("P")||type.contains_text("S"))cap=true;
  type=substring(type,1);
- int t=5;
- string reply;
  switch(type){
-  case "sub":t=0;break;
-  case "obj":t=1;break;
-  case "ref":t=2;break;
-  case "pos":t=3;break;
-  case "det":t=4;break;
+  case "sub":reply=genderPronoun(who,gSub);
+  case "obj":reply=genderPronoun(who,gObj);
+  case "ref":reply=genderPronoun(who,gRefl);
+  case "pos":reply=genderPronoun(who,gPosPro);
+  case "det":reply=genderPronoun(who,gPosDet);
  }
- if(what!=1)reply=genders[what,t];
- else if(t<3)reply=who;
- else reply=who+"'s";
  if(cap)reply=reply.char_at(0).to_upper_case()+reply.substring(1);
  return reply;
 }
 
 string genderString(string who){
- if(hasProp(who,"gender",",0,?"))userdata[who,"gender"]="2";
- if(hasProp(who,"gender","1"))return userdata[who,"nick"];
- return genders[0,sysInt(who,"gender")];
+ if(userdata[who] contains "gender")return userdata[who,"gender"];
+ return defaultProp("gender");
 }
 
 void errorMessage(string who, string what){
- if(errorMsg)chat(who,what);
-}
-
-void errorMessage(string who, string what, int g){
  matcher mx=create_matcher("(?i)(\\$psub|\\$pobj|\\$pref|\\$ppos|\\&pdet)",what);
  while(mx.find()){
-  what=mx.replace_first(genderPronoun(who,g,mx.group(1)));
+  what=mx.replace_first(genderPronoun(who,mx.group(1)));
   mx=mx.reset(what);
  }
- errorMessage(who,what);
+ if(errorMsg)chat(who,what);
 }
 
 boolean buffable(string sender){
@@ -586,13 +586,13 @@ void mod(string sender, string msg){
    case "noLimit":
     if(adminonly){
      userdata[user,"buffLimit"]="false";
-     chat(sender,user+" has had "+genders[userdata[user,"gender"].to_int(),gPosDet]+" limit lifted.");
+     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit lifted.");
     }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
     break;
    case "limit":
     if(adminonly){
      userdata[user,"buffLimit"]="true";
-     chat(sender,user+" has had "+genders[userdata[user,"gender"].to_int(),gPosDet]+" limit re-imposed.");
+     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit re-imposed.");
     }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
     break;
    case "nowarning":
@@ -608,7 +608,8 @@ void mod(string sender, string msg){
     chat(sender,user+"\'s warnings enabled.");
     break;
    case "clear":
-    remove userdata[user,"ID#"];
+    defaultProp(user,"ID#");
+    defaultProp(user,"membership");
     chat(sender,"Clan Status cleared for "+user+".");
     break;
    case "add":
@@ -639,10 +640,10 @@ void mod(string sender, string msg){
     break;
    case "reset":
     if(adminonly){
-     userdata[user,"membership"]="none";
-     userdata[user,"ID#"]="";
+     defaultProp(user,"membership");
+     defaultProp(user,"ID#");
      updateId(user,true);
-     chat(sender,user+" has had $ppos settings cleared.");
+     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" settings cleared.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    default:
@@ -736,8 +737,8 @@ string replyParser(string sender, string msg){
  if(someoneDefined!="")someone=someoneDefined;
  if(hasProp(someone,"ID#",",0"))updateId(someone,true);
  if(hasProp(sender,"ID#",",0"))updateId(sender,true);
- if(hasProp(someone,"gender",",0,?"))userdata[someone,"gender"]="2";
- if(hasProp(sender,"gender",",0,?"))userdata[sender,"gender"]="2";
+ if(hasProp(someone,"gender",",0,?"))defaultProp(someone,"gender");
+ if(hasProp(sender,"gender",",0,?"))defaultProp(sender,"gender");
  string[string] randplayer=userdata[someone];
  string[string] thesender=userdata[sender];
  string pclass;
@@ -769,10 +770,10 @@ string replyParser(string sender, string msg){
    case "sref":
    case "spos":
    case "sdet":
-    msg=replace_first(variable,genderPronoun(randplayer["nick"],randplayer["gender"].to_int(),variable.group(1)));
+    msg=replace_first(variable,genderPronoun(someone,variable.group(1)));
     break;
    case "sgender":
-    msg=replace_first(variable,genderString(randplayer));
+    msg=replace_first(variable,genderString(someone));
     break;
    case "strigger":
     msg=replace_first(variable,randplayer["lastTrigger"]);
@@ -816,10 +817,10 @@ string replyParser(string sender, string msg){
    case "pref":
    case "ppos":
    case "pdet":
-    msg=replace_first(variable,genderPronoun(thesender["nick"],thesender["gender"].to_int(),variable.group(1)));
+    msg=replace_first(variable,genderPronoun(sender,variable.group(1)));
     break;
    case "pgender":
-    msg=replace_first(variable,genderString(thesender));
+    msg=replace_first(variable,genderString(sender));
     break;
    case "ptrigger":
     msg=replace_first(variable,thesender["lastTrigger"]);
@@ -1119,7 +1120,7 @@ void userDetails(string sender, string who){
    reply=substring(reply,0,length(reply)-2)+".\n";
   }
   if(!hasProp(who,"nick",","+who))reply+="Goes by: "+userdata[who,"nick"]+"\n";
-  reply+="Gender: "+genderString(userdata[who])+"\n";
+  reply+="Gender: "+genderString(who)+"\n";
   if(userdata[who,"lastTime"]!="")reply+="Last Time Spoken: "+userdata[who,"lastTime"]+"\n";
   boolean f=true;
   if(who==sender)foreach a,v in userdata[who] if(a.char_at(0)=="~"){
@@ -1165,12 +1166,12 @@ string addMulti(string n1, string n2){
  biglist[n1]=true;
  biglist[n2]=true;
  foreach name in bigList{
-  if(hasProp(name,"gender",",0,?,2"))gencarry=userdata[name,"gender"];
+  if(sysString(name,"gender")!="unknown")gencarry=userdata[name,"gender"];
   if(userdata[name,"nick"]!="")ncarry=userdata[name,"nick"];
  }
  foreach mult in biglist{
+  if(sysString(mult,"gender")=="unknown")userdata[mult,"gender"]=gencarry;
   if(userdata[mult,"nick"]=="")userdata[mult,"nick"]=ncarry;
-  if(hasProp(mult,"gender",",0,?,2"))userdata[mult,"gender"]=gencarry;
   userdata[mult,"alts"]="";
   foreach mult2 in bigList if(mult2!=mult)userdata[mult,"alts"]+=mult2+",";
  }
@@ -1197,7 +1198,7 @@ void setMulti(string sender, string newaltlist){
    }
   }
   if(tmatch==""){
-   chat(alt,sender+" is attempting to register you as "+genders[userdata[sender,"gender"].to_int(),gPosDet]+" multi.");
+   chat(alt,sender+" is attempting to register you as "+genderPronoun(sender,gPosDet)+" multi.");
    mlist[sender,alt]=now+100;
   }else if(length(matchtxt)<length(tmatch))matchtxt=tmatch;
  }
@@ -1699,20 +1700,18 @@ void nopredpass(string sender, string msg, boolean addressed){
 }
 
 void setGender(string sender, string gender){
- int gval=2;
+ string gval="unknown";
  matcher g=create_matcher("(?i)(WHO I AM|ME)",gender);
- if(g.find())gval=1;
- int tc=2;
- while(gval==2){
-  tc+=1;
-  if(tc>=count(genders))break;
-  if(!(genders[tc] contains 5))continue;
-  g=create_matcher("(?i)("+genders[tc,5]+")",gender);
-  if(g.find())gval=tc;
+ if(g.find())gval="third";
+ foreach gname in genders{
+  if(gval!="unknown")break;
+  if((!(genders[gname] contains 5))||(gname=="list"))continue;
+  g=create_matcher("(?i)("+genders[gname,5]+")",gender);
+  if(g.find())gval=gname;
  }
  checkOut(userdata,"userdata.txt");
- userdata[sender,"gender"]=gval.to_string();
- foreach i,m in split_string(userdata[sender,"alts"],",")if((m!="")&&(hasProp(m,"gender",",0,?,2")))userdata[m,"gender"]=gval.to_string();
+ userdata[sender,"gender"]=gval;
+ foreach i,m in split_string(userdata[sender,"alts"],",")if((m!="")&&(sysString(m,"gender")=="unknown"))userdata[m,"gender"]=gval;
  commit(userdata,"userdata.txt");
 }
 
@@ -1960,7 +1959,7 @@ void publicChat(string sender, string msg){
   pred=m.group(1);
   oper=m.group(2);
  }
- for i from 2 upto count(genders)-1 if(genders[i] contains 5)genderMatcherString+="|"+genders[i,5];
+ foreach i in genders if((i!="list")&&(genders[i] contains 5))genderMatcherString+="|"+genders[i,5];
  genderMatcherString+=")";
  if(!addressed)m=create_matcher(genderMatcherString,msg);
  else m=create_matcher("(?i)"+genderMatcherString,msg);
