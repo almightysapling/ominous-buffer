@@ -332,7 +332,7 @@ void handleMeat(){
  int totspent=0;
  foreach name in userdata if( ((userdata[name,"lastTime"].contains_text(today))||(userdata[name,"lastTime"].contains_text(yest))) &&
   ((name!="Ominous Buffer")&&(name!="Ominous Tamer")&&(name!="Ominous Sauceror")) ){
-  userdata[name,"meat"]=to_string(userdata[name,"meat"]+100);
+  sysInc(name,"meat",100);
   totspent+=100;
  }
  commit(userdata,"userdata.txt");
