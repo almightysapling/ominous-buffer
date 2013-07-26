@@ -2189,6 +2189,7 @@ void systemHandler(string msg){
  if(!m.find())return;
  string cmd=m.group(1);
  string ops=m.group(2);
+ print(cmd);
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
@@ -2224,6 +2225,7 @@ void systemHandler(string msg){
    break;
   case "record": makeRecords();break;
   case "adventure":
+   if(my_adventures()<=burnTurns)break;
    if(adventure(5,$location[Icy Peak])){}
    burn();
    break;
@@ -2449,4 +2451,5 @@ void main(string sender, string msg, string channel){try{
    break;
  }
 }finally{
+
 }}
