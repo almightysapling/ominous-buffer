@@ -223,8 +223,9 @@ string wordshot(string sender, string guess){
  }
  if (guess==word){
   game.players[sender]=2;
-  game.intervals=-1;
-  saveGame(game);
+  chat_clan("Winner! "+sender+" won with '"+word+"'!");
+  chat_private(game.host,"Winner of wordshot: "+sender);
+  closeGame();
   return "x";
  }
  int[string] breakW;
@@ -251,25 +252,10 @@ void gRR(){
  if (!game.gameStarted){}else{}
 }
 
-void gWS(){
- gameData game=loadGame();
- if(game.intervals==-1){
-  string winner;
-  string word;
-  foreach k,v in game.players if(v==2) winner=k; else word=k;
-  chat_clan("Winner! "+winner+" won with '"+word+"'!");
-  chat_private(game.host,"Winner of wordshot: "+winner);
-  closeGame();
- }
-}
-
 void coreGameCycle(){
  switch (gameType()){
   case gameRoulette:
    gRR();
-   break;
-  case gameWordshot:
-   gWS();
    break;
   default:
    break;
