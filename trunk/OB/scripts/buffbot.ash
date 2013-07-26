@@ -1,7 +1,6 @@
 import <shared.ash>
 import <market.ash>
 import <mathlib.ash>
-invokeResourceMan(__FILE__);
 string[int] to_array(boolean[string] data){
  string[int] x;
  foreach y in data
@@ -49,9 +48,9 @@ record timestamp{
  int lastBm;
 };
 timestamp[int] ctimestamp;
-update(ctimestamp,"timefile.txt");
+checkOut(ctimestamp,"timefile.txt");
 timestamp ctimes=ctimestamp[0];
-update(userdata,"userdata.txt");
+checkOut(userdata,"userdata.txt");
 
 boolean errorMsg=true;
 string prefix="";
@@ -226,7 +225,7 @@ void shutdown(string sender,string options){
   }
  }
  if(options.contains_text("burn"))set_property("_forceShutdown","burn");
- else set_property("_forceShutdown","logout");
+ else set_property("_forceShutdown","shutdown");
 }
 
 void createAlias(string sender, string msg){
@@ -262,9 +261,7 @@ void removeAlias(string sender, string aliasname){
 boolean sendRecord(int skillId, string sender){
  item recording=to_item("recording of "+skillId.to_skill().to_string());
  if(item_amount(recording)<1) return false;
- claimResource("adventuring");
  cli_execute("csend 1 "+recording.to_string()+" to "+sender+" ||");
- freeResource("adventuring");
  return true;
 }
 
@@ -421,16 +418,13 @@ void buff(string sender, string msg, int numTurns, string ding){
    chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
    return;
   }
-  claimResource("adventuring");
   string t=visit_url("curse.php?action=use&pwd="+my_hash()+"&whichitem=4939&targetplayer="+sender);
   print("Throwing Time's Arrow at "+sender);
-  freeResource("adventuring");
   checkOut(userdata,"userdata.txt");
   sysInc(ding,"#"+skillnum);
   commit(userdata,"userdata.txt");
   return;
  }
- claimResource("adventuring");
  checkOut(userdata,"userdata.txt");
  if(have_skill(to_skill(skillnum))){
   if(use_skill(casts,to_skill(skillnum),sender)){
@@ -438,7 +432,7 @@ void buff(string sender, string msg, int numTurns, string ding){
    set_property('totalCastsEver',totCastsE.to_string());
    sysInc(ding,"#"+skillnum,casts);
    sysInc("#"+skillnum,casts);
-   commit(userdata,"userdata.txt",false);
+   commit(userdata,"userdata.txt");
    if(((skillnum>6019)&&(skillnum<6029))||(skillnum==62)){
     updateDC("useCurrent");
     updateLimits();
@@ -475,7 +469,6 @@ void buff(string sender, string msg, int numTurns, string ding){
   use(1,$item[magical mystery juice]);
  }
  commit(userdata,"userdata.txt");
- freeResource("adventuring");
 }
 
 int roll(string sender, string msg){
@@ -521,9 +514,9 @@ void startGame(string sender, string msg){
    foreach k,v in game.players if(v==1) w=k;
    if((l.to_int()==0)&&(l!="-")&&(l.length()>2)&&(l.length()<14)){
     boolean[string]list;
-    update(list,"wordshot/"+l.length()+".txt");
+    checkOut(list,"wordshot/"+l.length()+".txt");
     int[string] koldict;
-    update(koldict,"wordshot/custom.txt");
+    checkOut(koldict,"wordshot/custom.txt");
     if((list contains l)||(koldict contains l)){
      remove game.players[w];
      game.players[l]=1;
@@ -656,7 +649,7 @@ void mod(string sender, string msg){
 
 void fax(string sender, string msg){
  string[string] m;
- update(m,"faxnames.txt");
+ checkOut(m,"faxnames.txt");
  m["Hobelf"]="hobo_elf";
  m["Elf hobo"]="bathroom_elf";
  switch(msg){
@@ -703,9 +696,7 @@ void fax(string sender, string msg){
 
 void updateRaidlog(){
  if(raidlogRead)return;
- claimResource("adventuring");
  string v=visit_url("clan_raidlogs.php");
- freeResource("adventuring");
  matcher mx=create_matcher("opened (a|\\d+) sewer grate",v);
  int turned=0;
  while(mx.find())if(mx.group(1)=="a")turned+=1;
@@ -872,7 +863,7 @@ string replyParser(string sender, string msg){
     break;
    case "lotto":
     int[string] books;
-    update(books,"books.txt");
+    checkOut(books,"books.txt");
     temp=books["thisLotto"].to_string()+"k";
     msg=replace_first(variable,temp);
     break;
@@ -954,8 +945,6 @@ void train(string trainer, string msg){
   }
   if(!knownmethod){
    errorMessage(trainer,"Training failed: Unknown method: "+newr.method);
-   freeResource("changes.txt");
-   freeResource("replies.txt");
    return;
   }
   string t=newr.reply;
@@ -1009,7 +998,7 @@ void search(string sender, string msg){
  msg=msg.to_lower_case();
  string trigm,replm;
  responses[string] botdata;
- update(botdata,"replies.txt");
+ checkOut(botdata,"replies.txt");
  foreach trig,re in botdata{
   if(re.reply.to_lower_case().contains_text(msg)){
    replm+="T: "+trig+"\n";
@@ -1042,7 +1031,6 @@ void clearData(string what){
  switch(what){
   case "changelog":
    string[int,string] changes;
-   claimResource("changes.txt");
    commit(changes,"changes.txt");
    break;
  }
@@ -1225,13 +1213,10 @@ void clanTitle(string sender, string newt){
   chat("Only admins can use this until it gets fixed for rank recognition, sorry.");
   return;
  }
- claimResource("adventuring");
  visit_url("clan_members.php?pwd&action=modify&pids[]="+userdata[sender,"ID#"]+"&title"+userdata[sender,"ID#"]+"="+newt);
- freeResource("adventuring");
 }
 
 void whitelistEdit(string oper){
- claimResource("adventuring");
  string cw=visit_url("clan_whitelist.php");
  if(!cw.contains_text("<form>")){
   chat("Oh, no. A horrible, awful, irrevocable thing has happened... You broke my heart. {Core Privelage Disabled}");
@@ -1241,38 +1226,32 @@ void whitelistEdit(string oper){
  string i;
  if(!action.find()){
   chat("I'm not sure what exactly you want me to do with the whitelist.");
-  freeResource("adventuring");
   return;
  }
  i=getId(action.group(2));
  if(i==0){
   chat("I'm not sure who "+action.group(2)+" is.");
-  freeResource("adventuring");
   return;
  }
  if(action.group(1)=="-"){
   i=getId(action.group(2));
   if(!cw.contains_text("who="+i.to_string())){
    chat(action.group(2)+" isn't currently on the whitelist.");
-   freeResource("adventuring");
    return;
   }
   cw=visit_url("clan_whitelist.php?action=update&pwd&player"+i+"="+i+"&drop"+i+"=on");
-  freeResource("adventuring");
   return;
  }
  i=getId(action.group(2));
  string s="clan_whitelist.php?action=add&pwd";
  if(cw.contains_text("who="+i.to_string())){
   chat(action.group(2)+" is already whitelisted.");
-  freeResource("adventuring");
   return;
  }
  if(cw.contains_text("(#"+i+")")){
   s+="&clannie="+i;
   visit_url(s);
   chat(action.group(2)+" added to whitelist.");
-  freeResource("adventuring");
   return;
  }
  s+="&addwho="+action.group(2);
@@ -1286,7 +1265,6 @@ void whitelistEdit(string oper){
  }
  visit_url(s);
  chat(action.group(2)+" added to whitelist.");
- freeResource("adventuring");
 }
 
 void sendLink(string sender, string i){
@@ -1594,7 +1572,6 @@ string predicateFilter(string sender, string msg){
    chat("Looking for new test subjects and evaluating test data.");
    checkApps();
    checkMail();
-   checkData();
    return "x";
   case "remove":
    removeAlias(sender,oper);
@@ -1618,11 +1595,9 @@ string predicateFilter(string sender, string msg){
    if(is_online("wangbot")){
     chat_private("wangbot","target "+(oper==""?sender:oper));
    }else{
-    claimResource("adventuring");
     if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
     if(item_amount($item["WANG"])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(oper==""?sender:oper));
-    freeResource("adventuring");
    }
    set_property("_lastWang",(oper==""?sender:oper)+'|'+sender);
    return "x";
@@ -1649,7 +1624,7 @@ string predicateFilter(string sender, string msg){
 
 void nopredpass(string sender, string msg, boolean addressed){
  responses[string] botdata;
- update(botdata,"replies.txt");
+ checkOut(botdata,"replies.txt");
  boolean foundmatch=false;
  boolean referred=addressed;
  matcher ref=create_matcher("(?i)(\\WOB\\W|\\WOminous Buffer\\W)",msg);
@@ -1749,7 +1724,6 @@ int timeSinceLastChat(string who){
   ctimes.lastCB=who;
  }
  ctimestamp[0]=ctimes;
- claimResource("timefile.txt");
  commit(ctimestamp,"timefile.txt");
  checkOut(userdata,"userdata.txt");
  userdata[who,"lastTime"]=now_to_string("MMMM d, yyyy 'at' hh:mm:ss a z");
@@ -1847,7 +1821,6 @@ void searchDefine(string word){
    else defn[wordtype,count(defn[wordtype])+1]=m.group(1);
   }
  }
-print(count(defn));
  int totalitems=0;
  string bigjar;
  int c=0;
@@ -1937,7 +1910,192 @@ void searchUrban(string word){
  chat(result.decodeHTML(false));
 }
 
+void makeBackups(){
+ string n=now_to_string("yyyyMMdd");
+ int[string]books;
+ checkOut(books,"books.txt");
+ commit(books,"backup/"+n+"b.txt");
+ checkOut(userdata,"userdata.txt");
+ commit(userdata,"backup/"+n+"u.txt");
+}
+
+void sendMeat(string who, int amount){
+ take_closet(amount,$item[dense meat stack]);
+ string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
+ sender+="&fromwhere=0&action=Yep.";
+ visit_url(sender);
+}
+
+void checkLotto(){
+ int[string] books;
+ checkOut(books,"books.txt");
+ int event=0;
+ int time=minutesToRollover();
+ if(time<books["Event1"])event=1;
+ if(time<books["Event2"])event=2;
+ if(time<books["Event3"])event=3;
+ if(event<1)return;
+ books["Event"+event.to_string()]=0;
+ books["nextLotto"]+=2;
+ books["thisLotto"]+=14;
+ boolean[string] inClan=who_clan();
+ remove inClan["Ominous Buffer"];
+ remove inClan["MesaChat"];
+ remove inClan["Acoustic_shadow"];
+ remove inClan["relay"];
+ string[int] clannies;
+ foreach name in inClan clannies[count(clannies)]=name;
+ int num=count(clannies);
+ if(num<1){
+  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+  commit(books,"books.txt");
+  updateProfile();
+  return;
+ }
+ float perc;
+ if(num>7){
+  perc=1.4+0.12*num;
+ }else{
+  perc=0.4+num*2.0/(1.0+num);
+ }
+ if(perc>4)perc=4;
+ if(books["thisLotto"]>1500)perc=min(4.5,perc+1);
+ if(books["thisLotto"]>2500)perc=min(5,perc+1);
+ int d=ceil((100/perc)*num);
+ d=d+random(10)-random(10);
+ print("Event @ "+now_to_string("HH:mm")+" for "+books["thisLotto"].to_string()+" meat, "+num.to_string()+" players: 1d"+d.to_string(),"olive");
+ chat("Time for the Lotto! Right now it's for "+books["thisLotto"].to_commad()+",000 meat! We have "+num.to_string()+(num!=1?" players":" player")+" now (d"+d.to_string()+"). Good luck!");
+ d=random(d);
+ waitq(10);
+ chat("/em rolls "+to_string(d+1)+".");
+ string endsentence="!";
+ if(d<num){
+  print("Event Won: "+clannies[d],"blue");
+  chat_clan("A winner!");
+  waitq(7);
+  checkOut(userdata,"userdata.txt");
+  for i from 4 downto 1 if(userdata["*"] contains ("winner"+i.to_string()))userdata["*","winner"+to_string(i+1)]=userdata["*","winner"+i.to_string()];
+  userdata["*","winner1"]=clannies[d]+": "+books["thisLotto"].to_commad()+",000";
+  commit(userdata,"userdata.txt");
+  string wintext="";
+  for i from 1 to 5 if(userdata["*"] contains ("winner"+i.to_string()))wintext+=userdata["*","winner"+i.to_string()]+"::";
+  set_property("winners",wintext);
+  chat(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
+  sendMeat(clannies[d],books["thisLotto"]);
+  books["thisLotto"]=books["nextLotto"]-1;
+  books["nextLotto"]=1;  
+ }else{
+  print("Event Lost.","blue");
+  chat("Just what I thought. Everyone here is a loser. And "+insultCore()+" as well.");
+ }
+ set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+ commit(books,"books.txt");
+ updateProfile();
+}
+
+void makeRecords(){
+ print("Recording leftover music.","olive");
+ checkOut(userdata,"userdata.txt");
+ if(sysInt("#6026")<50){//Donho
+  if(sysInt("#6026")<25){
+   while(my_mp()<(25-sysInt("#6026"))*75)cli_execute("use mmj");
+   visit_url("volcanoisland.php?action=tuba&pwd");
+   visit_url("choice.php?whichchoice=409&option=1&pwd");
+   visit_url("choice.php?whichchoice=410&option=2&pwd");
+   visit_url("choice.php?whichchoice=412&option=3&pwd");
+   visit_url("choice.php?whichchoice=418&option=3&pwd");
+   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(25-sysInt("#6026"))+"&option=1&pwd");
+   userdata["*","#6026"]="25";
+   visit_url("choice.php?pwd&whichchoice=440&option=2");
+  }
+  while(my_mp()<max(50-sysInt("#6026"),0)*75)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-sysInt("#6026"))+"&option=1&pwd");
+  userdata["*","#6026"]="50";
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
+ }
+ print("Donho's recorded","blue");
+ if(sysInt("#6028")<5){//Inigo
+  while(my_mp()<(5-sysInt("#6028"))*100)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-sysInt("#6028"))+"&option=1&pwd");
+  userdata["*","#6028"]=5;
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
+ }
+ print("Inigo's recorded","blue");
+ for song from 6020 to 6024 if(sysInt("#"+song)<10){
+  while(my_mp()<(10-sysInt("#"+song))*50)cli_execute("use mmj");
+  visit_url("volcanoisland.php?action=tuba&pwd");
+  visit_url("choice.php?whichchoice=409&option=1&pwd");
+  visit_url("choice.php?whichchoice=410&option=2&pwd");
+  visit_url("choice.php?whichchoice=412&option=3&pwd");
+  visit_url("choice.php?whichchoice=418&option=3&pwd");
+  visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-sysInt("#"+song))+"&option=1&pwd");
+  userdata["*","#"+song]=10;
+  visit_url("choice.php?pwd&whichchoice=440&option=2");
+ }
+ print("Hobopolis songs recorded","green");
+ commit(userdata,"userdata.txt");
+ updateLimits();
+ updateDC("useCurrent");
+}
+
+void doBounty(){
+ string bounty=visit_url("bhh.php");
+ matcher m=create_matcher("(40 billy|5 burned|40 coal|5 discard|20 disint|11 non-E|5 sammich|6 bits of)",bounty);
+ if(!m.find())return;
+ int b;
+ switch(m.group(1)){
+  case "40 billy":b=2409;break;
+  case "5 burned":b=2106;break;
+  case "40 coal":b=2105;break;
+  case "5 discard":b=2415;break;
+  case "20 disint":b=2470;break;
+  case "11 non-E":b=2107;break;
+  case "5 sammich":b=2412;break;
+  case "6 bits of":b=2471;break;
+  default:return;
+ }
+ int oldLucre=item_amount($item[filthy lucre]);
+ visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
+ while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
+ visit_url("bhh.php");
+}
+
+void burn(){
+ int to_burn=my_mp()-800;
+ if(to_burn<0)return;
+ int farmbuff=get_property("_lastFarmBuff").to_int();
+ skill farmingbuff;
+ switch(farmbuff){
+  case 0:
+   farmingbuff=$skill[Fat Leon's Phat Loot Lyric];
+   farmbuff+=1;
+   break;
+  case 1:
+   farmingbuff=$skill[Polka of Plenty];
+   farmbuff+=1;
+   break;
+  default:
+   farmingbuff=$skill[Cantata of Confrontation];
+   farmbuff=0;
+ }
+ set_property("_lastFarmBuff",farmbuff.to_string());
+ int numCasts=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
+ numCasts=max((numCasts/3),1);
+ use_skill(numCasts,farmingbuff);
+}
+
 void publicChat(string sender, string msg){
+ checkLotto();
  matcher m;
  string original=msg;
  chatVars["timedif"]=timeSinceLastChat(sender).to_string();
@@ -2027,7 +2185,50 @@ void publicChat(string sender, string msg){
 }
 
 void systemHandler(string msg){
- prefix=":";
+ matcher m=create_matcher("(\\S*)\\s?(.*)",msg);
+ if(!m.find())return;
+ string cmd=m.group(1);
+ string ops=m.group(2);
+ switch(cmd){
+  case "logout":
+   saveSettings(nightlySave);
+   cli_execute("maximize adv, -tie");
+   updateDC();
+   makeBackups();
+   set_property("chatbotScript","");
+   clearBuffs(6014);
+   if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
+   overdrink(1,$item[eggnog]);
+   checkApps();
+   cli_execute("exit");
+   break;
+  case "apps":checkApps();break;
+  case "mail":checkMail();break;
+  case "deMole":if(have_effect($effect[Shape of...Mole!])>0){
+    while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
+    if(!adventure(1,$location[Mt. Molehill])){}
+    visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
+   }
+   break;
+  case "outfit":switch(ops){
+    case "farm":
+     cli_execute("familiar "+meatFam);
+     cli_execute("maximize 2 meat, item, 100 combat, equip C.H.U.M. knife, -tie");
+     break;
+    case "buff":
+     cli_execute("familiar "+statFam);
+     cli_execute("outfit birthday suit");
+     cli_execute("maximize mp");
+     break;
+   }
+   break;
+  case "record": makeRecords();break;
+  case "adventure":
+   if(adventure(5,$location[Icy Peak])){}
+   burn();
+   break;
+  case "bounty":doBounty();
+ }
 }
 
 boolean metaParser(string sender, string msg){
@@ -2104,7 +2305,7 @@ void eventHandler(string msg){
 
 void privateHandler(string sender, string msg){
  matcher m;
- if(sender=="Ominous Buffer")systemHandler(msg);
+ if(sender==my_name())systemHandler(msg);
  if(sender=="MesaChat"){
   m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
@@ -2179,7 +2380,7 @@ boolean preHandled(string sender, string msg, string channel){
  if(sender=="System Message"){
   return true;
  }
- if(!couldClaim("science")){
+ if(get_property("_lockChat")!=""){
   if(channel=="")chat(sender,"You've got no use chatting, I've got science to do.");
   return true;
  }
@@ -2190,14 +2391,12 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if(sender=="wangbot"){
   if(msg.contains_text("dried out")){
-   claimResource("adventuring");
    if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
    matcher m=create_matcher("([^|]*)|(.*)",get_property("_lastWang"));
    if(m.find()){
     if(item_amount($item["WANG"])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+m.group(1));
    }
-   freeResource("adventuring");
   }
   return true;
  }
@@ -2250,5 +2449,4 @@ void main(string sender, string msg, string channel){try{
    break;
  }
 }finally{
- releaseResources();
 }}
