@@ -9,6 +9,10 @@ file_to_map("userdata.txt",userdata);
 string nightlySave="totalDaysCasting;totalCastsEver;books;winners";
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
+int burnTurns=130;
+string meatFam="leprechaun";
+string statFam="hovering sombrero";
+
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;
 associates[21459]=true;//Hogs of Destiny
@@ -19,120 +23,35 @@ associates[2046983684]=true;//Clan of 14 Days
 associates[2046991423]=true;//Margaretting Tye
 associates[76566]=true;//Imitation Plastic Death Star
 associates[72876]=true;//Hyrule
-int repValue=4;
 
-record resource{
- string owner;
- int depth;
-};
-
-void invokeResourceMan(string newname){
- NAME_=newname;
- resource[string] resources;
- file_to_map("resources.txt",resources);
- foreach n,res in resources if((res.owner==NAME_)||(res.depth==0)) remove resources[n];
- map_to_file(resources,"resources.txt");
-}
-
-void debug(int i){
- resource[string] resources;
- file_to_map("resources.txt",resources);
- boolean out=false;
- foreach name,res in resources if(res.depth!=0){
-  if((!out)&&(i>0))print("@"+i+" {");
-  print((i>0?"-":"")+name+": "+res.owner+"["+res.depth+"]");
-  out=true;
- }
- if((out)&&(i>0))print("}");
-}
-
-void debug(){
- debug(-1);
-}
-
-void cleanResources(){ //Remove all holds
- resource[string]blank;
- map_to_file(blank,"resources.txt");
-}
-
-void releaseResources(){ //Remove all holds of a certain script
- resource[string] resources;
- file_to_map("resources.txt",resources);
- foreach name,res in resources if(res.owner==NAME_)remove resources[name];
- map_to_file(resources,"resources.txt");
-}
-
-boolean claimResource(string resourceName){ //Lock a symbol
- resource[string] resources;
- file_to_map("resources.txt",resources);
- while((resources[resourceName].owner!="")&&(resources[resourceName].owner!=NAME_)){
-  waitq(1);
-  file_to_map("resources.txt",resources);
- }
- resources[resourceName].owner=NAME_;
- resources[resourceName].depth+=1;
- map_to_file(resources,"resources.txt");
- return true;
-}
-
-string freeResource(string resourceName){ //Free a symbol without saving
- resource[string] resources;
- file_to_map("resources.txt",resources);
- string owner=resources[resourceName].owner;
- if(owner==NAME_){
-  resources[resourceName].depth-=1;
-  if(resources[resourceName].depth==0)remove resources[resourceName];
-  map_to_file(resources,"resources.txt");
- }
- return owner;
-}
-
-string commit(string resourceName){ //Free a symbol without saving
- return freeResource(resourceName);
-}
-
-aggregate checkOut(aggregate data, string resourceName){ //Lock a symbol and load its contents
- claimResource(resourceName);
+aggregate checkOut(aggregate data, string resourceName){ //Load a file
  file_to_map(resourceName,data);
  return data;
 }
 
-aggregate update(aggregate data, string resourceName){ //Load a symbol, but don't get permission to save
- file_to_map(resourceName,data);
- return data;
+void commit(aggregate data, string resourceName){ //Save data
+ map_to_file(data,resourceName);
 }
 
-string commit(aggregate data, string resourceName, boolean freeR){ //Save data to a symbol, optionally free the symbol
- resource[string] resources;
- file_to_map("resources.txt",resources);
- string owner=resources[resourceName].owner;
- if(owner==NAME_){
-  map_to_file(data,resourceName);
-  if(freeR){
-   resources[resourceName].depth-=1;
-   if(resources[resourceName].depth==0)remove resources[resourceName];
-   map_to_file(resources,"resources.txt");
-  }
- }
- return owner;
+int minutesToRollover(){
+ int GMT=to_int(now_to_string("HHmm"))-to_int(now_to_string("Z"));
+ if(GMT<0)GMT+=2400;
+ if(GMT>2399)GMT-=2400;
+ string GMTs=to_string(GMT);
+ while(length(GMTs)<4)GMTs="0"+GMTs;
+ GMT=to_int(substring(GMTs,0,2))*60+to_int(substring(GMTs,2));
+ GMT=210-GMT;
+ if(GMT<0)GMT+=24*60;
+ return GMT;
 }
 
-string commit(aggregate data, string resourceName){ //Save data to a symbol and free it
- return commit(data,resourceName,true);
+void defaultProp(string user,string prop){
+ if(userdata[":"] contains prop)userdata[user,prop]=userdata[":",prop];
+ else remove userdata[user,prop];
 }
 
-boolean couldClaim(string resourceName){
- resource[string] resources;
- file_to_map("resources.txt",resources);
- if((resources[resourceName].owner!="")&&(resources[resourceName].owner!=NAME_))return false;
- return true;
-}
-
-int permissionDepth(string resourceName){
- resource[string] resources;
- file_to_map("resources.txt",resources);
- if(resources[resourceName].owner==NAME_)return resources[resourceName].depth;
- return -resources[resourceName].depth;
+string defaultProp(string prop){
+ return userdata[":",prop];
 }
 
 boolean getUF(string user,string flag){
@@ -154,6 +73,11 @@ boolean hasProp(string user,string setting,string prop){
 
 void removeProp(string user,string setting,string prop){
 }*/
+
+string sysString(string user, string prop){
+ if(userdata[user] contains prop)return userdata[user,prop];
+ return defaultProp(prop);
+}
 
 int sysInt(string user,string prop){
  return userdata[user,prop].to_int();
@@ -178,18 +102,14 @@ void sysInc(string prop){
 
 //check clan whitelist for user if not in clan
 boolean checkWhitelist(string id){
- claimResource("adventuring");
  string page=visit_url("clan_whitelist.php");
- freeResource("adventuring");
  matcher m=create_matcher("(?i)="+id+"'",page);
  if(find(m))return true;
  return false;
 }
 
 string to_playerName(int pId){
- claimResource("adventuring");
  string v=visit_url("showplayer.php?who="+pId.to_string());
- freeResource("adventuring");
  matcher m=create_matcher("<center><b>(.+?)</b>",v);
  if (m.find()){
   return m.group(1);
@@ -198,9 +118,7 @@ string to_playerName(int pId){
 }
 
 string to_clanName(int cId){
- claimResource("adventuring");
  string p=visit_url("showclan.php?whichclan="+cId);
- freeResource("adventuring");
  matcher m=create_matcher("blue><b>(.+?)</b",p);
  if(!m.find())return "";
  return m.group(1);
@@ -209,16 +127,13 @@ string to_clanName(int cId){
 //request unknown user's id. if (add) then place them into the users file.
 string updateId(string user,boolean add){
  if(user=="")return 0;
- claimResource("adventuring");
  string searchstring=visit_url("searchplayer.php?searching=Yep.&searchstring="+user+"&hardcoreonly=0");
- freeResource("adventuring");
  matcher nameClan=create_matcher('(?i)(\\d*)">'+user+'</a></b> (?: \\(PvP\\))?(?:<br>\\(<a target=mainpane href="showclan\\.php\\?whichclan=(\\d*))?',searchstring);
  if(!find(nameClan))return 0;
  checkOut(userdata,"userdata.txt");
  if(!add)return group(nameClan,1).to_int();
- userdata[user,"gender"]="?";
  userdata[user,"ID#"]=group(nameClan,1);
- if(!hasProp(user,"membership","whitelist,blacklist"))userdata[user,"membership"]="none";
+ if(!hasProp(user,"membership","whitelist,blacklist"))defaultProp(user,"membership");
  if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
  if(associates contains group(nameClan,2).to_int())userdata[user,"membership"]="associate";
  if((!hasProp(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
@@ -230,7 +145,7 @@ string updateId(string user,boolean add){
 string getId(string sender){
  if(sender=="")return 0;
  string x=userdata[sender,"ID#"];
- if((x=="")||(x=="0"))x=updateId(sender,false);
+ if(x=="")x=updateId(sender,false);
  return x;
 }
 
@@ -246,7 +161,7 @@ string to_commad(int i){
 
 string factCore(string type){
  string[string,int] factList;
- update(factList,"facts.txt");
+ checkOut(factList,"facts.txt");
  return factList[type,random(count(factList[type]))];
 }
 
@@ -258,6 +173,16 @@ string insultCore(){
  return factCore("I");
 }
 
+void clearBuffs(int skip){
+ for i from 6000 to 6030{
+  if((i==6006)||(i==6010)||(i==skip))continue;
+  if(i.to_skill().to_effect().have_effect()>0)cli_execute("uneffect "+i.to_skill().to_effect().to_string());
+ }
+}
+void clearBuffs(){
+ clearBuffs(0);
+}
+
 void updateDC(string list){
  if(list=="useCurrent")list=get_property("_currentDeals");
  else set_property("_currentDeals",list);
@@ -265,15 +190,9 @@ void updateDC(string list){
  matcher extra=create_matcher("\\s,\\s",list);
  list=replace_all(extra,",");
  string[int] names=split_string(list,",");
- foreach x in names deals+=names[x]+" (#"+getId(names[x]).to_int()+")\n";
- if(deals==" (#0)\n"){
-//  print("No deals for DC","green");
-  deals="";
- }else{
-  print("Deals in DC for the following players:","green");
-  print(deals,"olive");
-  deals="Current deals in mall:\n"+deals+"\n";
- } 
+ foreach x in names deals+=names[x]+" (#"+getId(names[x])+")\n";
+ if(deals==" (#0)\n")deals="";
+ else deals="Current deals in mall:\n"+deals+"\n";
  int served=get_property('totalCastsEver').to_int();
  int days=get_property('totalDaysCasting').to_int()+1;
  string avg=to_string(served*1.0/days);
@@ -286,19 +205,26 @@ void updateDC(string list){
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
  s+="Managerial Manipulation: "+to_int(1-userdata["*"].buffs[62])+"\n";
- claimResource("adventuring");
  visit_url(s);
- freeResource("adventuring");
 }
-
 void updateDC(){
  updateDC("");
+}
+
+void updateProfile(){
+ int[string]books;
+ checkOut(books,"books.txt");
+ string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
+ buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nCurrent Lotto for "+to_commad(14+books["thisLotto"])+",000 meat!\nLast Five Lotto Winners:";
+ string wintext=get_property("winners");
+ string[int] winners=split_string(wintext,"::");
+ for i from 0 upto count(winners)-1 buf+="\n"+winners[i];
+ visit_url(buf);
 }
 
 void updateLimits(){
  string s;
  buffer n;
- claimResource("adventuring");
  if((50-sysInt("#6026"))>10){
   s="managecollection.php?action=modifyshelves&pwd&newname12=";
   s+=to_string(50-sysInt("#6026"));
@@ -318,20 +244,15 @@ void updateLimits(){
  s+="&whichshelf4501="+to_string(max(11-sysInt("#6024"),1));
  n=visit_url(s);
  set_property("_limitBuffs",userdata["*","#62"]);
- freeResource("adventuring");
 }
 
 void saveSettings(){
- claimResource("adventuring");
  visit_url("questlog.php?which=4&action=updatenotes&font=0&notes=");
- freeResource("adventuring");
 }
 
 boolean loadSettings(string postRO){
- claimResource("adventuring");
  boolean rollpassed=false;
  string ls=visit_url("questlog.php?which=4");
- freeResource("adventuring");
  matcher notef=create_matcher(";'\\>([\\s\\S]*)\\</text",ls);
  if(!find(notef))return false;
  string[int] setting=split_string(group(notef,1),'\\r?\\n|\\s=\\s');
@@ -367,32 +288,25 @@ void saveSettings(string settings){
  foreach i in setting submit+=setting[i]+" = "+get_property(setting[i])+"\n";
  submit+="!day = "+gameday_to_int();
  submit="questlog.php?which=4&action=updatenotes&font=0&notes="+submit;
- claimResource("adventuring");
  visit_url(submit);
- freeResource("adventuring");
 }
 
 void deleteAnnouncement(){
- claimResource("adventuring");
  string t=visit_url("clan_hall.php");
  matcher m=create_matcher("(\\d+)\">delete</a>\\]<b><br>From: Ominous Buffer \\(",t);
  if(m.find())visit_url("clan_hall.php?action=delete&pwd&msgid="+m.group(1));
- freeResource("adventuring");
 }
 
 void announceClan(string message){
- claimResource("adventuring");
  deleteAnnouncement();
  string t="clan_board.php?action=postannounce&pwd&message="+message;
  visit_url(t);
- freeResource("adventuring");
 }
 
 void checkApps(){
  int[item] gift;
  gift[$item[black forest cake]]=1;
  gift[$item[bulky buddy box]]=1;
- claimResource("adventuring");
  boolean acceptall=true;
  matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
  if((appcheck.find())&&(acceptall)){
@@ -417,11 +331,10 @@ void checkApps(){
    commit(userdata,"userdata.txt");
   }
  }
- freeResource("adventuring");
 }
 
-void checkData(){
- update(userdata,"userdata.txt");
+/*void checkData(){
+ checkOut(userdata,"userdata.txt");
  if(!(userdata["*"] contains "~boss")){
   checkOut(userdata,"userdata.txt");
   userdata["*","~boss"]="25 phat loot, 25 thingfinder, 25 chorale";
@@ -432,7 +345,7 @@ void checkData(){
   chat_private("Almighty Sapling","I am error.");
   chat_clan("I am error.");
  }
-}
+}*/
 
 void raffleAnnounce(gameData g){
  string s="RAFFLE!\n";
@@ -491,7 +404,6 @@ void endRaffle(gameData g){
 }
 
 void checkMail(){
- claimResource("adventuring");
  checkOut(userdata,"userdata.txt");
  message[int] mail=parseMail();
  matcher mx;
@@ -626,5 +538,4 @@ raffle gameData{
   }
  }
  commit(userdata,"userdata.txt");
- freeResource("adventuring");
 }

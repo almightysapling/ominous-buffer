@@ -12,7 +12,6 @@ cuss at everyone	Fuck off. I have better things to do.	4	say
 definate	definite*	0	say		
 dissapear	disappear*	0	say		
 Finker	You mean Twinker, $pname.	0	say		
-good night	Good night, $pnick.	8	say		
 goodnight	Sweet dreams $pnick!	8	say		
 HIMYM?	How I Met Your Mother, $pnick.	3	say		
 is being ignored	goes over and plays in the corner with $pnick	0	do		
