@@ -4,6 +4,7 @@ int logMinutes=3;
 int burnMinutes=50;
 
 void systemCall(string command){
+print("sending: "+command);
  chat_private(my_name(),command);
 }
 
@@ -313,17 +314,21 @@ void main(){try{
    systemCall("apps");
    systemCall("mail");
   }
-  waitq(31);
+  waitq(55);
  }
  print("Using excess adventures before rollover.","blue");
  systemCall("deMole");
+ waitq(5);
  systemCall("record");
+ waitq(5);
  systemCall("outfit farm");
+ waitq(5);
  systemCall("bounty");
+ waitq(20);
  while(my_adventures()>burnTurns){
-  m=my_adventures()-5;
+  m=max(my_adventures()-5,burnTurns);
   systemCall("adventure");
-  while(my_adventures()>m)waitq(15);
+  while(my_adventures()>m)waitq(20);
  }
  systemCall("outfit buff");
  systemCall("apps");
