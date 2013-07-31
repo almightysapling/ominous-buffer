@@ -4,7 +4,6 @@ int logMinutes=3;
 int burnMinutes=50;
 
 void systemCall(string command){
-print("sending: "+command);
  chat_private(my_name(),command);
 }
 
@@ -215,7 +214,7 @@ void breakfast(){
  retrieve_item(7,$item[eggnog]);
  retrieve_item(1,$item[ram's face lager]);
  clearBuffs(6014);
- if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
+ if(have_skill($skill[the ode to booze]))(!use_skill(1,$skill[the ode to booze]));
  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[eggnog]);
  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[ram's face lager]);
  clearBuffs();
@@ -249,9 +248,9 @@ void breakfast(){
  eatsilent(1,$item[super salad]); 
  eatsilent(1,$item[handful of nuts and berries]); 
  */ 
- if((have_skill($skill[sonata of sneakiness]))&&(have_effect($effect[sonata of sneakiness])<1))(!use_skill(1,$skill[sonata of sneakiness]));
+ if((have_skill($skill[the sonata of sneakiness]))&&(have_effect($effect[the sonata of sneakiness])<1))(!use_skill(1,$skill[the sonata of sneakiness]));
  if((have_effect($effect[dreams and lights])<1)||((have_effect($effect[dreams and lights])<9)&&(have_effect($effect[arcane in the brain])<1))){
-  while(have_effect($effect[dreams and lights])<9)(!adventure(1,$location[haunted gallery]));
+  while(have_effect($effect[dreams and lights])<9)(!adventure(1,$location[the haunted gallery]));
   clearBuffs();
   retrieve_item(1,$item[llama lama gong]);
   cli_execute("gong mole");
