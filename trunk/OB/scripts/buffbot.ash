@@ -7,7 +7,9 @@ string[int] to_array(boolean[string] data){
   x[count(x)]=y;
  return x;
 }
-
+static{
+ boolean[string]doubleRun;
+}
 string genderMatcherString="(?:I AM|I'M) (?:AN |A )?(WHO I AM|ME";
 string[string,int] genders;
 genders["list"]=to_array($strings[genders, third, unknown, androgynous, male, female, inanimate]);
@@ -280,13 +282,13 @@ void buff(string sender, string msg, int numTurns, string ding){
     break;
    case "RATION":switch(failsplit[1]){
     case "ITEM":
-     use_skill(12,$skill[Fat Leon's Phat Loot Lyric],sender);
+     use_skill(12,$skill[fat leon's phat loot lyric],sender);
      break;
     case "MEAT":
-     use_skill(12,$skill[Polka of Plenty],sender);
+     use_skill(12,$skill[the polka of plenty],sender);
      break;
     case "NONCOMBAT":
-     use_skill(12,$skill[Carlweather's Cantata of Confrontation],sender);
+     use_skill(12,$skill[carlweather's cantata of confrontation],sender);
      break;
     }
     break;
@@ -472,7 +474,7 @@ void buff(string sender, string msg, int numTurns, string ding){
 }
 
 int roll(string sender, string msg){
- matcher m=create_matcher("(\\d+)[dD](\\d+)",msg);
+ matcher m=create_matcher("(\\d+)?[dD](\\d+)",msg);
  if(!m.find()){
   errorMessage(sender,"You're doing it wrong. Typical.");
   return 0;
@@ -483,7 +485,7 @@ int roll(string sender, string msg){
   return 0;
  }
  for die from 1 to m.group(1).to_int() running+=(1+random(m.group(2).to_int()));
- if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+m.group(1)+"d"+m.group(2)+").");
+ if(prefix=="")chat("/em rolls "+running+" for "+(userdata[sender,"nick"]!=""?userdata[sender,"nick"]:sender)+" ("+m.group(1)+"d"+m.group(2)+").");
  else chat("Rolling "+m.group(1)+"d"+m.group(2)+" gives "+running+".");
  return running;
 }
@@ -1120,8 +1122,8 @@ void userDetails(string sender, string who){
   }
   if(sysInt(who,"donated")>0)reply+="Donated: "+userdata[who,"donated"]+" meat.\n";
   if(who==sender){
-   reply+="Bank: "+userdata[who,"meat"]+" meat.\n";
-   reply+="Default Casts: "+userdata[who,"defaultCast"]+"\n";
+   if(userdata[who,"meat"].to_int()>0)reply+="Bank: "+userdata[who,"meat"]+" meat.\n";
+   if(userdata[who,"defaultCast"].to_int()>0)reply+="Default Casts: "+userdata[who,"defaultCast"]+"\n";
   }
   cli_execute("csend to "+sender+"||"+reply);
  }else chat(sender,"No match found for "+who+".");
@@ -1267,6 +1269,10 @@ void whitelistEdit(string oper){
  chat(action.group(2)+" added to whitelist.");
 }
 
+void man(string sender, string query){
+ cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+}
+
 void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
@@ -1378,6 +1384,7 @@ boolean subUser(string oper){
     return false;
    }
  }
+ commit(userdata,"userdata.txt");
  return true;
 }
 
@@ -1411,6 +1418,7 @@ boolean subEnv(string oper){
    chat(trueUser,"#"+(userdata[trueUser,"schannel"]==""?"!":userdata[trueUser,"schannel"])+">");
    return false;
  }
+ commit(userdata,"userdata.txt");
  return true;
 }
 
@@ -1484,8 +1492,9 @@ string predicateFilter(string sender, string msg){
    fax(sender,oper);
    return "x";
   case "help":
+  case "man":
   case "?":
-   cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+   man(sender,oper);
    return "x";
   case "host":
    startGame(sender,oper);
@@ -1596,7 +1605,7 @@ string predicateFilter(string sender, string msg){
     chat_private("wangbot","target "+(oper==""?sender:oper));
    }else{
     if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
-    if(item_amount($item["WANG"])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
+    if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(oper==""?sender:oper));
    }
    set_property("_lastWang",(oper==""?sender:oper)+'|'+sender);
@@ -1620,6 +1629,19 @@ string predicateFilter(string sender, string msg){
    return "x";
  }
  return msg;
+}
+
+boolean advancedFilterFail(string sender, string msg, string filter, string expected){
+ switch(filter){
+  case "msgHas":
+    if(msg.contains_text(expected))return false;
+   break;
+  case "msgStarts":
+    if(length(expected)>length(msg))return true;
+    if(msg.substring(0,length(expected))==expected)return false;
+   break;
+ }
+ return true;
 }
 
 void nopredpass(string sender, string msg, boolean addressed){
@@ -1652,7 +1674,7 @@ void nopredpass(string sender, string msg, boolean addressed){
    if(!ref.find())continue;
   }
   foundmatch=true;
-  if(replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
+  if((replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2))&&advancedFilterFail(sender,msg,reply.cond1,reply.cond2)){
    foundmatch=false;
    continue;
   }
@@ -2077,15 +2099,15 @@ void burn(){
  skill farmingbuff;
  switch(farmbuff){
   case 0:
-   farmingbuff=$skill[Fat Leon's Phat Loot Lyric];
+   farmingbuff=$skill[fat leon's phat loot lyric];
    farmbuff+=1;
    break;
   case 1:
-   farmingbuff=$skill[Polka of Plenty];
+   farmingbuff=$skill[the polka of plenty];
    farmbuff+=1;
    break;
   default:
-   farmingbuff=$skill[Cantata of Confrontation];
+   farmingbuff=$skill[carlweather\'s cantata of confrontation];
    farmbuff=0;
  }
  set_property("_lastFarmBuff",farmbuff.to_string());
@@ -2189,7 +2211,8 @@ void systemHandler(string msg){
  if(!m.find())return;
  string cmd=m.group(1);
  string ops=m.group(2);
- print(cmd);
+ doubleRun[cmd]=!doubleRun[cmd];
+ if(doubleRun[cmd])return;
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
@@ -2198,7 +2221,7 @@ void systemHandler(string msg){
    makeBackups();
    set_property("chatbotScript","");
    clearBuffs(6014);
-   if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
+   if(have_skill($skill[the ode to booze]))(!use_skill(1,$skill[the ode to booze]));
    overdrink(1,$item[eggnog]);
    checkApps();
    cli_execute("exit");
@@ -2301,13 +2324,23 @@ void hauntedhouseHandler(string sender, string msg){
  publicChat(sender,msg);
 }
 
+void dreadHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
+ prefix="/dread ";
+ if(sender=="Dungeon")return;
+ publicChat(sender,msg);
+}
+
 void eventHandler(string msg){
  //What to do here... hmm.
 }
 
 void privateHandler(string sender, string msg){
  matcher m;
- if(sender==my_name())systemHandler(msg);
+ if(sender==my_name()){
+  systemHandler(msg);
+  return;
+ }
  if(sender=="MesaChat"){
   m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
@@ -2317,6 +2350,7 @@ void privateHandler(string sender, string msg){
   }
   return;
  }
+ if(sender=="chatbot")return;
  if(!buffable(sender))return;
  prefix=sender;
  if(msg.char_at(0)=="!"){
@@ -2341,7 +2375,6 @@ void privateHandler(string sender, string msg){
   buff(sender,msg,0,sender);
   return;
  }
- if((sender=="chatbot")||(sender==my_name()))return;
  m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
@@ -2393,10 +2426,10 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if(sender=="wangbot"){
   if(msg.contains_text("dried out")){
-   if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+   if(item_amount($item[WANG])<1)cli_execute("stash take wang");
    matcher m=create_matcher("([^|]*)|(.*)",get_property("_lastWang"));
    if(m.find()){
-    if(item_amount($item["WANG"])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
+    if(item_amount($item[WANG])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+m.group(1));
    }
   }
@@ -2443,11 +2476,16 @@ void main(string sender, string msg, string channel){try{
   case "/hauntedhouse":
    hauntedhouseHandler(sender,msg);
    break;
+  case "/dread":
+   dreadHandler(sender,msg);
+   break;
   case "Events":
    eventHandler(msg);
    break;
-  default:
+  case "":
    privateHandler(sender,msg);
+   break;
+  default:
    break;
  }
 }finally{

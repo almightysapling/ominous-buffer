@@ -11,7 +11,7 @@ string turtleBot="Ominous Tamer";
 string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
-int burnTurns=130;
+int burnTurns=100;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
 
