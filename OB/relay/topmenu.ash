@@ -1,5 +1,4 @@
 import <shared.ash>
-invokeResourceMan(__FILE__);
 string[string] fields=form_fields();
 //html properties
 boolean spaced=false;
@@ -197,7 +196,7 @@ void header(){
 
 void options(){
  int[string] books;
- update(books,"books.txt");
+ checkOut(books,"books.txt");
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
  nln("<input type=\"hidden\" name=\"cp\" value=\"save\" />");
  nln("<span class=\"optGroup\">Ominous Buffer</span>");
