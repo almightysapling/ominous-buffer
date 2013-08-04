@@ -1220,7 +1220,7 @@ void clanTitle(string sender, string newt){
 
 void whitelistEdit(string oper){
  string cw=visit_url("clan_whitelist.php");
- if(!cw.contains_text("<form>")){
+ if(!cw.contains_text("<form")){
   chat("Oh, no. A horrible, awful, irrevocable thing has happened... You broke my heart. {Core Privelage Disabled}");
   return;
  }
