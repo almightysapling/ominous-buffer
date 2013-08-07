@@ -220,6 +220,7 @@ print("Players: "+count(game.players).to_string());
 
 boolean hangman(string sender, string guess){
  gameData game=loadGame();
+ if(game.host==sender)return false;
  if(game.intervals<7){
   if(guess==game.data[0]){
    chat_clan("Great job, "+sender+"! The phrase was \""+game.data[-1]+"\"");
