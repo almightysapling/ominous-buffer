@@ -503,12 +503,24 @@ void startGame(string sender, string msg){
   }else chat(sender,"A game is already in session by "+game.host+".");
   return;
  }
- matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
+ matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette|hangman)\\s?(\\d+|[A-Za-z'\\s]+)?",msg);
  if(!m.find())return;
  string t=m.group(1);
  string l="-";
  if(m.group_count()>1)l=m.group(2);
  switch(t){
+  case "hangman":
+   startHangman(l,sender);
+   game=loadGame();
+   if((l=="-")||((l.to_int()==0)&&(l.char_at(0)=="0"))){
+    print("Invalid: "+l);
+    closeGame();
+    break;
+   }
+   chat(sender,"Game started.");
+   chat("","Hangman time!");
+   chat(game.data[1]);
+   break;
   case "wordshot":
    startWordshot(l.to_int(),sender);
    game=loadGame();
@@ -2282,6 +2294,8 @@ void clanHandler(string sender, string msg){
   case gameRoulette:
    russianRoulette(sender,msg);
    return;
+  case gameHangman:
+   if(hangman(sender,msg))return;
   default:
    publicChat(sender,msg);
    if(silent)maybeFact();
