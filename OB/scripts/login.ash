@@ -126,7 +126,6 @@ void handleMeat(){
  books["Event2"]=-1;
  books["Event3"]=-1;
  resetEvents(books);
- set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
 }
 

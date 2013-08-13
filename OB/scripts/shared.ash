@@ -10,7 +10,7 @@ string sauceBot="Ominous Sauceror";
 string turtleBot="Ominous Tamer";
 string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
-string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
+string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals;!day";
 int burnTurns=100;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
@@ -262,11 +262,12 @@ boolean loadSettings(string postRO){
  if(x==0)return false;
  int day=-1;
  for i from 0 to count(setting)-1 if(setting[i]=="!day")day=setting[i+1].to_int();
+ print("Quest Save Data: "+day+"; Today: "+gameday_to_int());
  if(day!=gameday_to_int()){
   rollpassed=true;
   string[int] skipsplit=split_string(postRO,';');
   int[string] skip;
-  foreach toskip in skipsplit skip[skipsplit[toskip]]=1;
+  foreach num,toskip in skipsplit skip[toskip]=1;
   for i from 0 to x-1 if(!(skip contains setting[2*i]))set_property(setting[2*i],setting[2*i+1]);
  }else for i from 0 to x-1 set_property(setting[2*i],setting[2*i+1]);
  saveSettings();
