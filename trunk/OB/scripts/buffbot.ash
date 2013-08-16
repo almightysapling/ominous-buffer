@@ -512,7 +512,7 @@ void startGame(string sender, string msg){
   case "hangman":
    startHangman(l,sender);
    game=loadGame();
-   if((l=="-")||((l.to_int()==0)&&(l.char_at(0)=="0"))){
+   if((l=="-")||(l=="")||((l.to_int()==0)&&(l.char_at(0)=="0"))){
     print("Invalid: "+l);
     closeGame();
     break;
