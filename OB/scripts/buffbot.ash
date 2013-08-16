@@ -512,7 +512,7 @@ void startGame(string sender, string msg){
   case "hangman":
    startHangman(l,sender);
    game=loadGame();
-   if((l=="-")||(l=="")||((l.to_int()==0)&&(l.char_at(0)=="0"))){
+   if((l.to_int()!=0)||(l.char_at(0)=="0")){
     print("Invalid: "+l);
     closeGame();
     break;
@@ -785,6 +785,7 @@ string replyParser(string sender, string msg){
     break;
    case "sresult":
    case "smath":
+   case "sans":
     temp=randplayer["lastMath"];
     if(randplayer["lastMath"].to_int()==randplayer["lastMath"].to_float())temp=randplayer["lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -832,6 +833,7 @@ string replyParser(string sender, string msg){
     break;
    case "presult":
    case "pmath":
+   case "pans":
     temp=thesender["lastMath"];
     if(thesender["lastMath"].to_int()==thesender["lastMath"].to_float())temp=thesender["lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -868,6 +870,7 @@ string replyParser(string sender, string msg){
     break;
    case "math":
    case "result":
+   case "ans":
     temp=userdata["*","lastMath"];
     if(userdata["*","lastMath"].to_int()==userdata["*","lastMath"].to_float())temp=userdata["*","lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -1773,7 +1776,7 @@ int timeSinceLastChat(string who){
 boolean isMath(string m){
  matcher fix=create_matcher("(?i)(?<![a-z])(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)(?![a-z])",m);
  m=replace_all(fix,"+");
- fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
+ fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]]",m);
  if(fix.find())return false;
  return true;
 }
