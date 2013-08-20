@@ -911,6 +911,14 @@ string replyParser(string sender, string msg){
     i=random(i);
     msg=replace_first(variable,i.to_string());
     break;
+   case "fact":
+    if(sender.getUF("admin")){
+     if(variable.group_count()>1)i=variable.group(2).to_int();
+     msg=replace_first(variable,factCore("F",i));
+     break;
+    }
+    msg=replace_first(variable,variable.group(1));
+    break;
    default:
     if(chatVars contains variable.group(1))msg=replace_first(variable,chatVars[variable.group(1)]);
     else msg=replace_first(variable,variable.group(1));

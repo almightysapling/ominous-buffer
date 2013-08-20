@@ -161,18 +161,19 @@ string to_commad(int i){
  return c;
 }
 
-string factCore(string type){
+string factCore(string type,int i){
  string[string,int] factList;
  checkOut(factList,"facts.txt");
- return factList[type,random(count(factList[type]))];
+ if((i<0)||(i>=count(factList[type]))return factList[type,random(count(factList[type]))];
+ return factList[type,i];
 }
 
 string factCore(){
- return factCore("F");
+ return factCore("F",-1);
 }
 
 string insultCore(){
- return factCore("I");
+ return factCore("I",-1);
 }
 
 void clearBuffs(int skip){
