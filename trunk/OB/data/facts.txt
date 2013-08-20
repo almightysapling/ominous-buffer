@@ -9,7 +9,7 @@ F	7	An ostrich's eye is bigger than its brain.
 F	8	Hot water freezes quicker than cold water.
 F	9	Polymerase I polypeptide A is a human gene.
 F	10	The Sun is 330,330 times larger than Earth.
-F	F	11	The moon orbits the Earth every 27.32 days.
+F	11	The moon orbits the Earth every 27.32 days.
 F	12	A nanosecond lasts one billionth of a second.
 F	13	To make a photocopier, simply photocopy a mirror.
 F	14	Humans can survive underwater. But not for very long.
@@ -21,7 +21,7 @@ F	19	The atomic weight of Germanium is 72.64.
 F	20	China produces the world's second largest crop of soybeans.
 F	21	Human tapeworms can grow up to 22.9 meters.
 F	22	89% of magic tricks are not magic. Technically, they are sorcery.
-F	23	Iguanas can stay underwater for twenty-eight point seven minutes.
+F	23	Iguanas can stay underwater for 28.7 minutes.
 F	24	Every square inch of the human body has 32 million bacteria on it.
 F	25	The average life expectancy of a rhinoceros in captivity is 15 years.
 F	26	At the end of The Seagull by Anton Chekhov, Konstantin kills himself.
@@ -61,7 +61,7 @@ F	59	It is incorrectly noted that Thomas Edison invented 'push-ups' in 1878. Nik
 F	60	The automobile brake was not invented until 1895. Before this, someone had to remain in the car at all times, driving in circles until passengers returned from their errands.
 F	61	The most poisonous fish in the world is the orange ruffy. Everything but its eyes are made of a deadly poison. The ruffy's eyes are composed of a less harmful, deadly poison.
 F	62	In 1862, Abraham Lincoln signed the Emancipation Proclamation, freeing the slaves. Like everything he did, Lincoln freed the slaves while sleepwalking, and later had no memory of the event.
-F	63	The Schrodinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
+F	63	The Schrödinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
 F	64	Fact not found.
 F	65	If you have trouble with simple counting, use the following mnemonic device: 1 comes before 2 comes before I should kill myself. The world will be a better place without you.
 F	66	Ominous Buffer is the most handsome buffer.
@@ -92,3 +92,4 @@ I	11	as unique as a snowflake, and just as useful
 I	12	clearly suffering from mental instability
 I	13	likely a murderer
 I	14	unloved
+I	15	friendless
