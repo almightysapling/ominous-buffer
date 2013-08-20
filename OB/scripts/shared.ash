@@ -164,7 +164,7 @@ string to_commad(int i){
 string factCore(string type,int i){
  string[string,int] factList;
  checkOut(factList,"facts.txt");
- if((i<0)||(i>=count(factList[type]))return factList[type,random(count(factList[type]))];
+ if((i<0)||(i>=count(factList[type])))return factList[type,random(count(factList[type]))];
  return factList[type,i];
 }
 
