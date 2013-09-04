@@ -101,7 +101,6 @@ void sysInc(string prop){
  sysInc("*",prop,1);
 }
 
-
 //check clan whitelist for user if not in clan
 boolean checkWhitelist(string id){
  string page=visit_url("clan_whitelist.php");
@@ -174,6 +173,14 @@ string factCore(){
 
 string insultCore(){
  return factCore("I",-1);
+}
+
+void deMole(){
+ if(have_effect($effect[Shape of...Mole!])>0){
+  while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
+  if(!adventure(1,$location[Mt. Molehill])){}
+  visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
+ }
 }
 
 void clearBuffs(int skip){
