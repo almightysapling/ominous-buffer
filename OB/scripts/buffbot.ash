@@ -2229,6 +2229,14 @@ void publicChat(string sender, string msg){
  return;
 }
 
+void deMole(){
+ if(have_effect($effect[Shape of...Mole!])>0){
+  while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
+  if(!adventure(1,$location[Mt. Molehill])){}
+  visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
+ }
+}
+
 void systemHandler(string msg){
  matcher m=create_matcher("(\\S*)\\s?(.*)",msg);
  if(!m.find())return;
@@ -2251,12 +2259,6 @@ void systemHandler(string msg){
    break;
   case "apps":checkApps();break;
   case "mail":checkMail();break;
-  case "deMole":if(have_effect($effect[Shape of...Mole!])>0){
-    while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
-    if(!adventure(1,$location[Mt. Molehill])){}
-    visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
-   }
-   break;
   case "outfit":switch(ops){
     case "farm":
      cli_execute("familiar "+meatFam);
@@ -2269,13 +2271,14 @@ void systemHandler(string msg){
      break;
    }
    break;
-  case "record": makeRecords();break;
+  case "record": deMole(); makeRecords();break;
   case "adventure":
+   deMole();
    if(my_adventures()<=burnTurns)break;
    if(adventure(5,$location[Icy Peak])){}
    burn();
    break;
-  case "bounty":doBounty();
+  case "bounty":deMole(); doBounty();break;
  }
 }
 

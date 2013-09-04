@@ -315,8 +315,6 @@ void main(){try{
   waitq(55);
  }
  print("Using excess adventures before rollover.","blue");
- systemCall("deMole");
- waitq(5);
  systemCall("record");
  waitq(5);
  systemCall("outfit farm");
