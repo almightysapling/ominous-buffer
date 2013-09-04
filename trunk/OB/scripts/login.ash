@@ -177,6 +177,7 @@ void processQuestData(boolean rp){
 void breakfast(){
  string rumpus=visit_url("clan_rumpus.php");
  checkMail();
+ deMole();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
  cli_execute("maximize exp, -100 combat");
  print("Visiting clan rumpus room.", "blue");
