@@ -14,6 +14,7 @@ string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals;!day";
 int burnTurns=100;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
+boolean errorFree=false;
 
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;

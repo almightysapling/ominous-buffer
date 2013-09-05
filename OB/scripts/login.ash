@@ -338,7 +338,9 @@ void main(){try{
  if(MinutesToRollover()<10)chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  print("Logging out","blue");
  systemCall("logout");
+ errorFree=true;
 }finally{
+ if(!errorFree)print("Some sort of error","red");
  print("Script Halted","red");
  saveSettings(earlySave);
 }}

@@ -2432,6 +2432,7 @@ void privateHandler(string sender, string msg){
 }
 
 boolean preHandled(string sender, string msg, string channel){
+ errorFree=true;
  if(sender=="System Message"){
   return true;
  }
@@ -2457,6 +2458,7 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if((sender=="MesaChat")&&(channel!=""))return true;
  if((sender==my_name())&&(channel!=""))return true;
+ errorFree=false;
  return false;
 }
 
@@ -2508,6 +2510,11 @@ void main(string sender, string msg, string channel){try{
   default:
    break;
  }
+ errorFree=true;
 }finally{
-
+ if(!errorFree){
+  print("ERROR","red");
+  print("Message: "+msg,"olive");
+  print("From "+sender+" in "+channel,"olive");
+ }
 }}
