@@ -122,11 +122,16 @@ void handleMeat(){
  int[string] books;
  checkOut(books,"books.txt");
  books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
+ books["avg"]=(books["avg"]*3+totalDMS-19)/4;
  books["Event1"]=-1;
  books["Event2"]=-1;
  books["Event3"]=-1;
  resetEvents(books);
  commit(books,"books.txt");
+ if(totalDMS<0){
+  take_closet(totalDMS,$item[dense meat stack]);
+  cli_execute("autosell * dense meat stack");
+ }
 }
 
 void updateFaxes(){
