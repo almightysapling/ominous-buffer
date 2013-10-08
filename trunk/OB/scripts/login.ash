@@ -128,6 +128,7 @@ void handleMeat(){
  books["Event3"]=-1;
  resetEvents(books);
  commit(books,"books.txt");
+ set_property("books",books["Event1"]+"::"+books["Event2"]+"::"+books["Event3"]+"::"+books["nextLotto"]+"::"+books["thisLotto"]);
  if(totalDMS<0){
   take_closet(totalDMS,$item[dense meat stack]);
   cli_execute("autosell * dense meat stack");
