@@ -303,6 +303,7 @@ void prepareScript(){
 
 void main(){try{
  run_combat();
+ cli_execute("autoattack none; ccs default;");
  print("Starting Login...","olive");
  set_property("chatbotScript",chatbotScript);
  set_property("_lockChat","1");
