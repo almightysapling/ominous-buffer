@@ -9,8 +9,8 @@ file_to_map("userdata.txt",userdata);
 string sauceBot="Ominous Sauceror";
 string turtleBot="Ominous Tamer";
 string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners";
-string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
-string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals;!day";
+string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;lottos;books;winners;admins";
+string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals;lottos;!day";
 int burnTurns=100;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
@@ -58,6 +58,7 @@ string defaultProp(string prop){
 }
 
 boolean getUF(string user,string flag){
+ if(!(userdata[user] contains flag))defaultProp(user,flag);
  return userdata[user,flag].to_boolean();
 }
 

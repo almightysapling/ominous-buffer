@@ -1980,6 +1980,9 @@ void checkLotto(){
  if(time<books["Event2"])event=2;
  if(time<books["Event3"])event=3;
  if(event<1)return;
+ int num;
+ for i from 1 to 3 if(books["Event"+i.to_string()]>0)num+=1;
+ set_property("lottos",num.to_string());
  books["Event"+event.to_string()]=0;
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
@@ -1990,9 +1993,9 @@ void checkLotto(){
  remove inClan["relay"];
  string[int] clannies;
  foreach name in inClan clannies[count(clannies)]=name;
- int num=count(clannies);
+ num=count(clannies);
  if(num<1){
-  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+  set_property("books",books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
   commit(books,"books.txt");
   updateProfile();
   return;
@@ -2033,7 +2036,7 @@ void checkLotto(){
   print("Event Lost.","blue");
   chat("Just what I thought. Everyone here is a loser. And "+insultCore()+" as well.");
  }
- set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+ set_property("books",books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
 }
