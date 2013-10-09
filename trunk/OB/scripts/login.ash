@@ -123,12 +123,7 @@ void handleMeat(){
  checkOut(books,"books.txt");
  books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
  books["avg"]=(books["avg"]*3+totalDMS-19)/4;
- books["Event1"]=-1;
- books["Event2"]=-1;
- books["Event3"]=-1;
- resetEvents(books);
  commit(books,"books.txt");
- set_property("books",books["Event1"]+"::"+books["Event2"]+"::"+books["Event3"]+"::"+books["nextLotto"]+"::"+books["thisLotto"]);
  if(totalDMS<0){
   take_closet(totalDMS,$item[dense meat stack]);
   cli_execute("autosell * dense meat stack");
@@ -152,18 +147,15 @@ void processQuestData(boolean rp){
  //Lotto
  int[string] books;
  checkOut(books,"books.txt");
- matcher m=create_matcher("(\\d+)::(\\d+)::(\\d+)::(\\d+)::(\\d+)",get_property("books"));
+ matcher m=create_matcher("(\\d+)::(\\d+)",get_property("books"));
  if(m.find()){
-  if(!rp){
-   books["Event1"]=(m.group(1).to_int()>0?-1:0);
-   books["Event2"]=(m.group(2).to_int()>0?-1:0);
-   books["Event3"]=(m.group(3).to_int()>0?-1:0);
-   resetEvents(books);
-  }
   books["nextLotto"]=m.group(4).to_int();
   books["thisLotto"]=m.group(5).to_int();
  }
- set_property("books",books["Event1"]+"::"+books["Event2"]+"::"+books["Event3"]+"::"+books["nextLotto"]+"::"+books["thisLotto"]);
+ if(!rp){
+  for i from 0 to 2 books["Event"+to_string(i+1)]=(get_property("lottos").to_int()>i?-1:0);
+  resetEvents(books);
+ }
  commit(books,"books.txt");
  //Limited Buffs
  checkOut(userdata,"userdata.txt");
@@ -284,12 +276,6 @@ void cleanPC(){
  lifetime["*"]=0;
  foreach sk in lifetime if(sk!="*")lifetime["*"]+=lifetime[sk];
  commit(lifetime,"lifetime.txt");
- int[string]books;
- checkOut(books,"books.txt");
- books["Event1"]=0;
- books["Event2"]=0;
- books["Event3"]=0;
- commit(books,"books.txt");
  set_property("_thisBreakfast","1");
 }
 
@@ -307,9 +293,9 @@ void main(){try{
  print("Starting Login...","olive");
  set_property("chatbotScript",chatbotScript);
  set_property("_lockChat","1");
- if(get_property("_breakfast")=="")breakfast();
- if(get_property("_thisBreakfast")=="")cleanPC();
  prepareScript();
+ if(get_property("_thisBreakfast")=="")cleanPC();
+ if(get_property("_breakfast")=="")breakfast();
  set_property("_lockChat","");
  print("Entering wait cycle.","green");
  int m=burnMinutes+1;
