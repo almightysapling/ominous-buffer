@@ -2270,7 +2270,7 @@ void systemHandler(string msg){
   case "adventure":
    deMole();
    if(my_adventures()<=burnTurns)break;
-   if(adventure(5,$location[Icy Peak])){}
+   if(adventure(5,$location[The Icy Peak])){}
    burn();
    break;
   case "bounty":deMole(); doBounty();break;
