@@ -15,12 +15,13 @@
 62	Managerial Manipulation	4	5	20
 
 2007	Ghostly Shell	4	6	5	4
-2008	Reptilian Fortitude	4	10	5	9
+2008	Reptilian Fortitude	4	10	5	10
 2009	Empathy of the Newt	4	15	5	8
 2010	Tenacity of the Snapper	4	8	5	6
 2012	Astral Shell	4	10	5	12
 2025	Jingle Bells	4	5	5
 2026	Curiosity of Br'er Tarrypin	4	10	5
+2031	Spiky Shell	4	8	5	9
 
 4007	Elemental Saucesphere	4	10	5	4
 4008	Jalape&ntilde;o Saucesphere	4	5	5	7
