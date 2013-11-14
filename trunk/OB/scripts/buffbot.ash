@@ -2253,6 +2253,7 @@ void systemHandler(string msg){
    cli_execute("exit");
    break;
   case "apps":checkApps();break;
+  case "check":checkApps();
   case "mail":checkMail();break;
   case "outfit":switch(ops){
     case "farm":
@@ -2273,7 +2274,7 @@ void systemHandler(string msg){
    if(adventure(5,$location[The Icy Peak])){}
    burn();
    break;
-  case "bounty":deMole(); doBounty();break;
+  case "bounty":systemHandler("outfit farm"); deMole(); doBounty();break;
  }
 }
 
