@@ -152,10 +152,9 @@ void processQuestData(boolean rp){
   books["nextLotto"]=m.group(1).to_int();
   books["thisLotto"]=m.group(2).to_int();
  }
- if(!rp){
-  for i from 0 to 2 books["Event"+to_string(i+1)]=(get_property("lottos").to_int()>i?-1:0);
-  resetEvents(books);
- }
+ if(!rp) for i from 0 to 2 books["Event"+to_string(i+1)]=(get_property("lottos").to_int()>i?-1:0);
+ else for i from 0 to 2 books["Event"+to_string(i+1)]=-1;
+ resetEvents(books);
  commit(books,"books.txt");
  //Limited Buffs
  checkOut(userdata,"userdata.txt");
@@ -303,15 +302,12 @@ void main(){try{
   m=minutesToRollover();
   checkProperties();
   if((m%5)==0){
-   systemCall("apps");
-   systemCall("mail");
+   systemCall("check");
   }
   waitq(55);
  }
  print("Using excess adventures before rollover.","blue");
  systemCall("record");
- waitq(5);
- systemCall("outfit farm");
  waitq(5);
  systemCall("bounty");
  waitq(20);
