@@ -1979,6 +1979,7 @@ void checkLotto(){
  if(time<books["Event1"])event=1;
  if(time<books["Event2"])event=2;
  if(time<books["Event3"])event=3;
+ if(time<0)return;
  if(event<1)return;
  int num;
  for i from 1 to 3 if(books["Event"+i.to_string()]>0)num+=1;
