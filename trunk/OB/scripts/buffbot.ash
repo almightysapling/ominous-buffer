@@ -334,7 +334,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
   case 46:case 47:case 48:case 58:case 59:case 60:
-  case 7040:case 7041: return;
+  case 7040:case 7041:case 6037:case 6040: return;
  }
  //Forward skill requests to relay bots when necessary
  string senderid=getId(sender);
@@ -2275,7 +2275,7 @@ void systemHandler(string msg){
    if(adventure(5,$location[The Icy Peak])){}
    burn();
    break;
-  case "bounty":systemHandler("outfit farm"); deMole(); doBounty();break;
+  case "bounty":systemHandler("outfit farm");systemHandler("outfit farm"); deMole(); doBounty();break;
  }
 }
 

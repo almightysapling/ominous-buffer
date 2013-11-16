@@ -151,7 +151,7 @@ void main(){try{
   cli_execute("familiar "+meatfarm_fam);
   print("Daily Adventuring","red");
   while(my_adventures()>130){
-   adventure(1,$location[icy peak]);
+   adventure(1,$location[the icy peak]);
    while(my_mp()>0.9*my_maxmp()) switch(my_class()){
     case $class[sauceror]:
      use_skill(3,$skill[elemental saucesphere],"Ominous Buffer");
