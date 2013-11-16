@@ -26,7 +26,7 @@
 4007	Elemental Saucesphere	4	10	5	4
 4008	Jalape&ntilde;o Saucesphere	4	5	5	7
 4019	Scarysauce	4	10	5
-4033	Antibiotic Saucesphere	4	10	15	10
+4033	Antibiotic Saucesphere	4	15	5	10
 
 6003	Aloysius' Antiphon of Aptitude	4	40	5	11
 6004	The Moxious Madrigal	4	2	5	1
@@ -52,6 +52,9 @@
 6026	Donho's Bubbly Ballad	4	75	5
 6027	Cringle's Curative Carol	4	5	5
 6028	Inigo's Incantation of Inspiration	4	100	5
+
+6037	Bawdy Refrain	5	11	0	9
+6040	Cone of Zydeco	5	15	0	12
 
 6901	Time's Arrow Adventures	0	0	0
 
