@@ -51,7 +51,7 @@ void resetEvents(int[string] books){
  limit=3;
  foreach i,v in e if(books["Event"+i]!=0)books["Event"+i]=v;
  foreach i in e if(books["Event"+i]==0)limit-=1;
- print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).");
+ print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).</font>");
 }
 
 void handleMeat(){
