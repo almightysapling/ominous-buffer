@@ -49,7 +49,7 @@ void resetEvents(int[string] books){
   }
  }
  limit=3;
- foreach i,v in e if(books["Event"+i]<0)books["Event"+i]=v;
+ foreach i,v in e if(books["Event"+i]!=0)books["Event"+i]=v;
  foreach i in e if(books["Event"+i]==0)limit-=1;
  print("Setting times for "+limit+" lotto events.","green");
 }
