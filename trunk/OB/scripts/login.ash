@@ -51,7 +51,7 @@ void resetEvents(int[string] books){
  limit=3;
  foreach i,v in e if(books["Event"+i]!=0)books["Event"+i]=v;
  foreach i in e if(books["Event"+i]==0)limit-=1;
- print("Setting times for "+limit+" lotto events.","green");
+ print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).");
 }
 
 void handleMeat(){
@@ -293,7 +293,11 @@ void main(){try{
  run_combat();
  cli_execute("autoattack none; ccs default;");
  print("Starting Login...","olive");
+ set_property("!day",gameday_to_int());
  set_property("chatbotScript",chatbotScript);
+ print("Purge pending requests","olive");
+ waitq(30);
+ print("Time up, continue logging in.","olive");
  set_property("_lockChat","1");
  prepareScript();
  if(get_property("_thisBreakfast")=="")cleanPC();
