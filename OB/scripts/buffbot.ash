@@ -1981,8 +1981,9 @@ void checkLotto(){
  if(time<books["Event3"])event=3;
  if(time<0)return;
  if(event<1)return;
- int num;
+ int num=-1;
  for i from 1 to 3 if(books["Event"+i.to_string()]>0)num+=1;
+ if(num<0)num=0;
  set_property("lottos",num.to_string());
  books["Event"+event.to_string()]=0;
  books["nextLotto"]+=2;
