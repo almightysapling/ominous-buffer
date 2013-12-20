@@ -2432,13 +2432,15 @@ void privateHandler(string sender, string msg){
   m=create_matcher("[a-zA-Z\\?](?:[a-zA-Z']|(?:\\s(?=\\w)))*",messages[i]);
   if(m.find())messages[i]=m.group(0);
   if(multiplier==0)buff(sender,messages[i],turnR,co);
-  else if(turnR==0)buff(sender,messages[i],multiplier,co);
-  else buff(sender,messages[i],multiplier*turnR,co);
+  else buff(sender,messages[i],multiplier,co);
  }
 }
 
 boolean preHandled(string sender, string msg, string channel){
  errorFree=true;
+ if(msg==""){
+  return true;
+ }
  if(sender=="System Message"){
   return true;
  }
