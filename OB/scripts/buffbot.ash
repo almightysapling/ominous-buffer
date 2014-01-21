@@ -67,25 +67,33 @@ boolean raidlogRead=false;
 boolean silent=true;
 
 string glitch(string s){
+ buffer b;
  matcher m;
  m=create_matcher("12",s);
  while(m.find()){
-  switch(random(8)){
-   case 0: s=m.replace_first("TWELVE");
-    break;
-   case 1: s=m.replace_first("tWeLve.");
-    break;
-   case 2: s=m.replace_first("twlv");
-    break;
-   case 3: s=m.replace_first("twelve");
-    break;
-  }
-  m=m.reset(s);
+  if(random(100)<25){
+   switch(random(5)){
+    case 0: m.append_replacement(b,"TWELVE");
+     break;
+    case 1: m.append_replacement(b,"tWeLve");
+     break;
+    case 2: m.append_replacement(b,"twlv");
+     break;
+    case 3: m.append_replacement(b,"twelve");
+     break;
+    case 4: m.append_replacement(b,"XII");
+     break;
+   }
+  }else m.append_replacement(b,"12");
  }
- if(random(1000)<20){
-  m=create_matcher("I",s);
-  s=m.replace_all("i");
- }
+ m.append_tail(b);
+ s=b.to_string();
+ b.delete(0,length(b));
+ m=create_matcher("I",s);
+ while(m.find())if(random(1000)<35)m.append_replacement(b,"i");
+  else m.append_replacement(b,m.group(0));
+ m.append_tail(b);
+ s=b.to_string();
  return s;
 }
 
@@ -1997,7 +2005,7 @@ void checkLotto(){
  foreach name in inClan clannies[count(clannies)]=name;
  num=count(clannies);
  if(num<1){
-  set_property("books",books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+  set_property("books",books["thisLotto"].to_string()+"::"+books["nextLotto"].to_string());
   commit(books,"books.txt");
   updateProfile();
   return;
@@ -2038,7 +2046,7 @@ void checkLotto(){
   print("Event Lost.","blue");
   chat("Just what I thought. Everyone here is a loser. And "+insultCore()+" as well.");
  }
- set_property("books",books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+ set_property("books",books["thisLotto"].to_string()+"::"+books["nextLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
 }
@@ -2269,14 +2277,15 @@ void systemHandler(string msg){
      break;
    }
    break;
-  case "record": deMole(); makeRecords();break;
+  case "record":systemHandler("outfit buff"); systemHandler("outfit buff"); deMole(); makeRecords();break;
   case "adventure":
+   systemHandler("outfit farm");systemHandler("outfit farm");
    deMole();
    if(my_adventures()<=burnTurns)break;
    if(adventure(5,$location[The Icy Peak])){}
    burn();
    break;
-  case "bounty":systemHandler("outfit farm");systemHandler("outfit farm"); deMole(); doBounty();break;
+//  case "bounty":systemHandler("outfit farm");systemHandler("outfit farm"); deMole(); doBounty();break;
  }
 }
 

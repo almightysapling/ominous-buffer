@@ -285,7 +285,6 @@ void prepareScript(){
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
- cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
 }
 
@@ -303,6 +302,7 @@ void main(){try{
  if(get_property("_thisBreakfast")=="")cleanPC();
  if(get_property("_breakfast")=="")breakfast();
  set_property("_lockChat","");
+ systemCall("outfit buff");
  print("Entering wait cycle.","green");
  int m=burnMinutes+1;
  while(m>burnMinutes){
