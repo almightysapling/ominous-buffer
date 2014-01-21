@@ -292,6 +292,12 @@ void formProps(){
  string prop="";
  foreach u in userdata if(getUF(u,"admin"))prop+=u+"::";
  set_property("admins",prop);
+ int[string] books;
+ checkOut(books,"books.txt");
+ string[int]split=split_string(get_property("books"),"::");
+ books["thisLotto"]=split[0].to_int();
+ books["nextLotto"]=split[1].to_int();
+ commit(books,"books.txt");
 }
 
 void saveSettings(string settings){
