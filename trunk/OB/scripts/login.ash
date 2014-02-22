@@ -336,7 +336,7 @@ void main(){try{
  systemCall("logout");
  errorFree=true;
 }finally{
- if(!errorFree)print("Some sort of error","red");
- print("Script Halted","red");
+ if(!errorFree)print("ABRUPT STOP","red");
+ print("Script Halted @R-"+minutesToRollover(),"red");
  saveSettings(earlySave);
 }}
