@@ -2124,7 +2124,7 @@ void doBounty(){
  }
  int oldLucre=item_amount($item[filthy lucre]);
  visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
- while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
+// while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
  visit_url("bhh.php");
 }
 
@@ -2268,7 +2268,7 @@ void systemHandler(string msg){
   case "outfit":switch(ops){
     case "farm":
      cli_execute("familiar "+meatFam);
-     cli_execute("maximize 2 meat, item, 100 combat, equip C.H.U.M. knife, -tie");
+     cli_execute("maximize 2 meat, item, 100 combat, equip trikitixa, -tie");
      break;
     case "buff":
      cli_execute("familiar "+statFam);
