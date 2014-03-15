@@ -152,11 +152,14 @@ void processQuestData(boolean rp){
  checkOut(books,"books.txt");
  matcher m=create_matcher("(\\d+)::(\\d+)",get_property("books"));
  if(m.find()){
-  books["nextLotto"]=m.group(1).to_int();
-  books["thisLotto"]=m.group(2).to_int();
+  books["thisLotto"]=m.group(1).to_int();
+  books["nextLotto"]=m.group(2).to_int();
  }
  if(!rp) for i from 0 to 2 books["Event"+to_string(i+1)]=(get_property("lottos").to_int()>i?-1:0);
- else for i from 0 to 2 books["Event"+to_string(i+1)]=-1;
+ else{
+  for i from 0 to 2 books["Event"+to_string(i+1)]=-1;
+  set_property("lottos",2);
+ }
  resetEvents(books);
  commit(books,"books.txt");
  //Limited Buffs

@@ -2049,6 +2049,7 @@ void checkLotto(){
  set_property("books",books["thisLotto"].to_string()+"::"+books["nextLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
+ saveSettings(earlySave);
 }
 
 void makeRecords(){
