@@ -71,7 +71,7 @@ string glitch(string s){
  matcher m;
  m=create_matcher("12",s);
  while(m.find()){
-  if(random(100)<25){
+  if(random(100)<10){
    switch(random(5)){
     case 0: m.append_replacement(b,"TWELVE");
      break;
@@ -90,7 +90,7 @@ string glitch(string s){
  s=b.to_string();
  b.delete(0,length(b));
  m=create_matcher("I",s);
- while(m.find())if(random(1000)<35)m.append_replacement(b,"i");
+ while(m.find())if(random(1000)<55)m.append_replacement(b,"i");
   else m.append_replacement(b,m.group(0));
  m.append_tail(b);
  s=b.to_string();
