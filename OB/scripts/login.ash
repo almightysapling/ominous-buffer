@@ -210,6 +210,7 @@ void breakfast(){
  if(get_property("sidequestArenaCompleted")!="none")visit_url("postwarisland.php?action=concert&option=2");
  if(item_amount($item[burrowgrub hive])>0)use(1,$item[burrowgrub hive]);
  if(item_amount($item[cheap toaster])>0)for i from 1 to 3 use(1,$item[cheap toaster]);
+ if(item_amount($item[festive warbear bank])>0)use(1,$item[festive warbear bank]);
  visit_url("volcanoisland.php?action=npc");
  if(item_amount($item[fisherman's sack])>1)use(1,$item[fisherman's sack]);
  for i from 1 to 5 (!hermit(1,$item[ten-leaf clover]));
