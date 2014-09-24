@@ -327,7 +327,7 @@ void checkApps(){
  gift[$item[black forest cake]]=1;
 // gift[$item[bulky buddy box]]=1;
  boolean acceptall=true;
- matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
+ matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));
  if((appcheck.find())&&(acceptall)){
   matcher applicants=create_matcher("who=(\\d+)\">(.+?)<",visit_url("clan_applications.php"));
   while(applicants.find()){
