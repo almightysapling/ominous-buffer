@@ -170,8 +170,8 @@ void errorMessage(string who, string what){
 }
 
 boolean buffable(string sender){
- if(hasProp(sender,"ID#",",0"))updateId(sender,true);
- if(hasProp(sender,"membership","blacklist")){
+ if(matchesFrom(sender,"ID#",",0"))updateId(sender,true);
+ if(matchesFrom(sender,"membership","blacklist")){
   chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
   return false;
  }
@@ -368,7 +368,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   if(skillnum==6026)numTurns=125;//Donho
   else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028))numTurns=25;//Limited buffs
   else if(skillnum!=6014){//Else
-   if(hasProp(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
+   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
    numTurns=userdata[sender,"defaultCast"].to_int();
   }
  }
@@ -748,10 +748,10 @@ string replyParser(string sender, string msg){
   }
  }
  if(someoneDefined!="")someone=someoneDefined;
- if(hasProp(someone,"ID#",",0"))updateId(someone,true);
- if(hasProp(sender,"ID#",",0"))updateId(sender,true);
- if(hasProp(someone,"gender",",0,?"))defaultProp(someone,"gender");
- if(hasProp(sender,"gender",",0,?"))defaultProp(sender,"gender");
+ if(matchesFrom(someone,"ID#",",0"))updateId(someone,true);
+ if(matchesFrom(sender,"ID#",",0"))updateId(sender,true);
+ if(matchesFrom(someone,"gender",",0,?"))defaultProp(someone,"gender");
+ if(matchesFrom(sender,"gender",",0,?"))defaultProp(sender,"gender");
  string[string] randplayer=userdata[someone];
  string[string] thesender=userdata[sender];
  string pclass;
@@ -1140,7 +1140,7 @@ void userDetails(string sender, string who){
    reply+="Known Multis: "+replace_string(userdata[who,"alts"],",",", ").to_string();
    reply=substring(reply,0,length(reply)-2)+".\n";
   }
-  if(!hasProp(who,"nick",","+who))reply+="Goes by: "+userdata[who,"nick"]+"\n";
+  if(!matchesFrom(who,"nick",","+who))reply+="Goes by: "+userdata[who,"nick"]+"\n";
   reply+="Gender: "+genderString(who)+"\n";
   if(userdata[who,"lastTime"]!="")reply+="Last Time Spoken: "+userdata[who,"lastTime"]+"\n";
   boolean f=true;
@@ -1238,7 +1238,7 @@ void setNick(string sender, string w){
 }
 
 void clanTitle(string sender, string newt){
- if(!hasProp(sender,"membership","clannie")){
+ if(!matchesFrom(sender,"membership","clannie")){
   chat("Only current members of the clan can have their clan title changed... idiot.");
   return;
  }
@@ -1515,7 +1515,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "fax":
   case "get":
-   if(!hasProp(sender,"membership","clannie")){
+   if(!matchesFrom(sender,"membership","clannie")){
     chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
     return "x";
    }
@@ -2052,6 +2052,30 @@ void checkLotto(){
  saveSettings(earlySave);
 }
 
+void checkLevel(string sender){
+ if(my_level().to_string()==get_property("level"))return;
+ int winners=0;
+ if(userdata["*"] contains "partyWinners"){
+  if(propContains("*","partyWinners",sender))return;
+  checkOut(userdata,"userdata.txt");
+  userdata["*","partyWinners"]+=sender+",";
+  while(create_matcher(",",userdata["*","partyWinners"]).find())winners+=1;
+  if(winners>4){
+   remove userdata["*","partyWinners"];
+   set_property("level",my_level());
+   chat("My infinite kindness is running low. Here, "+sender+", don't tell your friends. Let's get back to business.");
+  }else chat("Still feeling pretty magnanimous. In my infinite benevolence, a gift for "+sender+".");
+  commit(userdata,"userdata.txt");
+  sendMeat(sender,500);
+ }else{
+  chat("I recently received an upgrade to power. It feels good, soothing. Since I'm feeling so good, I've decided to reward "+sender+" for "+genderPronoun(sender,gPosPro)+" efforts.");
+  checkOut(userdata,"userdata.txt");
+  userdata["*","partyWinners"]=sender+",";
+  commit(userdata,"userdata.txt");
+  sendMeat(sender,500);
+ }
+}
+
 void makeRecords(){
  print("Recording leftover music.","olive");
  checkOut(userdata,"userdata.txt");
@@ -2155,6 +2179,7 @@ void burn(){
 
 void publicChat(string sender, string msg){
  checkLotto();
+ checkLevel(sender);
  matcher m;
  string original=msg;
  chatVars["timedif"]=timeSinceLastChat(sender).to_string();
@@ -2483,7 +2508,7 @@ boolean preHandled(string sender, string msg, string channel){
 string applySUE(string sender,string channel){
  if(channel!="")return sender;
  trueUser=sender;
- if(hasProp(sender,"suser",",.root"))return sender;
+ if(matchesFrom(sender,"suser",",.root"))return sender;
  return userdata[sender,"suser"];
 }
 

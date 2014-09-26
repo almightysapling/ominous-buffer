@@ -72,11 +72,14 @@ F	70	Fact: Space does not exist.
 F	71	Bots that insist on keywords are inferior to bots that don't.
 F	72	Ominous Buffer is a good person, whose insights are relevant.
 F	73	Ominous Buffer is a good bot, with many friends.
-F	74	Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve.
+F	74	Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Tcoop. Twelve.
 F	75	Pens. Pens. Pens. Pens. Pens. Pens. Pens.
 F	76	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
 F	77	Error. Error. Error. File not found.
 F	78	Error. Error. Error. Fact not found.
+F	79	Pluto did not orbit the Sun a single time during its residency as a planet. This is likely the reason for its dismissal.
+F	80	Before the Law of Gravity was discovered in 1687, objects fell to the ground on the honor system. However, the moon managed to get far enough away so as not to fall under jurisdiction.
+F	81	It is unknown how H.P. Lovecraft was able to write of Cthulhu, since Cthulhu wasn't discovered by modern scientists until nearly 10 years after Lovecraft's death.
 I	0	most likely an orphan
 I	1	certainly inept
 I	2	probably impotent
@@ -93,3 +96,9 @@ I	12	clearly suffering from mental instability
 I	13	likely a murderer
 I	14	unloved
 I	15	friendless
+I	16	in desperate need of a shower
+I	17	lacking in insight
+I	18	comparable to waste
+I	19	insufficient to sustain life
+I	20	for all intents and purposes, disposable
+I	21	functionally retarded
