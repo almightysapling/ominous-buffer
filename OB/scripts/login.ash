@@ -125,7 +125,7 @@ void handleMeat(){
  int[string] books;
  checkOut(books,"books.txt");
  books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
- books["avg"]=(books["avg"]*3+totalDMS-19)/4;
+ books["avg"]=(books["avg"]*4+totalDMS-19)/5;
  commit(books,"books.txt");
  if(totalDMS<0){
   take_closet(totalDMS,$item[dense meat stack]);
