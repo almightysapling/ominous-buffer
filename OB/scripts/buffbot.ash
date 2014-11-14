@@ -1972,9 +1972,9 @@ void makeBackups(){
  commit(userdata,"backup/"+n+"u.txt");
 }
 
-void sendMeat(string who, int amount){
+void sendMeat(string who, int amount, string outside){
  take_closet(amount,$item[dense meat stack]);
- string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
+ string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note="+outside+"&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
  sender+="&fromwhere=0&action=Yep.";
  visit_url(sender);
 }
@@ -2039,7 +2039,7 @@ void checkLotto(){
   for i from 1 to 5 if(userdata["*"] contains ("winner"+i.to_string()))wintext+=userdata["*","winner"+i.to_string()]+"::";
   set_property("winners",wintext);
   chat(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
-  sendMeat(clannies[d],books["thisLotto"]);
+  sendMeat(clannies[d],books["thisLotto"],"You won the Lotto!");
   books["thisLotto"]=books["nextLotto"]-1;
   books["nextLotto"]=1;  
  }else{
@@ -2053,26 +2053,30 @@ void checkLotto(){
 }
 
 void checkLevel(string sender){
+ matcher m;
  if(my_level().to_string()==get_property("level"))return;
  int winners=0;
  if(userdata["*"] contains "partyWinners"){
   if(propContains("*","partyWinners",sender))return;
   checkOut(userdata,"userdata.txt");
   userdata["*","partyWinners"]+=sender+",";
-  while(create_matcher(",",userdata["*","partyWinners"]).find())winners+=1;
+  m=create_matcher(",",userdata["*","partyWinners"]);
+  while(m.find())winners+=1;
+print(winners+": "+userdata["*","partyWinners"]);
   if(winners>4){
    remove userdata["*","partyWinners"];
    set_property("level",my_level());
    chat("My infinite kindness is running low. Here, "+sender+", don't tell your friends. Let's get back to business.");
   }else chat("Still feeling pretty magnanimous. In my infinite benevolence, a gift for "+sender+".");
   commit(userdata,"userdata.txt");
-  sendMeat(sender,500);
+print("COMMITTED","green");
+  sendMeat(sender,500,"I leveled up!");
  }else{
   chat("I recently received an upgrade to power. It feels good, soothing. Since I'm feeling so good, I've decided to reward "+sender+" for "+genderPronoun(sender,gPosPro)+" efforts.");
   checkOut(userdata,"userdata.txt");
   userdata["*","partyWinners"]=sender+",";
   commit(userdata,"userdata.txt");
-  sendMeat(sender,500);
+  sendMeat(sender,500,"I leveled up!");
  }
 }
 
