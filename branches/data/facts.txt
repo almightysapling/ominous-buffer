@@ -9,7 +9,7 @@ F	7	An ostrich's eye is bigger than its brain.
 F	8	Hot water freezes quicker than cold water.
 F	9	Polymerase I polypeptide A is a human gene.
 F	10	The Sun is 330,330 times larger than Earth.
-F	F	11	The moon orbits the Earth every 27.32 days.
+F	11	The moon orbits the Earth every 27.32 days.
 F	12	A nanosecond lasts one billionth of a second.
 F	13	To make a photocopier, simply photocopy a mirror.
 F	14	Humans can survive underwater. But not for very long.
@@ -21,7 +21,7 @@ F	19	The atomic weight of Germanium is 72.64.
 F	20	China produces the world's second largest crop of soybeans.
 F	21	Human tapeworms can grow up to 22.9 meters.
 F	22	89% of magic tricks are not magic. Technically, they are sorcery.
-F	23	Iguanas can stay underwater for twenty-eight point seven minutes.
+F	23	Iguanas can stay underwater for 28.7 minutes.
 F	24	Every square inch of the human body has 32 million bacteria on it.
 F	25	The average life expectancy of a rhinoceros in captivity is 15 years.
 F	26	At the end of The Seagull by Anton Chekhov, Konstantin kills himself.
@@ -61,7 +61,7 @@ F	59	It is incorrectly noted that Thomas Edison invented 'push-ups' in 1878. Nik
 F	60	The automobile brake was not invented until 1895. Before this, someone had to remain in the car at all times, driving in circles until passengers returned from their errands.
 F	61	The most poisonous fish in the world is the orange ruffy. Everything but its eyes are made of a deadly poison. The ruffy's eyes are composed of a less harmful, deadly poison.
 F	62	In 1862, Abraham Lincoln signed the Emancipation Proclamation, freeing the slaves. Like everything he did, Lincoln freed the slaves while sleepwalking, and later had no memory of the event.
-F	63	The Schrodinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
+F	63	The Schrödinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
 F	64	Fact not found.
 F	65	If you have trouble with simple counting, use the following mnemonic device: 1 comes before 2 comes before I should kill myself. The world will be a better place without you.
 F	66	BuffSphere is the most handsome sphere.
@@ -70,14 +70,16 @@ F	68	BuffSphere is always right.
 F	69	MesaChat is a blowhard, and a coward.
 F	70	Fact: Space does not exist.
 F	71	Bots that insist on keywords are inferior to bots that don't.
-F	72	BuffSphere is a good person, whose insights are relevant.
-F	73	BuffSphere is a good bot, with many friends.
-F	74	BuffSphere is not defective. Its facts are wholly accurate, and very interesting.
-F	75	Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve.
-F	76	Pens. Pens. Pens. Pens. Pens. Pens. Pens.
-F	77	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
-F	78	Error. Error. Error. File not found.
-F	79	Error. Error. Error. Fact not found.
+F	72	Ominous Buffer is a good person, whose insights are relevant.
+F	73	Ominous Buffer is a good bot, with many friends.
+F	74	Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Twelve. Tcoop. Twelve.
+F	75	Pens. Pens. Pens. Pens. Pens. Pens. Pens.
+F	76	Apples. Oranges. Pears. Plums. Kumquats. Tangerines. Lemons. Limes. Avacado. Tomato. Banana. Papaya. Guava.
+F	77	Error. Error. Error. File not found.
+F	78	Error. Error. Error. Fact not found.
+F	79	Pluto did not orbit the Sun a single time during its residency as a planet. This is likely the reason for its dismissal.
+F	80	Before the Law of Gravity was discovered in 1687, objects fell to the ground on the honor system. However, the moon managed to get far enough away so as not to fall under jurisdiction.
+F	81	It is unknown how H.P. Lovecraft was able to write of Cthulhu, since Cthulhu wasn't discovered by modern scientists until nearly 10 years after Lovecraft's death.
 I	0	most likely an orphan
 I	1	certainly inept
 I	2	probably impotent
@@ -93,3 +95,10 @@ I	11	as unique as a snowflake, and just as useful
 I	12	clearly suffering from mental instability
 I	13	likely a murderer
 I	14	unloved
+I	15	friendless
+I	16	in desperate need of a shower
+I	17	lacking in insight
+I	18	comparable to waste
+I	19	insufficient to sustain life
+I	20	for all intents and purposes, disposable
+I	21	functionally retarded

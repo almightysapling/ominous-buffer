@@ -48,7 +48,10 @@ void resetEvents(int[string] books){
    tries+=1;
   }
  }
- foreach i,v in e if(books["Event"+i]<0)books["Event"+i]=v;
+ limit=3;
+ foreach i,v in e if(books["Event"+i]!=0)books["Event"+i]=v;
+ foreach i in e if(books["Event"+i]==0)limit-=1;
+ print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).</font>");
 }
 
 void handleMeat(){
@@ -121,12 +124,12 @@ void handleMeat(){
  int[string] books;
  checkOut(books,"books.txt");
  books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
- books["Event1"]=-1;
- books["Event2"]=-1;
- books["Event3"]=-1;
- resetEvents(books);
- set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+ books["avg"]=(books["avg"]*4+totalDMS-19)/5;
  commit(books,"books.txt");
+ if(totalDMS<0){
+  take_closet(totalDMS,$item[dense meat stack]);
+  cli_execute("autosell * dense meat stack");
+ }
 }
 
 void updateFaxes(){
@@ -146,18 +149,17 @@ void processQuestData(boolean rp){
  //Lotto
  int[string] books;
  checkOut(books,"books.txt");
- matcher m=create_matcher("(\\d+)::(\\d+)::(\\d+)::(\\d+)::(\\d+)",get_property("books"));
+ matcher m=create_matcher("(\\d+)::(\\d+)",get_property("books"));
  if(m.find()){
-  if(!rp){
-   books["Event1"]=(m.group(1).to_int()>0?-1:0);
-   books["Event2"]=(m.group(2).to_int()>0?-1:0);
-   books["Event3"]=(m.group(3).to_int()>0?-1:0);
-   resetEvents(books);
-  }
-  books["nextLotto"]=m.group(4).to_int();
-  books["thisLotto"]=m.group(5).to_int();
+  books["thisLotto"]=m.group(1).to_int();
+  books["nextLotto"]=m.group(2).to_int();
  }
- set_property("books",books["Event1"]+"::"+books["Event2"]+"::"+books["Event3"]+"::"+books["nextLotto"]+"::"+books["thisLotto"]);
+ if(!rp) for i from 0 to 2 books["Event"+to_string(i+1)]=(get_property("lottos").to_int()>i?-1:0);
+ else{
+  for i from 0 to 2 books["Event"+to_string(i+1)]=-1;
+  set_property("lottos",2);
+ }
+ resetEvents(books);
  commit(books,"books.txt");
  //Limited Buffs
  checkOut(userdata,"userdata.txt");
@@ -177,6 +179,7 @@ void processQuestData(boolean rp){
 void breakfast(){
  string rumpus=visit_url("clan_rumpus.php");
  checkMail();
+ deMole();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
  cli_execute("maximize exp, -100 combat");
  print("Visiting clan rumpus room.", "blue");
@@ -206,6 +209,7 @@ void breakfast(){
  if(get_property("sidequestArenaCompleted")!="none")visit_url("postwarisland.php?action=concert&option=2");
  if(item_amount($item[burrowgrub hive])>0)use(1,$item[burrowgrub hive]);
  if(item_amount($item[cheap toaster])>0)for i from 1 to 3 use(1,$item[cheap toaster]);
+ if(item_amount($item[festive warbear bank])>0)use(1,$item[festive warbear bank]);
  visit_url("volcanoisland.php?action=npc");
  if(item_amount($item[fisherman's sack])>1)use(1,$item[fisherman's sack]);
  for i from 1 to 5 (!hermit(1,$item[ten-leaf clover]));
@@ -213,7 +217,7 @@ void breakfast(){
  retrieve_item(7,$item[eggnog]);
  retrieve_item(1,$item[ram's face lager]);
  clearBuffs(6014);
- if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
+ if(have_skill($skill[the ode to booze]))(!use_skill(1,$skill[the ode to booze]));
  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[eggnog]);
  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[ram's face lager]);
  clearBuffs();
@@ -247,9 +251,9 @@ void breakfast(){
  eatsilent(1,$item[super salad]); 
  eatsilent(1,$item[handful of nuts and berries]); 
  */ 
- if((have_skill($skill[sonata of sneakiness]))&&(have_effect($effect[sonata of sneakiness])<1))(!use_skill(1,$skill[sonata of sneakiness]));
+ if((have_skill($skill[the sonata of sneakiness]))&&(have_effect($effect[the sonata of sneakiness])<1))(!use_skill(1,$skill[the sonata of sneakiness]));
  if((have_effect($effect[dreams and lights])<1)||((have_effect($effect[dreams and lights])<9)&&(have_effect($effect[arcane in the brain])<1))){
-  while(have_effect($effect[dreams and lights])<9)(!adventure(1,$location[haunted gallery]));
+  while(have_effect($effect[dreams and lights])<9)(!adventure(1,$location[the haunted gallery]));
   clearBuffs();
   retrieve_item(1,$item[llama lama gong]);
   cli_execute("gong mole");
@@ -277,12 +281,6 @@ void cleanPC(){
  lifetime["*"]=0;
  foreach sk in lifetime if(sk!="*")lifetime["*"]+=lifetime[sk];
  commit(lifetime,"lifetime.txt");
- int[string]books;
- checkOut(books,"books.txt");
- books["Event1"]=0;
- books["Event2"]=0;
- books["Event3"]=0;
- commit(books,"books.txt");
  set_property("_thisBreakfast","1");
 }
 
@@ -290,34 +288,36 @@ void prepareScript(){
  processQuestData(loadSettings(ignorePile));
  updateLimits();
  updateDC();
- cli_execute("maximize mp");
  if(get_property("_checkedRaffle")=="")checkRaffle();
 }
 
 void main(){try{
  run_combat();
+ cli_execute("autoattack none; ccs default;");
  print("Starting Login...","olive");
+ set_property("!day",gameday_to_int());
  set_property("chatbotScript",chatbotScript);
+ print("Purge pending requests","olive");
+ waitq(30);
+ print("Time up, continue logging in.","olive");
  set_property("_lockChat","1");
- if(get_property("_breakfast")=="")breakfast();
- if(get_property("_thisBreakfast")=="")cleanPC();
  prepareScript();
+ if(get_property("_thisBreakfast")=="")cleanPC();
+ if(get_property("_breakfast")=="")breakfast();
  set_property("_lockChat","");
+ systemCall("outfit buff");
  print("Entering wait cycle.","green");
  int m=burnMinutes+1;
  while(m>burnMinutes){
   m=minutesToRollover();
   checkProperties();
   if((m%5)==0){
-   systemCall("apps");
-   systemCall("mail");
+   systemCall("check");
   }
   waitq(31);
  }
  print("Using excess adventures before rollover.","blue");
- systemCall("deMole");
  systemCall("record");
- systemCall("outfit farm");
  systemCall("bounty");
  while(my_adventures()>burnTurns){
   m=my_adventures()-5;
@@ -333,7 +333,9 @@ void main(){try{
  if(MinutesToRollover()<10)chat_clan("Remember to turn in your bounties, overdrink, and equip your rollover gear\!");
  print("Logging out","blue");
  systemCall("logout");
+ errorFree=true;
 }finally{
- print("Script Halted","red");
+ if(!errorFree)print("ABRUPT STOP","red");
+ print("Script Halted @R-"+minutesToRollover(),"red");
  saveSettings(earlySave);
 }}

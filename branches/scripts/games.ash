@@ -16,6 +16,7 @@ int gameNone=0;
 int gameRoulette=1;
 int gameWordshot=2;
 int gameLotto=4;
+int gameHangman=5;
 
 string startGame(int gType, int ivals, boolean started, string host){
  file_to_map("gameMode.txt",gamesavedata);
@@ -129,6 +130,18 @@ string startWordshot(string host){
  return startWordshot(0,host);
 }
 
+string startHangman(string word,string host){
+ gameData game=loadGame(startGame(gameHangman,0,true,host));
+ game.intervals=0;
+ game.data[-1]=word;
+ game.data[0]=word.to_upper_case();
+ matcher m=create_matcher("[A-Za-z]",word);
+ word=m.replace_all("-");
+ game.data[1]=word;
+ saveGame(game);
+ return gamesavedata["."].data[0];
+}
+
 void russianRoulette(string sender, string msg){
 print("RR");
  matcher m;
@@ -203,6 +216,69 @@ print("Players: "+count(game.players).to_string());
    break;
  }
  saveGame(game);
+}
+
+boolean hangman(string sender, string guess){
+ gameData game=loadGame();
+ if(game.host==sender)return false;
+ if(game.intervals<7){
+  if(guess==game.data[0]){
+   chat_clan("Great job, "+sender+"! The phrase was \""+game.data[-1]+"\"");
+   closeGame();
+   return true;
+  }
+  matcher m=create_matcher("[a-zA-Z]",guess);
+  if(!m.find())return false;
+  string l=m.group(0).to_upper_case();
+  string out="";
+  if((guess.length()>1)&&(!contains_text(".!",guess.char_at(1))))return false;
+  if(game.data[0].contains_text(l)){
+   boolean[int] matches;
+   int i=game.data[0].index_of(l);
+   while(i>-1){
+    matches[i]=true;
+    i=game.data[0].index_of(l,i+1);
+   }
+   foreach i in matches game.data[1]=game.data[1].substring(0,i)+game.data[-1].char_at(i)+game.data[1].substring(i+1);
+   if(game.data[1]==game.data[-1]){
+    chat_clan("Well done! The phrase was \""+game.data[1]+"\"");
+    closeGame();
+    return true;
+   }
+   chat_clan(game.data[1]);
+  }else{
+   if(game.data[-2].contains_text(l)){
+    chat_clan(l+" was already suggested.");
+    return true;
+   }
+   game.intervals+=1;
+   game.data[-2]=game.data[-2]+l;
+   chat_clan("No "+l+". o"+(game.intervals>1?"-":"")+(game.intervals==3?"/":"")+(game.intervals>3?"|":"")+(game.intervals>4?"-":"")+(game.intervals==6?"/":"")+(game.intervals>6?"< You are dead.":""));
+   if(game.intervals>6)chat_clan("Final Guess Round!");
+  }
+ }else{
+  if(guess.length()!=game.data[0].length())return false;
+  if(game.players contains sender){
+   chat_clan("Only one guess each, "+sender);
+   return true;
+  }
+  if(guess==game.data[0]){
+   chat_clan("Correct, "+sender+"! The phrase was \""+game.data[-1]+"\"");
+   closeGame();
+   return true;
+  }
+  game.intervals+=1;
+  chat_clan("No, "+sender+", that is incorrect.");
+  if(game.intervals<11)chat_clan(to_string(11-game.intervals)+" more guesses, clan.");
+  if(game.intervals>10){
+   chat_clan("The phrase was \""+game.data[-1]+"\"");
+   closeGame();
+   return true;
+  }
+  game.players[sender]=1;
+ }
+ game.saveGame();
+ return true;
 }
 
 string wordshot(string sender, string guess){

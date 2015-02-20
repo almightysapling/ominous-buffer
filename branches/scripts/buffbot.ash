@@ -7,7 +7,9 @@ string[int] to_array(boolean[string] data){
   x[count(x)]=y;
  return x;
 }
-
+static{
+ boolean[string]doubleRun;
+}
 string genderMatcherString="(?:I AM|I'M) (?:AN |A )?(WHO I AM|ME";
 string[string,int] genders;
 genders["list"]=to_array($strings[genders, third, unknown, androgynous, male, female, inanimate]);
@@ -65,25 +67,33 @@ boolean raidlogRead=false;
 boolean silent=true;
 
 string glitch(string s){
+ buffer b;
  matcher m;
  m=create_matcher("12",s);
  while(m.find()){
-  switch(random(8)){
-   case 0: s=m.replace_first("TWELVE");
-    break;
-   case 1: s=m.replace_first("tWeLve.");
-    break;
-   case 2: s=m.replace_first("twlv");
-    break;
-   case 3: s=m.replace_first("twelve");
-    break;
-  }
-  m=m.reset(s);
+  if(random(100)<10){
+   switch(random(5)){
+    case 0: m.append_replacement(b,"TWELVE");
+     break;
+    case 1: m.append_replacement(b,"tWeLve");
+     break;
+    case 2: m.append_replacement(b,"twlv");
+     break;
+    case 3: m.append_replacement(b,"twelve");
+     break;
+    case 4: m.append_replacement(b,"XII");
+     break;
+   }
+  }else m.append_replacement(b,"12");
  }
- if(random(1000)<20){
-  m=create_matcher("I",s);
-  s=m.replace_all("i");
- }
+ m.append_tail(b);
+ s=b.to_string();
+ b.delete(0,length(b));
+ m=create_matcher("I",s);
+ while(m.find())if(random(1000)<55)m.append_replacement(b,"i");
+  else m.append_replacement(b,m.group(0));
+ m.append_tail(b);
+ s=b.to_string();
  return s;
 }
 
@@ -160,8 +170,8 @@ void errorMessage(string who, string what){
 }
 
 boolean buffable(string sender){
- if(hasProp(sender,"ID#",",0"))updateId(sender,true);
- if(hasProp(sender,"membership","blacklist")){
+ if(matchesFrom(sender,"ID#",",0"))updateId(sender,true);
+ if(matchesFrom(sender,"membership","blacklist")){
   chat(sender,"We do what we must because we can. For the good of all of us. Except the ones who are blacklisted from Black Mesa.");
   return false;
  }
@@ -253,6 +263,7 @@ boolean sendRecord(int skillId, string sender){
 }
 
 void buff(string sender, string msg, int numTurns, string ding){
+
  skill messageNew;
  messageNew=to_skill(msg);
  int casts;
@@ -266,7 +277,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
   case 46:case 47:case 48:case 58:case 59:case 60:
-  case 7040:case 7041: return;
+  case 7040:case 7041:case 6037:case 6040: return;
  }
  string senderid=getId(sender);
  string mout;
@@ -280,7 +291,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   if(skillnum==6026)numTurns=125;//Donho
   else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028))numTurns=25;//Limited buffs
   else if(skillnum!=6014){//Else
-   if(hasProp(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
+   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
    numTurns=userdata[sender,"defaultCast"].to_int();
   }
  }
@@ -385,7 +396,7 @@ void buff(string sender, string msg, int numTurns, string ding){
 }
 
 int roll(string sender, string msg){
- matcher m=create_matcher("(\\d+)[dD](\\d+)",msg);
+ matcher m=create_matcher("(\\d+)?[dD](\\d+)",msg);
  if(!m.find()){
   errorMessage(sender,"You're doing it wrong. Typical.");
   return 0;
@@ -396,7 +407,7 @@ int roll(string sender, string msg){
   return 0;
  }
  for die from 1 to m.group(1).to_int() running+=(1+random(m.group(2).to_int()));
- if(prefix=="")chat("/em rolls "+running+" for "+sender+" ("+m.group(1)+"d"+m.group(2)+").");
+ if(prefix=="")chat("/em rolls "+running+" for "+(userdata[sender,"nick"]!=""?userdata[sender,"nick"]:sender)+" ("+m.group(1)+"d"+m.group(2)+").");
  else chat("Rolling "+m.group(1)+"d"+m.group(2)+" gives "+running+".");
  return running;
 }
@@ -414,12 +425,24 @@ void startGame(string sender, string msg){
   }else chat(sender,"A game is already in session by "+game.host+".");
   return;
  }
- matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette)\\s?(\\d+|\\w+)?",msg);
+ matcher m=create_matcher("(?i)(wordshot|RR|russian roulette|russianroulette|hangman)\\s?(\\d+|[A-Za-z'\\s]+)?",msg);
  if(!m.find())return;
  string t=m.group(1);
  string l="-";
  if(m.group_count()>1)l=m.group(2);
  switch(t){
+  case "hangman":
+   startHangman(l,sender);
+   game=loadGame();
+   if((l.to_int()!=0)||(l.char_at(0)=="0")){
+    print("Invalid: "+l);
+    closeGame();
+    break;
+   }
+   chat(sender,"Game started.");
+   chat("","Hangman time!");
+   chat(game.data[1]);
+   break;
   case "wordshot":
    startWordshot(l.to_int(),sender);
    game=loadGame();
@@ -639,10 +662,10 @@ string replyParser(string sender, string msg){
   }
  }
  if(someoneDefined!="")someone=someoneDefined;
- if(hasProp(someone,"ID#",",0"))updateId(someone,true);
- if(hasProp(sender,"ID#",",0"))updateId(sender,true);
- if(hasProp(someone,"gender",",0,?"))defaultProp(someone,"gender");
- if(hasProp(sender,"gender",",0,?"))defaultProp(sender,"gender");
+ if(matchesFrom(someone,"ID#",",0"))updateId(someone,true);
+ if(matchesFrom(sender,"ID#",",0"))updateId(sender,true);
+ if(matchesFrom(someone,"gender",",0,?"))defaultProp(someone,"gender");
+ if(matchesFrom(sender,"gender",",0,?"))defaultProp(sender,"gender");
  string[string] randplayer=userdata[someone];
  string[string] thesender=userdata[sender];
  string pclass;
@@ -684,6 +707,7 @@ string replyParser(string sender, string msg){
     break;
    case "sresult":
    case "smath":
+   case "sans":
     temp=randplayer["lastMath"];
     if(randplayer["lastMath"].to_int()==randplayer["lastMath"].to_float())temp=randplayer["lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -731,6 +755,7 @@ string replyParser(string sender, string msg){
     break;
    case "presult":
    case "pmath":
+   case "pans":
     temp=thesender["lastMath"];
     if(thesender["lastMath"].to_int()==thesender["lastMath"].to_float())temp=thesender["lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -767,6 +792,7 @@ string replyParser(string sender, string msg){
     break;
    case "math":
    case "result":
+   case "ans":
     temp=userdata["*","lastMath"];
     if(userdata["*","lastMath"].to_int()==userdata["*","lastMath"].to_float())temp=userdata["*","lastMath"].to_int().to_string();
     msg=replace_first(variable,temp);
@@ -806,6 +832,14 @@ string replyParser(string sender, string msg){
     if(variable.group_count()>1)i=variable.group(2).to_int();
     i=random(i);
     msg=replace_first(variable,i.to_string());
+    break;
+   case "fact":
+    if(sender.getUF("admin")){
+     if(variable.group_count()>1)i=variable.group(2).to_int();
+     msg=replace_first(variable,factCore("F",i));
+     break;
+    }
+    msg=replace_first(variable,variable.group(1));
     break;
    default:
     if(chatVars contains variable.group(1))msg=replace_first(variable,chatVars[variable.group(1)]);
@@ -1020,7 +1054,7 @@ void userDetails(string sender, string who){
    reply+="Known Multis: "+replace_string(userdata[who,"alts"],",",", ").to_string();
    reply=substring(reply,0,length(reply)-2)+".\n";
   }
-  if(!hasProp(who,"nick",","+who))reply+="Goes by: "+userdata[who,"nick"]+"\n";
+  if(!matchesFrom(who,"nick",","+who))reply+="Goes by: "+userdata[who,"nick"]+"\n";
   reply+="Gender: "+genderString(who)+"\n";
   if(userdata[who,"lastTime"]!="")reply+="Last Time Spoken: "+userdata[who,"lastTime"]+"\n";
   boolean f=true;
@@ -1033,8 +1067,8 @@ void userDetails(string sender, string who){
   }
   if(sysInt(who,"donated")>0)reply+="Donated: "+userdata[who,"donated"]+" meat.\n";
   if(who==sender){
-   reply+="Bank: "+userdata[who,"meat"]+" meat.\n";
-   reply+="Default Casts: "+userdata[who,"defaultCast"]+"\n";
+   if(userdata[who,"meat"].to_int()>0)reply+="Bank: "+userdata[who,"meat"]+" meat.\n";
+   if(userdata[who,"defaultCast"].to_int()>0)reply+="Default Casts: "+userdata[who,"defaultCast"]+"\n";
   }
   cli_execute("csend to "+sender+"||"+reply);
  }else chat(sender,"No match found for "+who+".");
@@ -1118,7 +1152,7 @@ void setNick(string sender, string w){
 }
 
 void clanTitle(string sender, string newt){
- if(!hasProp(sender,"membership","clannie")){
+ if(!matchesFrom(sender,"membership","clannie")){
   chat("Only current members of the clan can have their clan title changed... idiot.");
   return;
  }
@@ -1131,7 +1165,7 @@ void clanTitle(string sender, string newt){
 
 void whitelistEdit(string oper){
  string cw=visit_url("clan_whitelist.php");
- if(!cw.contains_text("<form>")){
+ if(!cw.contains_text("<form")){
   chat("Oh, no. A horrible, awful, irrevocable thing has happened... You broke my heart. {Core Privelage Disabled}");
   return;
  }
@@ -1178,6 +1212,10 @@ void whitelistEdit(string oper){
  }
  visit_url(s);
  chat(action.group(2)+" added to whitelist.");
+}
+
+void man(string sender, string query){
+ cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
 }
 
 void sendLink(string sender, string i){
@@ -1291,6 +1329,7 @@ boolean subUser(string oper){
     return false;
    }
  }
+ commit(userdata,"userdata.txt");
  return true;
 }
 
@@ -1324,6 +1363,7 @@ boolean subEnv(string oper){
    chat(trueUser,"#"+(userdata[trueUser,"schannel"]==""?"!":userdata[trueUser,"schannel"])+">");
    return false;
  }
+ commit(userdata,"userdata.txt");
  return true;
 }
 
@@ -1385,7 +1425,7 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "fax":
   case "get":
-   if(!hasProp(sender,"membership","clannie")){
+   if(!matchesFrom(sender,"membership","clannie")){
     chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
     return "x";
    }
@@ -1393,8 +1433,9 @@ string predicateFilter(string sender, string msg){
    fax(sender,oper);
    return "x";
   case "help":
+  case "man":
   case "?":
-   cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+   man(sender,oper);
    return "x";
   case "host":
    startGame(sender,oper);
@@ -1488,7 +1529,7 @@ string predicateFilter(string sender, string msg){
     chat_private("wangbot","target "+(oper==""?sender:oper));
    }else{
     if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
-    if(item_amount($item["WANG"])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
+    if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(oper==""?sender:oper));
    }
    set_property("_lastWang",(oper==""?sender:oper)+'|'+sender);
@@ -1512,6 +1553,19 @@ string predicateFilter(string sender, string msg){
    return "x";
  }
  return msg;
+}
+
+boolean advancedFilterFail(string sender, string msg, string filter, string expected){
+ switch(filter){
+  case "msgHas":
+    if(msg.contains_text(expected))return false;
+   break;
+  case "msgStarts":
+    if(length(expected)>length(msg))return true;
+    if(msg.substring(0,length(expected))==expected)return false;
+   break;
+ }
+ return true;
 }
 
 void nopredpass(string sender, string msg, boolean addressed){
@@ -1544,7 +1598,7 @@ void nopredpass(string sender, string msg, boolean addressed){
    if(!ref.find())continue;
   }
   foundmatch=true;
-  if(replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2)){
+  if((replyParser(sender,reply.cond1)!=replyParser(sender,reply.cond2))&&advancedFilterFail(sender,msg,reply.cond1,reply.cond2)){
    foundmatch=false;
    continue;
   }
@@ -1631,7 +1685,7 @@ int timeSinceLastChat(string who){
 boolean isMath(string m){
  matcher fix=create_matcher("(?i)(?<![a-z])(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)(?![a-z])",m);
  m=replace_all(fix,"+");
- fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]\\$]",m);
+ fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]]",m);
  if(fix.find())return false;
  return true;
 }
@@ -1811,9 +1865,9 @@ void makeBackups(){
  commit(userdata,"backup/"+n+"u.txt");
 }
 
-void sendMeat(string who, int amount){
+void sendMeat(string who, int amount, string outside){
  take_closet(amount,$item[dense meat stack]);
- string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note=You won the Lotto!&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
+ string sender="town_sendgift.php?pwd="+my_hash()+"&towho="+who+"&note="+outside+"&insidenote=A winner is you!&whichpackage=1&howmany1="+amount.to_string()+"&whichitem1="+$item[dense meat stack].to_int().to_string();
  sender+="&fromwhere=0&action=Yep.";
  visit_url(sender);
 }
@@ -1826,7 +1880,12 @@ void checkLotto(){
  if(time<books["Event1"])event=1;
  if(time<books["Event2"])event=2;
  if(time<books["Event3"])event=3;
+ if(time<0)return;
  if(event<1)return;
+ int num=-1;
+ for i from 1 to 3 if(books["Event"+i.to_string()]>0)num+=1;
+ if(num<0)num=0;
+ set_property("lottos",num.to_string());
  books["Event"+event.to_string()]=0;
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
@@ -1837,9 +1896,9 @@ void checkLotto(){
  remove inClan["relay"];
  string[int] clannies;
  foreach name in inClan clannies[count(clannies)]=name;
- int num=count(clannies);
+ num=count(clannies);
  if(num<1){
-  set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+  set_property("books",books["thisLotto"].to_string()+"::"+books["nextLotto"].to_string());
   commit(books,"books.txt");
   updateProfile();
   return;
@@ -1873,16 +1932,45 @@ void checkLotto(){
   for i from 1 to 5 if(userdata["*"] contains ("winner"+i.to_string()))wintext+=userdata["*","winner"+i.to_string()]+"::";
   set_property("winners",wintext);
   chat(clannies[d]+" wins the lotto and takes home "+books["thisLotto"].to_commad()+",000 meat! See you again soon!");
-  sendMeat(clannies[d],books["thisLotto"]);
+  sendMeat(clannies[d],books["thisLotto"],"You won the Lotto!");
   books["thisLotto"]=books["nextLotto"]-1;
   books["nextLotto"]=1;  
  }else{
   print("Event Lost.","blue");
   chat("Just what I thought. Everyone here is a loser. And "+insultCore()+" as well.");
  }
- set_property("books",books["Event1"].to_string()+"::"+books["Event2"].to_string()+"::"+books["Event3"].to_string()+"::"+books["nextLotto"].to_string()+"::"+books["thisLotto"].to_string());
+ set_property("books",books["thisLotto"].to_string()+"::"+books["nextLotto"].to_string());
  commit(books,"books.txt");
  updateProfile();
+ saveSettings(earlySave);
+}
+
+void checkLevel(string sender){
+ matcher m;
+ if(my_level().to_string()==get_property("level"))return;
+ int winners=0;
+ if(userdata["*"] contains "partyWinners"){
+  if(propContains("*","partyWinners",sender))return;
+  checkOut(userdata,"userdata.txt");
+  userdata["*","partyWinners"]+=sender+",";
+  m=create_matcher(",",userdata["*","partyWinners"]);
+  while(m.find())winners+=1;
+print(winners+": "+userdata["*","partyWinners"]);
+  if(winners>4){
+   remove userdata["*","partyWinners"];
+   set_property("level",my_level());
+   chat("My infinite kindness is running low. Here, "+sender+", don't tell your friends. Let's get back to business.");
+  }else chat("Still feeling pretty magnanimous. In my infinite benevolence, a gift for "+sender+".");
+  commit(userdata,"userdata.txt");
+print("COMMITTED","green");
+  sendMeat(sender,500,"I leveled up!");
+ }else{
+  chat("I recently received an upgrade to power. It feels good, soothing. Since I'm feeling so good, I've decided to reward "+sender+" for "+genderPronoun(sender,gPosPro)+" efforts.");
+  checkOut(userdata,"userdata.txt");
+  userdata["*","partyWinners"]=sender+",";
+  commit(userdata,"userdata.txt");
+  sendMeat(sender,500,"I leveled up!");
+ }
 }
 
 void makeRecords(){
@@ -1958,7 +2046,7 @@ void doBounty(){
  }
  int oldLucre=item_amount($item[filthy lucre]);
  visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
- while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
+// while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
  visit_url("bhh.php");
 }
 
@@ -1969,15 +2057,15 @@ void burn(){
  skill farmingbuff;
  switch(farmbuff){
   case 0:
-   farmingbuff=$skill[Fat Leon's Phat Loot Lyric];
+   farmingbuff=$skill[fat leon's phat loot lyric];
    farmbuff+=1;
    break;
   case 1:
-   farmingbuff=$skill[Polka of Plenty];
+   farmingbuff=$skill[the polka of plenty];
    farmbuff+=1;
    break;
   default:
-   farmingbuff=$skill[Cantata of Confrontation];
+   farmingbuff=$skill[carlweather\'s cantata of confrontation];
    farmbuff=0;
  }
  set_property("_lastFarmBuff",farmbuff.to_string());
@@ -1988,6 +2076,7 @@ void burn(){
 
 void publicChat(string sender, string msg){
  checkLotto();
+// checkLevel(sender);
  matcher m;
  string original=msg;
  chatVars["timedif"]=timeSinceLastChat(sender).to_string();
@@ -2081,6 +2170,8 @@ void systemHandler(string msg){
  if(!m.find())return;
  string cmd=m.group(1);
  string ops=m.group(2);
+ doubleRun[cmd]=!doubleRun[cmd];
+ if(doubleRun[cmd])return;
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
@@ -2089,23 +2180,18 @@ void systemHandler(string msg){
    makeBackups();
    set_property("chatbotScript","");
    clearBuffs(6014);
-   if(have_skill($skill[ode to booze]))(!use_skill(1,$skill[ode to booze]));
+   if(have_skill($skill[the ode to booze]))(!use_skill(1,$skill[the ode to booze]));
    overdrink(1,$item[eggnog]);
    checkApps();
    cli_execute("exit");
    break;
   case "apps":checkApps();break;
+  case "check":checkApps();
   case "mail":checkMail();break;
-  case "deMole":if(have_effect($effect[Shape of...Mole!])>0){
-    while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
-    if(!adventure(1,$location[Mt. Molehill])){}
-    visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
-   }
-   break;
   case "outfit":switch(ops){
     case "farm":
      cli_execute("familiar "+meatFam);
-     cli_execute("maximize 2 meat, item, 100 combat, equip C.H.U.M. knife, -tie");
+     cli_execute("maximize 2 meat, item, 100 combat, equip trikitixa, -tie");
      break;
     case "buff":
      cli_execute("familiar "+statFam);
@@ -2114,12 +2200,15 @@ void systemHandler(string msg){
      break;
    }
    break;
-  case "record": makeRecords();break;
+  case "record":systemHandler("outfit buff"); systemHandler("outfit buff"); deMole(); makeRecords();break;
   case "adventure":
-   if(adventure(5,$location[Icy Peak])){}
+   systemHandler("outfit farm");systemHandler("outfit farm");
+   deMole();
+   if(my_adventures()<=burnTurns)break;
+   if(adventure(5,$location[The Icy Peak])){}
    burn();
    break;
-  case "bounty":doBounty();
+//  case "bounty":systemHandler("outfit farm");systemHandler("outfit farm"); deMole(); doBounty();break;
  }
 }
 
@@ -2149,6 +2238,8 @@ void clanHandler(string sender, string msg){
   case gameRoulette:
    russianRoulette(sender,msg);
    return;
+  case gameHangman:
+   if(hangman(sender,msg))return;
   default:
    publicChat(sender,msg);
    return;
@@ -2191,13 +2282,23 @@ void hauntedhouseHandler(string sender, string msg){
  publicChat(sender,msg);
 }
 
+void dreadHandler(string sender, string msg){
+ if((trueChannel=="")&&(metaParser(sender,msg)))return;
+ prefix="/dread ";
+ if(sender=="Dungeon")return;
+ publicChat(sender,msg);
+}
+
 void eventHandler(string msg){
  //What to do here... hmm.
 }
 
 void privateHandler(string sender, string msg){
  matcher m;
- if(sender==my_name())systemHandler(msg);
+ if(sender==my_name()){
+  systemHandler(msg);
+  return;
+ }
  if(sender=="MesaChat"){
   m=create_matcher("([a-zA-Z][\\w ]{1,29}):\\s?(.*)",msg);
   if(m.find()){
@@ -2207,6 +2308,7 @@ void privateHandler(string sender, string msg){
   }
   return;
  }
+ if(sender=="chatbot")return;
  if(!buffable(sender))return;
  prefix=sender;
  if(msg.char_at(0)=="!"){
@@ -2227,7 +2329,6 @@ void privateHandler(string sender, string msg){
  }else if(aliasList contains msg)msg=aliasList[msg];
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if((sender=="chatbot")||(sender==my_name()))return;
  m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
@@ -2259,12 +2360,15 @@ void privateHandler(string sender, string msg){
   m=create_matcher("[a-zA-Z\\?](?:[a-zA-Z']|(?:\\s(?=\\w)))*",messages[i]);
   if(m.find())messages[i]=m.group(0);
   if(multiplier==0)buff(sender,messages[i],turnR,co);
-  else if(turnR==0)buff(sender,messages[i],multiplier,co);
-  else buff(sender,messages[i],multiplier*turnR,co);
+  else buff(sender,messages[i],multiplier,co);
  }
 }
 
 boolean preHandled(string sender, string msg, string channel){
+ errorFree=true;
+ if(msg==""){
+  return true;
+ }
  if(sender=="System Message"){
   return true;
  }
@@ -2279,10 +2383,10 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if(sender=="wangbot"){
   if(msg.contains_text("dried out")){
-   if(item_amount($item["WANG"])<1)cli_execute("stash take wang");
+   if(item_amount($item[WANG])<1)cli_execute("stash take wang");
    matcher m=create_matcher("([^|]*)|(.*)",get_property("_lastWang"));
    if(m.find()){
-    if(item_amount($item["WANG"])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
+    if(item_amount($item[WANG])<1)chat_private(m.group(2),"We seem to be completely out of WANGs, sorry.");
     else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+m.group(1));
    }
   }
@@ -2290,13 +2394,14 @@ boolean preHandled(string sender, string msg, string channel){
  }
  if((sender=="MesaChat")&&(channel!=""))return true;
  if((sender==my_name())&&(channel!=""))return true;
+ errorFree=false;
  return false;
 }
 
 string applySUE(string sender,string channel){
  if(channel!="")return sender;
  trueUser=sender;
- if(hasProp(sender,"suser",",.root"))return sender;
+ if(matchesFrom(sender,"suser",",.root"))return sender;
  return userdata[sender,"suser"];
 }
 
@@ -2329,12 +2434,23 @@ void main(string sender, string msg, string channel){try{
   case "/hauntedhouse":
    hauntedhouseHandler(sender,msg);
    break;
+  case "/dread":
+   dreadHandler(sender,msg);
+   break;
   case "Events":
    eventHandler(msg);
    break;
-  default:
+  case "":
    privateHandler(sender,msg);
    break;
+  default:
+   break;
  }
+ errorFree=true;
 }finally{
+ if(!errorFree){
+  print("ERROR","red");
+  print("Message: "+msg,"olive");
+  print("From "+sender+" in "+channel,"olive");
+ }
 }}

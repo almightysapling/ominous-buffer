@@ -1,5 +1,4 @@
 import <shared.ash>
-invokeResourceMan(__FILE__);
 string[string] fields=form_fields();
 //html properties
 boolean spaced=false;
@@ -176,16 +175,14 @@ void header(){
 
 void options(){
  int[string] books;
- update(books,"books.txt");
+ checkOut(books,"books.txt");
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
  nln("<input type=\"hidden\" name=\"cp\" value=\"save\" />");
  nln("<span class=\"optGroup\">BuffSphere</span>");
  ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\" />");
- nln("<input type=\"hidden\" name=\"prop.books.1\" value=\""+books["Event1"]+"\" />");
- nln("<input type=\"hidden\" name=\"prop.books.2\" value=\""+books["Event2"]+"\" />");
- nln("<input type=\"hidden\" name=\"prop.books.3\" value=\""+books["Event3"]+"\" />");
- ntln("Current Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.5\" value=\""+books["thisLotto"]+"\" />");
- nln("Next Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.4\" value=\""+books["nextLotto"]+"\" />");
+ ntln("Current Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.1\" value=\""+books["thisLotto"]+"\" />");
+ nln("Next Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.2\" value=\""+books["nextLotto"]+"\" />");
+ ntln("Lottos Left Today: <input class=\"unselected\" type=\"text\" name=\"prop.lottos\" value=\""+get_property("lottos")+"\" />");
  string[int] admins=split_string(get_property("admins"),"::");
  n("<br/>Admins: <span id=\"adminbox\">");
  foreach i,s in admins nln("<input class=\"unselected\" type=\"text\" name=\"admins."+i+"\" value=\""+s+"\" />"+(i==count(admins)-1?"</span><span id=\"numAdmins\">"+to_string(i+1)+"</span>.":", "));

@@ -15,7 +15,7 @@ Finker	You mean Twinker, $pname.	0	say
 goodnight	Sweet dreams $pnick!	8	say		
 HIMYM?	How I Met Your Mother, $pnick.	3	say		
 is being ignored	goes over and plays in the corner with $pnick	0	do		
-is chat dead	It has been $timedif minutes since someone last spoke.	16	say		
+is chat dead	It has been $timedif minutes since $lastchatter last spoke.	16	say		
 mispell	Misspell*	32	say		
 mispelled	Misspelled*	32	say		
 MMJ?	Magical mystery juice, $pnick.	3	say		

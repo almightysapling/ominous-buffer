@@ -1,19 +1,54 @@
 [ default ]
-skill candyblast
-28: skill moxious maneuver
+try to steal an item
+attack with weapon
 
-[ goth giant ]
-skill transcendent olfaction
-skill candyblast
-28: skill moxious maneuver
+[ digital underground dweller ]
+try to steal an item
+skill tunnel downwards
+skill tunnel downwards
+attack with weapon
 
 [ mt. molehill ]
+try to steal an item
 skill tunnel downwards
 skill tunnel downwards
 skill candyblast
 28: skill moxious maneuver
 
-[ mutated alielephant ]
+[ knott yeti ]
+try to steal an item
 skill transcendent olfaction
-skill candyblast
-28: skill moxious maneuver
+attack with weapon
+
+[ spelunking astronaut ]
+try to steal an item
+skill tunnel downwards
+skill tunnel downwards
+attack with weapon
+
+[ unrecognized ]
+skill cone of zydeco
+skill bawdy refrain
+skill cone of zydeco
+skill bawdy refrain
+skill cone of zydeco
+skill bawdy refrain
+skill cone of zydeco
+skill bawdy refrain
+skill cone of zydeco
+skill bawdy refrain
+skill cone of zydeco
+skill bawdy refrain
+
+[ velvet underground dweller ]
+try to steal an item
+skill tunnel downwards
+skill tunnel downwards
+attack with weapon
+
+[ weather underground dweller ]
+try to steal an item
+skill tunnel downwards
+skill tunnel downwards
+attack with weapon
+

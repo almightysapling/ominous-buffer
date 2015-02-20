@@ -12,6 +12,7 @@ string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
 int burnTurns=130;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
+boolean errorFree=false;
 
 int clanid=2046994401;//Black Mesa
 boolean[int] associates;
@@ -55,20 +56,27 @@ string defaultProp(string prop){
 }
 
 boolean getUF(string user,string flag){
+ if(!(userdata[user] contains flag))defaultProp(user,flag);
  return userdata[user,flag].to_boolean();
 }
 
-boolean hasProp(string user,string setting,string prop){
- string[int] props=split_string(prop,",");
+boolean matchesFrom(string user,string setting,string list){
+ string[int] props=split_string(list,",");
  foreach i,s in props{
   if((userdata[user,setting]==s)&&(s!=""))return true;
-  if((s=="")&&(userdata[user,setting]==""))return true;
+  if((s=="")&&(userdata[user,setting]==""))return true;//THIS MAKES SENSE, TRUST ME
  }
  return false;
 }
 
+boolean propContains(string user,string setting,string thing){
+ string[int] props=split_string(userdata[user,setting],",");
+ foreach i,s in props if(s==thing)return true;
+ return false;
+}
+
 /*void addProp(string user,string setting,string prop){
- if(!hasProp(user,setting,prop))userdata[user,setting]+=","+prop;
+ if(!matchesFrom(user,setting,prop))userdata[user,setting]+=","+prop;
 }
 
 void removeProp(string user,string setting,string prop){
@@ -98,7 +106,6 @@ void sysInc(string user,string prop){
 void sysInc(string prop){
  sysInc("*",prop,1);
 }
-
 
 //check clan whitelist for user if not in clan
 boolean checkWhitelist(string id){
@@ -133,10 +140,10 @@ string updateId(string user,boolean add){
  checkOut(userdata,"userdata.txt");
  if(!add)return group(nameClan,1).to_int();
  userdata[user,"ID#"]=group(nameClan,1);
- if(!hasProp(user,"membership","whitelist,blacklist"))defaultProp(user,"membership");
+ if(!matchesFrom(user,"membership","whitelist,blacklist"))defaultProp(user,"membership");
  if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
  if(associates contains group(nameClan,2).to_int())userdata[user,"membership"]="associate";
- if((!hasProp(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
+ if((!matchesFrom(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
  commit(userdata,"userdata.txt");
  return userdata[user,"ID#"];
 }
@@ -159,18 +166,27 @@ string to_commad(int i){
  return c;
 }
 
-string factCore(string type){
+string factCore(string type,int i){
  string[string,int] factList;
  checkOut(factList,"facts.txt");
- return factList[type,random(count(factList[type]))];
+ if((i<0)||(i>=count(factList[type])))return factList[type,random(count(factList[type]))];
+ return factList[type,i];
 }
 
 string factCore(){
- return factCore("F");
+ return factCore("F",-1);
 }
 
 string insultCore(){
- return factCore("I");
+ return factCore("I",-1);
+}
+
+void deMole(){
+ if(have_effect($effect[Shape of...Mole!])>0){
+  while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
+  if(!adventure(1,$location[Mt. Molehill])){}
+  visit_url("choice.php?pwd="+my_hash()+"&whichchoice=277&option=1");
+ }
 }
 
 void clearBuffs(int skip){
@@ -260,11 +276,12 @@ boolean loadSettings(string postRO){
  if(x==0)return false;
  int day=-1;
  for i from 0 to count(setting)-1 if(setting[i]=="!day")day=setting[i+1].to_int();
+ print("Quest Save Data: "+day+"; Today: "+gameday_to_int());
  if(day!=gameday_to_int()){
   rollpassed=true;
   string[int] skipsplit=split_string(postRO,';');
   int[string] skip;
-  foreach toskip in skipsplit skip[skipsplit[toskip]]=1;
+  foreach num,toskip in skipsplit skip[toskip]=1;
   for i from 0 to x-1 if(!(skip contains setting[2*i]))set_property(setting[2*i],setting[2*i+1]);
  }else for i from 0 to x-1 set_property(setting[2*i],setting[2*i+1]);
  saveSettings();
@@ -279,6 +296,12 @@ void formProps(){
  string prop="";
  foreach u in userdata if(getUF(u,"admin"))prop+=u+"::";
  set_property("admins",prop);
+ int[string] books;
+ checkOut(books,"books.txt");
+ string[int]split=split_string(get_property("books"),"::");
+ books["thisLotto"]=split[0].to_int();
+ books["nextLotto"]=split[1].to_int();
+ commit(books,"books.txt");
 }
 
 void saveSettings(string settings){
@@ -306,13 +329,13 @@ void announceClan(string message){
 void checkApps(){
  int[item] gift;
  gift[$item[black forest cake]]=1;
- gift[$item[bulky buddy box]]=1;
+// gift[$item[bulky buddy box]]=1;
  boolean acceptall=true;
- matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));	
+ matcher appcheck=create_matcher("y <b>(\\d+)</b> p", visit_url("clan_office.php"));
  if((appcheck.find())&&(acceptall)){
   matcher applicants=create_matcher("who=(\\d+)\">(.+?)<",visit_url("clan_applications.php"));
   while(applicants.find()){
-   if(hasProp(applicants.group(2),"membership","blacklist")){
+   if(matchesFrom(applicants.group(2),"membership","blacklist")){
     print("blacklist "+applicants.group(2)+" wants in");
     continue;
    }
@@ -326,7 +349,7 @@ void checkApps(){
    chat_clan(applicants.group(2)+" has just been accepted into Black Mesa. If you see them around chat, be sure to give them a warm welcome!");
    checkOut(userdata,"userdata.txt");
    userdata[applicants.group(2),"ID#"]=applicants.group(1);
-   if(!hasProp(applicants.group(2),"membership","whitelist"))userdata[applicants.group(2),"membership"]="clannie";
+   if(!matchesFrom(applicants.group(2),"membership","whitelist"))userdata[applicants.group(2),"membership"]="clannie";
    userdata[applicants.group(2),"hasCake"]="true";
    commit(userdata,"userdata.txt");
   }
