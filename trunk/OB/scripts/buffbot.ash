@@ -2183,7 +2183,7 @@ void burn(){
 
 void publicChat(string sender, string msg){
  checkLotto();
- checkLevel(sender);
+// checkLevel(sender);
  matcher m;
  string original=msg;
  chatVars["timedif"]=timeSinceLastChat(sender).to_string();
