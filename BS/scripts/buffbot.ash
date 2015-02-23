@@ -2185,13 +2185,14 @@ void systemHandler(string msg){
   case "mail":checkMail();break;
   case "outfit":switch(ops){
     case "farm":
+     cli_execute("outfit farming");
      break;
     case "buff":
      cli_execute("outfit buffing");
      break;
    }
    break;
-  case "record":systemHandler("outfit buff"); systemHandler("outfit buff"); deMole(); makeRecords();break;
+  case "record":systemHandler("outfit farm"); systemHandler("outfit farm"); deMole(); makeRecords();break;
   case "adventure":
    systemHandler("outfit farm");systemHandler("outfit farm");
    deMole();
