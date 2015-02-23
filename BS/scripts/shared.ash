@@ -6,18 +6,16 @@ string[string,string] userdata;
 file_to_map("userdata.txt",userdata);
 
 //Global variables
-string sauceBot="Ominous Sauceror";
-string turtleBot="Ominous Tamer";
-string nightlySave="totalDaysCasting;totalCastsEver;sauceCasts;tamerCasts;books;winners;level";
-string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;lottos;books;winners;admins;level";
-string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals;lottos;!day";
-int burnTurns=100;
+string nightlySave="totalDaysCasting;totalCastsEver;books;winners";
+string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
+string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
+int burnTurns=130;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
 boolean errorFree=false;
 
 int clanid=2046994401;//Black Mesa
-boolean[int] associates;
+/*boolean[int] associates;
 associates[21459]=true;//Hogs of Destiny
 associates[67356]=true;//Piglets of Fate
 associates[2046987019]=true;//Not Dead Yet
@@ -25,7 +23,7 @@ associates[2046991167]=true;//This One Time
 associates[2046983684]=true;//Clan of 14 Days
 associates[2046991423]=true;//Margaretting Tye
 associates[76566]=true;//Imitation Plastic Death Star
-associates[72876]=true;//Hyrule
+associates[72876]=true;//Hyrule*/
 
 aggregate checkOut(aggregate data, string resourceName){ //Load a file
  file_to_map(resourceName,data);
@@ -144,7 +142,6 @@ string updateId(string user,boolean add){
  userdata[user,"ID#"]=group(nameClan,1);
  if(!matchesFrom(user,"membership","whitelist,blacklist"))defaultProp(user,"membership");
  if(group(nameClan,2).to_int()==clanid)userdata[user,"membership"]="clannie";
- if(associates contains group(nameClan,2).to_int())userdata[user,"membership"]="associate";
  if((!matchesFrom(user,"membership","clannie"))&&(checkWhitelist(userdata[user,"ID#"])))userdata[user,"membership"]="clannie";
  commit(userdata,"userdata.txt");
  return userdata[user,"ID#"];
@@ -211,18 +208,18 @@ void updateDC(string list){
  foreach x in names deals+=names[x]+" (#"+getId(names[x])+")\n";
  if(deals==" (#0)\n")deals="";
  else deals="Current deals in mall:\n"+deals+"\n";
- int served=get_property('sauceCasts').to_int()+get_property('tamerCasts').to_int()+get_property('totalCastsEver').to_int();
+ int served=get_property('totalCastsEver').to_int();
  int days=get_property('totalDaysCasting').to_int()+1;
  string avg=to_string(served*1.0/days);
  if(index_of(avg,'.')+3<length(avg))avg=substring(avg,0,index_of(avg,'.')+3);
  string s="managecollection.php?action=changetext&pwd&newtext=";
- s+="Over "+to_commad(served)+" casts served since 2011!\n";
- s+="Daily Avg: "+avg+"\n\n";
+// s+="Over "+to_commad(served)+" casts served since 2013!\n";
+// s+="Daily Avg: "+avg+"\n\n";
  s+="More information on buffs offered can be found on the following page:\n";
  s+="http://kol.coldfront.net/thekolwiki/index.php/Buff\n\n";
  s+=deals;
  s+="Casts Remaining of limited skills listed below:\n";
- s+="Managerial Manipulation: "+to_int(3-sysInt("#62"))+"\n";
+ s+="Managerial Manipulation: "+to_int(1-sysInt("#62"))+"\n";
  visit_url(s);
 }
 void updateDC(){
@@ -437,7 +434,7 @@ void checkMail(){
   break;
  }
  foreach i,m in mail{
-  if((m.sender=="smashbot")||(m.sender=="ominous tamer")||(m.sender=="ominous sauceror")){
+  if(m.sender=="smashbot"){
    deleteMail(m);
    continue;
   }

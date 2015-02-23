@@ -61,8 +61,7 @@ string someoneDefined="";
 string[string] chatVars;
 string trueUser="";
 string trueChannel="";
-boolean impliedOB=false;
-int TPC=25;
+boolean impliedBS=false;
 boolean raidlogRead=false;
 boolean silent=true;
 
@@ -211,10 +210,6 @@ void logout(string sender,string options){
   chat(sender,"You do not have permission to use this command.");
   return;
  }
- if(options=="all"){
-  chat_private(turtleBot,"logout");
-  chat_private(sauceBot,"logout");
- }
  saveSettings(earlySave);
  set_property("chatbotScript","");
  cli_execute("exit");
@@ -224,15 +219,6 @@ void shutdown(string sender,string options){
  if(!getUF(sender,"admin")){
   chat(sender,"Haha, did you think it would be that easy?");
   return;
- }
- if(options.contains_text("all")){
-  if(options.contains_text("burn")){
-   chat_private(turtleBot,"burn");
-   chat_private(sauceBot,"burn");
-  }else{
-   chat_private(turtleBot,"shutdown");
-   chat_private(sauceBot,"shutdown");
-  }
  }
  if(options.contains_text("burn"))set_property("_forceShutdown","burn");
  else set_property("_forceShutdown","shutdown");
@@ -276,64 +262,11 @@ boolean sendRecord(int skillId, string sender){
 }
 
 void buff(string sender, string msg, int numTurns, string ding){
- //Catch incoming error messages (success in the case of Employee of the Month) from other Bots
- if((sender==turtleBot)||(sender==sauceBot)){
-  string[int] failsplit = split_string(msg,"\\s");
-  if(index_of("ARLNS",failsplit[0])>-1){
-   sender=to_playerName(failsplit[1].to_int());
-   ding=to_playerName(failsplit[2].to_int());
-  }
-  switch(failsplit[0]){
-   case "CASTRQ":
-    if(sender==turtleBot)set_property('tamerCasts',failsplit[1]);
-    if(sender==sauceBot)set_property('sauceCasts',failsplit[1]);
-    break;
-   case "RATION":switch(failsplit[1]){
-    case "ITEM":
-     use_skill(12,$skill[fat leon's phat loot lyric],sender);
-     break;
-    case "MEAT":
-     use_skill(12,$skill[the polka of plenty],sender);
-     break;
-    case "NONCOMBAT":
-     use_skill(12,$skill[carlweather's cantata of confrontation],sender);
-     break;
-    }
-    break;
-   case "FUNDS":
-    chat_private("Almighty Sapling","low funds on "+sender+".");
-    break;
-   case "A":
-    errorMessage(sender,"I can't buff you while you're adventuring!");
-    break;
-   case "R":
-    errorMessage(sender,"I can't buff you if you're in Hardcore or Ronin!");
-    break;
-   case "U":
-    errorMessage(sender,"Unknown error. Must be a problem with the lesser bots.");
-    break;
-   case "L":
-    errorMessage(failsplit[2],"I'm sorry, but you've reached your daily limit for "+failsplit[3].to_int().to_skill().to_string()+".");
-    break;
-   case "N":
-    errorMessage(failsplit[2],"The cake is a lie. So is that thing you asked for, since it wasn't a buff.");
-    break;
-   case "S":
-    checkOut(userdata,"userdata.txt");
-    sysInc(ding,"#"+failsplit[3]);
-    sysInc("#"+failsplit[3]);
-    commit(userdata,"userdata.txt");
-    updateDC("useCurrent");
-    updateLimits();
-    break;
-  }
-  return;
- }
  skill messageNew;
  messageNew=to_skill(msg);
  int casts;
- int max=700;
- if(userdata[ding,"membership"]=="none")max=400;
+ int max=900;
+ if(userdata[ding,"membership"]=="clannie")max=1200;
  int skillnum=to_int(messageNew);
  if(skillnum>9000){
   skillnum-=9000;
@@ -342,59 +275,41 @@ void buff(string sender, string msg, int numTurns, string ding){
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
   case 46:case 47:case 48:case 58:case 59:case 60:
-  case 7040:case 7041:case 6037:case 6040: return;
+  case 3012:case 7040:case 7041:case 6037:case 6040: return;
  }
- //Forward skill requests to relay bots when necessary
  string senderid=getId(sender);
  string mout;
- if(skillnum==62){
-  numTurns=1;
-  mout=senderid+" "+getId(ding)+" 62 1 1";
-  switch(sysInt("#62")){
-   case 1:
-    chat_private(turtleBot,mout);
-    return;
-   case 2:
-    chat_private(sauceBot,mout);
-    return;
-   case 3:
-    errorMessage(sender,"I'm sorry, but I'm all out of "+messageNew+" for today.");
-    return;
-  }
+ if((skillnum==62)&&(sysInt("#62")>0)){
+  errorMessage(sender,"I'm sorry, but I'm all out of "+messageNew+" for today.");
+  return;
  }
  //Assign default values if turns isn't specified.
- if(skillnum==6014)numTurns=TPC;//Ode
+ if(skillnum==6014)numTurns=25;//Ode
  if(numTurns==0){
   if(skillnum==6026)numTurns=125;//Donho
   else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028))numTurns=25;//Limited buffs
   else if(skillnum!=6014){//Else
-   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
+   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=300;
    numTurns=userdata[sender,"defaultCast"].to_int();
   }
  }
- mout=senderid+" "+getId(ding)+" "+to_string(skillnum)+" "+to_string(numTurns)+" "+(getUF(ding,"buffLimit")?to_string(max):"0");
- if((skillnum>2000)&&(skillnum<3000)){
-  chat_private(turtleBot,mout);
-  return;
- }
- if((skillnum>4000)&&(skillnum<5000)){
-  chat_private(sauceBot,mout);
-  return;
- }
- casts=ceil(numTurns/(TPC*1.0));
+ casts=ceil(numTurns/25.0);
+ if((skillnum>2000)&&(skillnum<3000))casts=ceil(numTurns/15.0);
  //Assign buff limits by clan.
- if(userdata[ding,"membership"]!="none"){
+ if(userdata[ding,"membership"]=="clannie"){
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;//Limited buffs
   else if(skillnum==6014)max=5;//Ode
   else if(skillnum==6026)max=20;//Donho
   else if(skillnum>6900)max=1;//Items (arrow and the like)
-  else max=28;//Else
+  else if((skillnum>2000)&&(skillnum<3000))max=80;//TT skills
+  else max=48;//Else
  }else{
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
   else if(skillnum==6014)max=5;
   else if(skillnum==6026)max=10;
   else if(skillnum>6900)max=1;//Item skills
-  else max=16;
+  else if((skillnum>2000)&&(skillnum<3000))max=60;
+  else max=36;
  }
  casts=min(casts,max);
  //Adjust casts to be within limits
@@ -466,13 +381,10 @@ void buff(string sender, string msg, int numTurns, string ding){
  }else{
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
  }
- if(((my_maxmp()-my_mp())>=300)&&(!to_boolean(get_property("oscusSodaUsed"))))use(1,$item[oscus's neverending soda]);
- if(((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")<3))cli_execute("nuns");
  if((my_mp()<900)&&(my_fullness()<15)){
   retrieve_item(1,$item[Jumbo Dr. Lucifer]);
   eatsilent(1,$item[Jumbo Dr. Lucifer]);
-  retrieve_item(1,$item[scroll of drastic healing]);
-  use(1,$item[scroll of drastic healing]);
+  use_skill(1,$skill[Cannelloni Cocoon]);
  }
  while(my_mp()<952){
   if(item_amount($item[magical mystery juice])<1)retrieve_item(1,$item[magical mystery juice]);
@@ -643,14 +555,14 @@ void mod(string sender, string msg){
     if(adminonly){
      updateId(user,true);
      userdata[user,"membership"]="whitelist";
-     chat(sender,user+" has been whitelisted to OB.");
+     chat(sender,user+" has been whitelisted to BS.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    case "blacklist":
     if(adminonly){
      updateId(user,true);
      userdata[user,"membership"]="blacklist";
-     chat(sender,user+" has been blacklisted from OB.");
+     chat(sender,user+" has been blacklisted from BS.");
     }else errorMessage(sender,"You do not have permission to use "+cmd+".");
     break;
    case "reset":
@@ -1121,15 +1033,11 @@ void userDetails(string sender, string who){
  if(who=="")who=sender;
  string reply;
  string t;
- if((who=="ob")||(who=="ominous buffer")){
-  reply="User: Ominous Buffer\n";
-  reply+="Known Multis: Ominous Tamer, Ominous Sauceror\nGoes by: OB\n";
+ if((who=="bs")||(who=="buffsphere")){
+  reply="User: BuffSphere\n";
+  reply+="Goes by: BS\n";
   reply+="Gender neutral.\n\n";
-  reply+="Currently casting for the following clans: Black Mesa";
-  foreach pId in associates{
-   t=pId.to_clanName();
-   if(t!="")reply+=", "+t;
-  }
+  reply+="Currently casting for the whole kingdom courtesy of Black Mesa!";
   reply+=".";
   cli_execute("csend to "+sender+"||"+reply);
   return;
@@ -1301,10 +1209,10 @@ void whitelistEdit(string oper){
 }
 
 void man(string sender, string query){
- cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+ cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
 }
 
-void sendLink(string sender, string i){
+/*void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
  string t;
@@ -1339,6 +1247,7 @@ void sendLink(string sender, string i){
   t="";
   continue;
  }
+ 
  m=create_matcher("href=\"(.+?)\"",t);
  if(m.find()){
   chat(sender,m.group(1));
@@ -1365,7 +1274,7 @@ void sendLink(string sender, string i){
   return;
  }
  chat(sender,base);
-}
+}*/
 
 string performMath(string sender, string msg){
  if(msg=="")msg="0";
@@ -1465,7 +1374,6 @@ string predicateFilter(string sender, string msg){
  }else return msg;
  switch(pred){
   case "alias":
-  case "createpack":
    createAlias(sender,oper);
    return "x";
   case "alt":
@@ -1502,9 +1410,6 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "deals":
    if(getUF(sender,"admin"))updateDC(oper);
-   return "x";
-  case "delpack":
-   removeAlias(sender,oper);
    return "x";
   case "details":
    userDetails(sender,oper);
@@ -1561,25 +1466,8 @@ string predicateFilter(string sender, string msg){
    }
    setNick(sender,oper);
    return "x";
-  case "pack":
-  case "set":
-   first=create_matcher("(\\d+)\\s*:?\\s*(.*)",oper);
-   pred="";
-   if(first.find()){
-    pred=first.group(1);
-    oper=first.group(2);
-   }
-   string r=userdata[sender,"~"+oper];
-   if((r=="")&&(!contains_text("0123456",oper)))r=userdata["*","~"+oper];
-   if(r==""){
-    errorMessage(sender,"That buffpack does not exist.");
-    return "x";
-   } 
-   return pred+":"+r;
   case "ping":
-   chat(turtleBot,"PING "+sender);
-   chat(sauceBot,"PING "+sender);
-   chat(sender,"Reply from Ominous Buffer"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
+   chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
    if(oper=="")return "x";
@@ -1652,9 +1540,9 @@ string predicateFilter(string sender, string msg){
   case "whois":
    lookup(sender,oper);
    return "x";
-  case "wiki":
+ /* case "wiki":
    sendLink(sender,oper);
-   return "x";
+   return "x";*/
   case "withdraw":
    userAccountEmpty(sender);
    return "x";
@@ -1680,7 +1568,7 @@ void nopredpass(string sender, string msg, boolean addressed){
  checkOut(botdata,"replies.txt");
  boolean foundmatch=false;
  boolean referred=addressed;
- matcher ref=create_matcher("(?i)(\\WOB\\W|\\WOminous Buffer\\W)",msg);
+ matcher ref=create_matcher("(?i)(\\WBS\\W|\\WBuffSphere\\W|\\WBuff Sphere\\W)",msg);
  if(ref.find())referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
@@ -1997,7 +1885,7 @@ void checkLotto(){
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
  boolean[string] inClan=who_clan();
- remove inClan["Ominous Buffer"];
+ remove inClan["BuffSphere"];
  remove inClan["MesaChat"];
  remove inClan["Acoustic_shadow"];
  remove inClan["relay"];
@@ -2190,14 +2078,14 @@ void publicChat(string sender, string msg){
  chatVars["time"]=now_to_string("HH:mm:ss z");
  boolean addressed=false;
  boolean referred=false;
- m=create_matcher("(?i)(^|\\. ?)(ominous buffer|ob)[:,]\\s?",msg);
+ m=create_matcher("(?i)(^|\\. ?)(buffsphere|buff sphere|bs)[:,]\\s?",msg);
  if(m.find()){
   addressed=true;
   msg=substring(msg,end(m));
  }
- m=create_matcher("(?i)(ominous buffer|\\Wob\\W)",msg);
+ m=create_matcher("(?i)(buffsphere|buff sphere|\\Wbs\\W)",msg);
  if(m.find())referred=true;
- if(impliedOB)addressed=true;
+ if(impliedBS)addressed=true;
  m=create_matcher("([\\w\\d]*):?\\s?(.*)",msg);
  string pred;
  string oper;
@@ -2282,7 +2170,7 @@ void systemHandler(string msg){
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
-   cli_execute("maximize adv, -tie");
+   cli_execute("outfit sleep");
    updateDC();
    makeBackups();
    set_property("chatbotScript","");
@@ -2297,13 +2185,9 @@ void systemHandler(string msg){
   case "mail":checkMail();break;
   case "outfit":switch(ops){
     case "farm":
-     cli_execute("familiar "+meatFam);
-     cli_execute("maximize 2 meat, item, 100 combat, equip trikitixa, -tie");
      break;
     case "buff":
-     cli_execute("familiar "+statFam);
-     cli_execute("outfit birthday suit");
-     cli_execute("maximize mp");
+     cli_execute("outfit buffing");
      break;
    }
    break;
@@ -2436,10 +2320,6 @@ void privateHandler(string sender, string msg){
  }else if(aliasList contains msg)msg=aliasList[msg];
  msg=predicateFilter(sender,msg);
  if(msg=="x")return;
- if((sender==turtleBot)||(sender==sauceBot)){
-  buff(sender,msg,0,sender);
-  return;
- }
  m=create_matcher("buff ([a-zA-Z][a-zA-Z 0-9']*) with (.*)",msg.to_lower_case());
  string co=sender;
  if(m.find()){
@@ -2518,7 +2398,7 @@ string applySUE(string sender,string channel){
 
 string applySUE(string channel){
  if(channel!="")return channel;
- if(trueUser!="MesaChat")impliedOB=true;
+ if(trueUser!="MesaChat")impliedBS=true;
  trueChannel=channel;
  if(userdata[trueUser,"schannel"]!="")return "/"+userdata[trueUser,"schannel"];
  return "";

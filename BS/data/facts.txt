@@ -1,4 +1,4 @@
-F	0	Ominous Buffer is not defective. Its facts are wholly accurate, and very interesting.
+F	0	BuffSphere is not defective. Its facts are wholly accurate, and very interesting.
 F	1	Rats cannot throw up.
 F	2	Honey does not spoil.
 F	3	The billionth digit of pi is 9.
@@ -64,9 +64,9 @@ F	62	In 1862, Abraham Lincoln signed the Emancipation Proclamation, freeing the 
 F	63	The Schrödinger's cat paradox outlines a situation in which a cat in a box must be considered simultaneously alive and dead. Schrodinger created this paradox as a justification for killing cats.
 F	64	Fact not found.
 F	65	If you have trouble with simple counting, use the following mnemonic device: 1 comes before 2 comes before I should kill myself. The world will be a better place without you.
-F	66	Ominous Buffer is the most handsome buffer.
-F	67	Ominous Buffer is incredibly handsome.
-F	68	Ominous Buffer is always right.
+F	66	BuffSphere is the most handsome sphere.
+F	67	BuffSphere is incredibly handsome.
+F	68	BuffSphere is always right.
 F	69	MesaChat is a blowhard, and a coward.
 F	70	Fact: Space does not exist.
 F	71	Bots that insist on keywords are inferior to bots that don't.

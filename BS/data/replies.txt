@@ -23,7 +23,7 @@ must of	must have*	32	say
 nickle	nickel*	0	say		
 noone	No one*	0	say		
 NPH?	Neil Patrick Harris, $pnick.	3	say		
-OB?	is OB, $pnick.	3	do		
+BS?	is BS, $pnick.	3	do		
 om nom nom	Much better, thank you.	0	say	$ptrigger	omnomnom
 omnomnom	Chew a bit slower, $pnick.	0	say		
 payed	paid*	32	say		
