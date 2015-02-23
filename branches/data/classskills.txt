@@ -36,6 +36,8 @@
 2026	Curiosity of Br'er Tarrypin	curiosity.gif	4	10	5
 2031	Spiky Shell	spikyshell.gif	4	8	5	9
 
+3012	Cannelloni Cocoon	coccoon.gif	2	20	0	12
+
 4007	Elemental Saucesphere	elesphere.gif	4	10	5	4
 4008	Jalape&ntilde;o Saucesphere	pepsphere.gif	4	5	5	7
 4019	Scarysauce	scarysauce.gif	4	10	5

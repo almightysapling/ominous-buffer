@@ -275,7 +275,7 @@ void buff(string sender, string msg, int numTurns, string ding){
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
   case 46:case 47:case 48:case 58:case 59:case 60:
-  case 7040:case 7041:case 6037:case 6040: return;
+  case 3012:case 7040:case 7041:case 6037:case 6040: return;
  }
  string senderid=getId(sender);
  string mout;
