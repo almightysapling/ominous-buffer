@@ -26,6 +26,7 @@
 60	Lunch Break	mpe.gif	1	10	0
 62	Managerial Manipulation	necktie.gif	4	5	20
 111	Psychokinetic Hug	reassured.gif	4	0	10
+116	Hollow Leg	hollowleg.gif	0	0	0
 
 2007	Ghostly Shell	ghosturtle.gif	4	6	5	4
 2008	Reptilian Fortitude	scharm.gif	4	10	5	10
@@ -83,6 +84,7 @@
 
 9605	Initiative	celerity.gif	4	4	5	3
 9606	Meat	plenty.gif	4	7	5	5
+9608	Ballad of the Arrowsmith	arrowsmith.gif	4	5	5	4
 9609	Brawnee's Anthem of Absorbtion Damage Reduction	brawnees.gif	4	13	5	8
 9610	Items	fatleons.gif	4	11	5	7
 9612	Weapon Damage Spell Damage	jackasses.gif	4	9	5	6
