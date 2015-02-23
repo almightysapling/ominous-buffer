@@ -115,7 +115,7 @@ void handleMeat(){
  commit(userdata,"userdata.txt");
  cli_execute("mallsell 0 snow queen crown @ 400");
  cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face lager, 0 ram horns, 0 ram stick, 0 yeti fur");
- int totalDMS=floor(my_meat()/1000)-500;
+ int totalDMS=floor(my_meat()/1000)-200;
  if(totalDMS>0){
   string exe="make "+to_string(totalDMS)+" dense meat stack";
   cli_execute(exe);
@@ -181,7 +181,6 @@ void breakfast(){
  checkMail();
  deMole();
  set_property("totalDaysCasting",get_property("totalDaysCasting").to_int()+1);
- cli_execute("maximize exp, -100 combat");
  print("Visiting clan rumpus room.", "blue");
  if(contains_text(rumpus,"rump3_3.gif")){
   visit_url("clan_rumpus.php?action=click&spot=3&furni=3");
@@ -221,7 +220,7 @@ void breakfast(){
  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[eggnog]);
  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[ram's face lager]);
  clearBuffs();
- retrieve_item(7,$item[bunch of square grapes]);
+ /*retrieve_item(7,$item[bunch of square grapes]);
  retrieve_item(1,$item[handful of nuts and berries]);
  retrieve_item(1,$item[milk of magnesium]);
  use(1,$item[milk of magnesium]);
@@ -251,10 +250,7 @@ void breakfast(){
  eatsilent(1,$item[super salad]); 
  eatsilent(1,$item[handful of nuts and berries]); 
  */ 
- if((have_skill($skill[the sonata of sneakiness]))&&(have_effect($effect[the sonata of sneakiness])<1))(!use_skill(1,$skill[the sonata of sneakiness]));
- if((have_effect($effect[dreams and lights])<1)||((have_effect($effect[dreams and lights])<9)&&(have_effect($effect[arcane in the brain])<1))){
-  while(have_effect($effect[dreams and lights])<9)(!adventure(1,$location[the haunted gallery]));
-  clearBuffs();
+ if(have_effect($effect[arcane in the brain])<1){
   retrieve_item(1,$item[llama lama gong]);
   cli_execute("gong mole");
   if(!adventure(8,$location[mt. molehill])){
@@ -298,7 +294,7 @@ void main(){try{
  set_property("!day",gameday_to_int());
  set_property("chatbotScript",chatbotScript);
  print("Purge pending requests","olive");
- waitq(30);
+ waitq(15);
  print("Time up, continue logging in.","olive");
  set_property("_lockChat","1");
  prepareScript();

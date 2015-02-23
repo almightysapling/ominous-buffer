@@ -62,7 +62,6 @@ string[string] chatVars;
 string trueUser="";
 string trueChannel="";
 boolean impliedBS=false;
-int TPC=25;
 boolean raidlogRead=false;
 boolean silent=true;
 
@@ -263,12 +262,11 @@ boolean sendRecord(int skillId, string sender){
 }
 
 void buff(string sender, string msg, int numTurns, string ding){
-
  skill messageNew;
  messageNew=to_skill(msg);
  int casts;
- int max=700;
- if(userdata[ding,"membership"]=="none")max=400;
+ int max=900;
+ if(userdata[ding,"membership"]=="clannie")max=1200;
  int skillnum=to_int(messageNew);
  if(skillnum>9000){
   skillnum-=9000;
@@ -286,29 +284,32 @@ void buff(string sender, string msg, int numTurns, string ding){
   return;
  }
  //Assign default values if turns isn't specified.
- if(skillnum==6014)numTurns=TPC;//Ode
+ if(skillnum==6014)numTurns=25;//Ode
  if(numTurns==0){
   if(skillnum==6026)numTurns=125;//Donho
   else if(((skillnum>6019)&&(skillnum<6025))||(skillnum==6028))numTurns=25;//Limited buffs
   else if(skillnum!=6014){//Else
-   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=200;
+   if(matchesFrom(sender,"defaultCast",",0"))userdata[sender,"defaultCast"]=300;
    numTurns=userdata[sender,"defaultCast"].to_int();
   }
  }
- casts=ceil(numTurns/(TPC*1.0));
+ casts=ceil(numTurns/25.0);
+ if((skillnum>2000)&&(skillnum<3000))casts=ceil(numTurns/15.0);
  //Assign buff limits by clan.
- if(userdata[ding,"membership"]!="none"){
+ if(userdata[ding,"membership"]=="clannie"){
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;//Limited buffs
   else if(skillnum==6014)max=5;//Ode
   else if(skillnum==6026)max=20;//Donho
   else if(skillnum>6900)max=1;//Items (arrow and the like)
-  else max=28;//Else
+  else if((skillnum>2000)&&(skillnum<3000))max=80;//TT skills
+  else max=48;//Else
  }else{
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
   else if(skillnum==6014)max=5;
   else if(skillnum==6026)max=10;
   else if(skillnum>6900)max=1;//Item skills
-  else max=16;
+  else if((skillnum>2000)&&(skillnum<3000))max=60;
+  else max=36;
  }
  casts=min(casts,max);
  //Adjust casts to be within limits
@@ -380,13 +381,10 @@ void buff(string sender, string msg, int numTurns, string ding){
  }else{
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
  }
- if(((my_maxmp()-my_mp())>=300)&&(!to_boolean(get_property("oscusSodaUsed"))))use(1,$item[oscus's neverending soda]);
- if(((my_maxmp()-my_mp())>=1000)&&(get_property("nunsVisits")<3))cli_execute("nuns");
  if((my_mp()<900)&&(my_fullness()<15)){
   retrieve_item(1,$item[Jumbo Dr. Lucifer]);
   eatsilent(1,$item[Jumbo Dr. Lucifer]);
-  retrieve_item(1,$item[scroll of drastic healing]);
-  use(1,$item[scroll of drastic healing]);
+  use_skill(1,$skill[Cannelloni Cocoon]);
  }
  while(my_mp()<952){
   if(item_amount($item[magical mystery juice])<1)retrieve_item(1,$item[magical mystery juice]);
@@ -1039,11 +1037,7 @@ void userDetails(string sender, string who){
   reply="User: BuffSphere\n";
   reply+="Goes by: BS\n";
   reply+="Gender neutral.\n\n";
-  reply+="Currently casting for the following clans: Black Mesa";
-  foreach pId in associates{
-   t=pId.to_clanName();
-   if(t!="")reply+=", "+t;
-  }
+  reply+="Currently casting for the whole kingdom courtesy of Black Mesa!";
   reply+=".";
   cli_execute("csend to "+sender+"||"+reply);
   return;
@@ -1215,10 +1209,10 @@ void whitelistEdit(string oper){
 }
 
 void man(string sender, string query){
- cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. I currently only buff members of Black Mesa and players on its whitelist. If you have recently joined, and are unable to receive a buff, please pm me with the phrase \"settings clear\". Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
+ cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
 }
 
-void sendLink(string sender, string i){
+/*void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
  string t;
@@ -1253,6 +1247,7 @@ void sendLink(string sender, string i){
   t="";
   continue;
  }
+ 
  m=create_matcher("href=\"(.+?)\"",t);
  if(m.find()){
   chat(sender,m.group(1));
@@ -1279,7 +1274,7 @@ void sendLink(string sender, string i){
   return;
  }
  chat(sender,base);
-}
+}*/
 
 string performMath(string sender, string msg){
  if(msg=="")msg="0";
@@ -1507,7 +1502,7 @@ string predicateFilter(string sender, string msg){
    checkMail();
    return "x";
   case "remove":
-   removeAliase(sender,oper);
+   removeAlias(sender,oper);
    return "x";
   case "roll":
    roll(sender,oper);
@@ -1545,9 +1540,9 @@ string predicateFilter(string sender, string msg){
   case "whois":
    lookup(sender,oper);
    return "x";
-  case "wiki":
+ /* case "wiki":
    sendLink(sender,oper);
-   return "x";
+   return "x";*/
   case "withdraw":
    userAccountEmpty(sender);
    return "x";
@@ -1890,7 +1885,7 @@ void checkLotto(){
  books["nextLotto"]+=2;
  books["thisLotto"]+=14;
  boolean[string] inClan=who_clan();
- remove inClan["Ominous Buffer"];
+ remove inClan["BuffSphere"];
  remove inClan["MesaChat"];
  remove inClan["Acoustic_shadow"];
  remove inClan["relay"];
@@ -2175,7 +2170,7 @@ void systemHandler(string msg){
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
-   cli_execute("maximize adv, -tie");
+   cli_execute("outfit sleep");
    updateDC();
    makeBackups();
    set_property("chatbotScript","");
@@ -2190,13 +2185,9 @@ void systemHandler(string msg){
   case "mail":checkMail();break;
   case "outfit":switch(ops){
     case "farm":
-     cli_execute("familiar "+meatFam);
-     cli_execute("maximize 2 meat, item, 100 combat, equip trikitixa, -tie");
      break;
     case "buff":
-     cli_execute("familiar "+statFam);
-     cli_execute("outfit birthday suit");
-     cli_execute("maximize mp");
+     cli_execute("outfit buffing");
      break;
    }
    break;
@@ -2242,9 +2233,9 @@ void clanHandler(string sender, string msg){
    if(hangman(sender,msg))return;
   default:
    publicChat(sender,msg);
+   if(silent)maybeFact();
    return;
  }
- if(silent)maybeFact();
 }
 
 void slimetubeHandler(string sender, string msg){

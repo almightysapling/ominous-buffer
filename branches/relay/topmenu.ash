@@ -241,7 +241,6 @@ void main(){
  switch(fields["cp"]){
   case "":topMenu();return;
   case "save":update();break;
-  case "control":manageOST();break;
  }
  header();
  options();
