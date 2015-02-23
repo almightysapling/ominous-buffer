@@ -11,8 +11,8 @@
 # 8 (Combat/Passive)
 # 9 (One-at-a-time Noncombat Expression)
 
-1	Liver of Steel	liver.gif	0	0	0
 3	The Smile of Mr. A.	gma.gif	4	0	40
+5	Stomach of Steel	stomach.gif	0	0	0
 12	Torso Awaregness	wtee2.gif	0	0	0
 15	CLEESH	commacha.gif	5	10	0
 19	Transcendent Olfaction	snout.gif	5	40	0
