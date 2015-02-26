@@ -93,7 +93,8 @@ void update(){
  }
  foreach g in groups{
   name="";
-  foreach i,v in groups[g] name+=v+"::";
+  foreach i,v in groups[g] if(i.to_int()>0)name+=v+"::";
+  else name+=i+":"+v+"::";
   set_property(g,name);
  }
  commit(userdata,"userdata.txt");
@@ -114,6 +115,7 @@ void header(){
  writeln(".righttable {text-align:right; width:50%; float:right; border:0px; background-color:white; padding: 0px; border-spacing:5px;}");
  writeln(".lefttable {text-align:left; border:0px; background-color:white; padding: 0px; border-spacing: 5px;}");
  writeln(".lefttable td {background-color:#F5E4DC;}");
+ writeln(".infobox {text-indent:-10px; padding:0px 0px 0px 25px;}");
  writeln(".info {background-color:#F5E4DC;}");
  writeln(".good {background-color: rgb(110,250,130);}");
  writeln(".bad {background-color: rgb(250,110,130);}");
@@ -179,13 +181,25 @@ void options(){
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
  nln("<input type=\"hidden\" name=\"cp\" value=\"save\" />");
  nln("<span class=\"optGroup\">BuffSphere</span>");
- ntln("Current Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.1\" value=\""+books["thisLotto"]+"\" />");
- nln("Next Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.2\" value=\""+books["nextLotto"]+"\" />");
- ntln("Lottos Left Today: <input class=\"unselected\" type=\"text\" name=\"prop.lottos\" value=\""+get_property("lottos")+"\" />");
+ opentag("div","class=\"infobox\"");
+ nln("Lottery Info");
+ ntln("Current Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.1\" value=\""+books["thisLotto"]+"\" />");
+ nln("Next Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.2\" value=\""+books["nextLotto"]+"\" />");
+ ntln("Remaining Today: <input class=\"unselected\" type=\"text\" name=\"prop.lottos\" value=\""+get_property("lottos")+"\" />");
+ nln("&Delta; Current: <input class=\"unselected\" type=\"text\" name=\"prop.scriptSet.lottoThis\" value=\""+scriptSettings["lottoThis"]+"\" />");
+ nln("&Delta; Next: <input class=\"unselected\" type=\"text\" name=\"prop.scriptSet.lottoNext\" value=\""+scriptSettings["lottoNext"]+"\" />");
+ cycletag("div","class=\"infobox\"");
+ nln("Logout Info");
+ ntln("Burn Adventures To: <input class=\"unselected\" type=\"text\" name=\"prop.scriptSet.burnTurns\" value=\""+scriptSettings["burnTurns"]+"\" />");
+ nln("Burn Time (MTR): <input class=\"unselected\" type=\"text\" name=\"prop.scriptSet.burnMinutes\" value=\""+scriptSettings["burnMinutes"]+"\" />");
+ nln("Logout Time (MTR): <input class=\"unselected\" type=\"text\" name=\"prop.scriptSet.logMinutes\" value=\""+scriptSettings["logMinutes"]+"\" />");
+ cycletag("div","class=\"infobox\"");
  string[int] admins=split_string(get_property("admins"),"::");
- n("<br/>Admins: <span id=\"adminbox\">");
+ nln("Administration<br/>");
+ n("Admins: <span id=\"adminbox\">");
  foreach i,s in admins nln("<input class=\"unselected\" type=\"text\" name=\"admins."+i+"\" value=\""+s+"\" />"+(i==count(admins)-1?"</span><span id=\"numAdmins\">"+to_string(i+1)+"</span>.":", "));
  nln("<span id=\"adder\" onclick=\"addMin();\">+</span>");
+ closetag("div");
  ntln("<span class=\"optGroup\">Current Host Only</span>");
  ntln("Host Name: <input class=\"unselected changesize\" type=\"text\" name=\"prop.hostName\" value=\""+get_property("hostName")+"\" />");
  ntln("<input type=\"submit\" name=\"submit\" value=\"Save\" class=\"kolbut\" />");

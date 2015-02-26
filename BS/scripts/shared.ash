@@ -25,17 +25,18 @@ associates[2046991423]=true;//Margaretting Tye
 associates[76566]=true;//Imitation Plastic Death Star
 associates[72876]=true;//Hyrule*/
 
-int[string] getScriptSettings(){
- int[string] sets;
+void getScriptSettings(){
  string[int] splits=split_string(get_property("scriptSet"),"::");
  string[int] splits2;
  foreach i,s in splits if(s!=""){
   splits2=split_string(s,":");
-  sets[splits2[0]]=splits2[1].to_int();
+  scriptSettings[splits2[0]]=splits2[1].to_int();
  }
- return sets;
+ if(scriptSettings["burnTurns"]==0)scriptSettings["burnTurns"]=110;
+ if(scriptSettings["burnMinutes"]==0)scriptSettings["burnMinutes"]=50;
+ if(scriptSettings["logMinutes"]==0)scriptSettings["logMinutes"]=3;
 }
-scriptSettings=getScriptSettings();
+getScriptSettings();
 int burnTurns=scriptSettings["burnTurns"];
 
 aggregate checkOut(aggregate data, string resourceName){ //Load a file
