@@ -1884,8 +1884,8 @@ void checkLotto(){
  if(num<0)num=0;
  set_property("lottos",num.to_string());
  books["Event"+event.to_string()]=0;
- books["nextLotto"]+=floor(lottoMeat/8);
- books["thisLotto"]+=ceil(7*lottoMeat/8);
+ books["nextLotto"]+=scriptSettings["lottoNext"];
+ books["thisLotto"]+=scriptSettings["lottoThis"];
  boolean[string] inClan=who_clan();
  remove inClan["BuffSphere"];
  remove inClan["MesaChat"];
