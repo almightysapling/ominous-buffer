@@ -179,7 +179,6 @@ void options(){
  opentag("form","method=\"post\" action=\""+__FILE__+"\"");
  nln("<input type=\"hidden\" name=\"cp\" value=\"save\" />");
  nln("<span class=\"optGroup\">BuffSphere</span>");
- ntln("Nuns Visited Today: <input class=\"unselected\" type=\"text\" name=\"prop.nunsVisits\" value=\""+get_property("nunsVisits")+"\" />");
  ntln("Current Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.1\" value=\""+books["thisLotto"]+"\" />");
  nln("Next Lottery Amount: <input class=\"unselected\" type=\"text\" name=\"prop.books.2\" value=\""+books["nextLotto"]+"\" />");
  ntln("Lottos Left Today: <input class=\"unselected\" type=\"text\" name=\"prop.lottos\" value=\""+get_property("lottos")+"\" />");

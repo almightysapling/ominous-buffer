@@ -54,6 +54,20 @@ void resetEvents(int[string] books){
  print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).</font>");
 }
 
+void balanceBuffs(){
+ if(have_effect($effect[arcane in the brain])<1){
+  retrieve_item(1,$item[llama lama gong]);
+  cli_execute("gong mole");
+  if(!adventure(8,$location[mt. molehill])){
+   print("Arcane in the Brain Error","red");
+  }
+ }
+/* if(have_effect($effect[Slippery Oiliness])<1){
+  retrieve_item(1,$item[oil of slipperiness]);
+  use(1,$item[oil of slipperiness]);
+ }*/
+}
+
 void handleMeat(){
  string today=now_to_string("MMMM d, yyyy");
  matcher mx=create_matcher("(\\w+) (\\d+), (\\d+)",today);
@@ -107,14 +121,8 @@ void handleMeat(){
   case 12: yest="December"+yest; break; 
  }
  checkOut(userdata,"userdata.txt");
- int totspent=0;
- foreach name in userdata if(((userdata[name,"lastTime"].contains_text(today))||(userdata[name,"lastTime"].contains_text(yest)))&&(name!="BuffSphere")){
-  sysInc(name,"meat",100);
-  totspent+=100;
- }
  commit(userdata,"userdata.txt");
- cli_execute("mallsell 0 snow queen crown @ 400");
- cli_execute("autosell 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face lager, 0 ram horns, 0 ram stick, 0 yeti fur");
+ cli_execute("autosell 0 snow queen crown, 0 crazy little Turkish delight, 0 ga-ga radio, 0 ram's face lager, 0 ram horns, 0 ram stick, 0 yeti fur");
  int totalDMS=floor(my_meat()/1000)-200;
  if(totalDMS>0){
   string exe="make "+to_string(totalDMS)+" dense meat stack";
@@ -123,8 +131,8 @@ void handleMeat(){
  }
  int[string] books;
  checkOut(books,"books.txt");
- books[now_to_string("yyyyMMdd")]=totalDMS-19-(totspent/100);
- books["avg"]=(books["avg"]*4+totalDMS-19)/5;
+ books[now_to_string("yyyyMMdd")]=totalDMS;
+ books["avg"]=(books["avg"]*4+totalDMS)/5;
  commit(books,"books.txt");
  if(totalDMS<0){
   take_closet(totalDMS,$item[dense meat stack]);
@@ -215,10 +223,13 @@ void breakfast(){
  if(have_skill($skill[Lunch Break]))(!use_skill(1,$skill[lunch break]));
  retrieve_item(7,$item[eggnog]);
  retrieve_item(1,$item[ram's face lager]);
- clearBuffs(6014);
+ clearBuffs();
  if(have_skill($skill[the ode to booze]))(!use_skill(1,$skill[the ode to booze]));
  while(inebriety_limit()-my_inebriety()>2)drink(1,$item[eggnog]);
  while(inebriety_limit()-my_inebriety()>0)drink(1,$item[ram's face lager]);
+ use_skill(1,$skill[Advanced Saucecrafting]);
+ use_skill(1,$skill[Advanced Cocktailcrafting]);
+ use_skill(1,$skill[Pastamastery]);
  clearBuffs();
  /*retrieve_item(7,$item[bunch of square grapes]);
  retrieve_item(1,$item[handful of nuts and berries]);
@@ -249,14 +260,8 @@ void breakfast(){
  eatsilent(3,$item[spectral pickle]); 
  eatsilent(1,$item[super salad]); 
  eatsilent(1,$item[handful of nuts and berries]); 
- */ 
- if(have_effect($effect[arcane in the brain])<1){
-  retrieve_item(1,$item[llama lama gong]);
-  cli_execute("gong mole");
-  if(!adventure(8,$location[mt. molehill])){
-   print("Arcane in the Brain Error","red");
-  }
- }
+ */
+ balanceBuffs();
  handleMeat();
  updateFaxes();
  set_property("_breakfast","1");
@@ -277,6 +282,8 @@ void cleanPC(){
  lifetime["*"]=0;
  foreach sk in lifetime if(sk!="*")lifetime["*"]+=lifetime[sk];
  commit(lifetime,"lifetime.txt");
+ updateLimits();
+ updateDC();
  set_property("_thisBreakfast","1");
 }
 

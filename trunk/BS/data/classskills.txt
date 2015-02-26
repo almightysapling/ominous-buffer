@@ -37,12 +37,16 @@
 2026	Curiosity of Br'er Tarrypin	curiosity.gif	4	10	5
 2031	Spiky Shell	spikyshell.gif	4	8	5	9
 
+3006	Pastamastery	bowl.gif	1	10	0	5
 3012	Cannelloni Cocoon	coccoon.gif	2	20	0	12
 
+4006	Advanced Saucecrafting	lovepotion.gif	1	10	0	5
 4007	Elemental Saucesphere	elesphere.gif	4	10	5	4
 4008	Jalape&ntilde;o Saucesphere	pepsphere.gif	4	5	5	7
 4019	Scarysauce	scarysauce.gif	4	10	5
 4033	Antibiotic Saucesphere	antibiosphere.gif	4	15	5	10
+
+5014	Advanced Cocktailcrafting	shaker.gif	1	10	0	5
 
 6003	Aloysius' Antiphon of Aptitude	antiphon.gif	4	40	5	11
 6004	The Moxious Madrigal	madrigal.gif	4	2	5	1
