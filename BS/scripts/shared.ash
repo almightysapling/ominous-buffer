@@ -9,7 +9,8 @@ file_to_map("userdata.txt",userdata);
 string nightlySave="totalDaysCasting;totalCastsEver;books;winners";
 string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
 string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
-int burnTurns=130;
+int burnTurns=105;
+int lottoMeat=8;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
 boolean errorFree=false;
@@ -354,20 +355,6 @@ void checkApps(){
   }
  }
 }
-
-/*void checkData(){
- checkOut(userdata,"userdata.txt");
- if(!(userdata["*"] contains "~boss")){
-  checkOut(userdata,"userdata.txt");
-  userdata["*","~boss"]="25 phat loot, 25 thingfinder, 25 chorale";
-  userdata["*","~s"]="100 elemental, 100 jalape, 100 jaba, 100 scarysauce";
-  userdata["*","~tt"]="100 astral, 100 ghostly, 100 tenacity, 100 empathy, 100 reptilian, 100 jingle";
-  commit(userdata,"userdata.txt");
-  chat_private("Sentrion","I am error.");
-  chat_private("Almighty Sapling","I am error.");
-  chat_clan("I am error.");
- }
-}*/
 
 void raffleAnnounce(gameData g){
  string s="RAFFLE!\n";

@@ -225,6 +225,9 @@ void shutdown(string sender,string options){
 }
 
 void createAlias(string sender, string msg){
+ if(msg=="?"){
+  return;
+ }
  matcher namem=create_matcher("(\\w*)\\s?(.*)",msg);
  string aliasname;
  string expansion;
@@ -275,7 +278,8 @@ void buff(string sender, string msg, int numTurns, string ding){
  switch(skillnum){
   case 1:case 3:case 12:case 15:case 19:
   case 46:case 47:case 48:case 58:case 59:case 60:case 116:
-  case 3012:case 6037:case 6040:case 7040:case 7041: return;
+  case 3006:case 3012:case 4006:case 5014:case 6037:case 6040:
+  case 7040:case 7041: return;
  }
  string senderid=getId(sender);
  string mout;
@@ -1208,10 +1212,6 @@ void whitelistEdit(string oper){
  chat(action.group(2)+" added to whitelist.");
 }
 
-void man(string sender, string query){
- cli_execute("kmail to "+sender+" || Thank you for your interest in my functions. Please visit http://z15.invisionfree.com/Black_Mesa_Forums/index.php?showforum=14 for more information.");
-}
-
 /*void sendLink(string sender, string i){
  string base="https://sites.google.com/site/kolclanmesa/";
  string link;
@@ -1430,7 +1430,9 @@ string predicateFilter(string sender, string msg){
   case "help":
   case "man":
   case "?":
-   man(sender,oper);
+   if(oper==""){
+    chat(sender,"Thank you for your interest in my functions. For specific details, try '? \"function name\"', check out my profile, or go to [website]. Thank you!");
+   }else predicateFilter(sender,oper+" ?");
    return "x";
   case "host":
    startGame(sender,oper);
@@ -1882,8 +1884,8 @@ void checkLotto(){
  if(num<0)num=0;
  set_property("lottos",num.to_string());
  books["Event"+event.to_string()]=0;
- books["nextLotto"]+=2;
- books["thisLotto"]+=14;
+ books["nextLotto"]+=floor(lottoMeat/8);
+ books["thisLotto"]+=ceil(7*lottoMeat/8);
  boolean[string] inClan=who_clan();
  remove inClan["BuffSphere"];
  remove inClan["MesaChat"];
@@ -1974,48 +1976,32 @@ void makeRecords(){
  if(sysInt("#6026")<50){//Donho
   if(sysInt("#6026")<25){
    while(my_mp()<(25-sysInt("#6026"))*75)cli_execute("use mmj");
-   visit_url("volcanoisland.php?action=tuba&pwd");
-   visit_url("choice.php?whichchoice=409&option=1&pwd");
-   visit_url("choice.php?whichchoice=410&option=2&pwd");
-   visit_url("choice.php?whichchoice=412&option=3&pwd");
-   visit_url("choice.php?whichchoice=418&option=3&pwd");
-   visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(25-sysInt("#6026"))+"&option=1&pwd");
+   visit_url("campground.php?action=lprom&pwd");
+   visit_url("choice.php?whichchoice=821&whicheffect=614&times="+to_string(25-sysInt("#6026"))+"&option=1&pwd");
    userdata["*","#6026"]="25";
-   visit_url("choice.php?pwd&whichchoice=440&option=2");
+   visit_url("choice.php?pwd&whichchoice=821&option=2");
   }
   while(my_mp()<max(50-sysInt("#6026"),0)*75)cli_execute("use mmj");
-  visit_url("volcanoisland.php?action=tuba&pwd");
-  visit_url("choice.php?whichchoice=409&option=1&pwd");
-  visit_url("choice.php?whichchoice=410&option=2&pwd");
-  visit_url("choice.php?whichchoice=412&option=3&pwd");
-  visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=614&times="+to_string(50-sysInt("#6026"))+"&option=1&pwd");
+  visit_url("campground.php?action=lprom&pwd");
+  visit_url("choice.php?whichchoice=821&whicheffect=614&times="+to_string(25-sysInt("#6026"))+"&option=1&pwd");
   userdata["*","#6026"]="50";
-  visit_url("choice.php?pwd&whichchoice=440&option=2");
+  visit_url("choice.php?pwd&whichchoice=821&option=2");
  }
  print("Donho's recorded","blue");
  if(sysInt("#6028")<5){//Inigo
   while(my_mp()<(5-sysInt("#6028"))*100)cli_execute("use mmj");
-  visit_url("volcanoisland.php?action=tuba&pwd");
-  visit_url("choice.php?whichchoice=409&option=1&pwd");
-  visit_url("choice.php?whichchoice=410&option=2&pwd");
-  visit_url("choice.php?whichchoice=412&option=3&pwd");
-  visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect=716&times="+to_string(5-sysInt("#6028"))+"&option=1&pwd");
+  visit_url("campground.php?action=lprom&pwd");
+  visit_url("choice.php?whichchoice=821&whicheffect=716&times="+to_string(5-sysInt("#6028"))+"&option=1&pwd");
   userdata["*","#6028"]=5;
-  visit_url("choice.php?pwd&whichchoice=440&option=2");
+  visit_url("choice.php?pwd&whichchoice=821&option=2");
  }
  print("Inigo's recorded","blue");
  for song from 6020 to 6024 if(sysInt("#"+song)<10){
   while(my_mp()<(10-sysInt("#"+song))*50)cli_execute("use mmj");
-  visit_url("volcanoisland.php?action=tuba&pwd");
-  visit_url("choice.php?whichchoice=409&option=1&pwd");
-  visit_url("choice.php?whichchoice=410&option=2&pwd");
-  visit_url("choice.php?whichchoice=412&option=3&pwd");
-  visit_url("choice.php?whichchoice=418&option=3&pwd");
-  visit_url("choice.php?whichchoice=440&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-sysInt("#"+song))+"&option=1&pwd");
+  visit_url("campground.php?action=lprom&pwd");
+  visit_url("choice.php?whichchoice=821&whicheffect="+song.to_skill().to_effect().to_int()+"&times="+to_string(10-sysInt("#"+song))+"&option=1&pwd");
   userdata["*","#"+song]=10;
-  visit_url("choice.php?pwd&whichchoice=440&option=2");
+  visit_url("choice.php?pwd&whichchoice=821&option=2");
  }
  print("Hobopolis songs recorded","green");
  commit(userdata,"userdata.txt");
@@ -2043,30 +2029,6 @@ void doBounty(){
  visit_url("bhh.php?pwd&action=takebounty&whichitem="+b.to_string());
 // while((my_adventures()>burnTurns)&&(item_amount($item[filthy lucre])==oldLucre))if(adventure(1,b.to_item().bounty)){}
  visit_url("bhh.php");
-}
-
-void burn(){
- int to_burn=my_mp()-800;
- if(to_burn<0)return;
- int farmbuff=get_property("_lastFarmBuff").to_int();
- skill farmingbuff;
- switch(farmbuff){
-  case 0:
-   farmingbuff=$skill[fat leon's phat loot lyric];
-   farmbuff+=1;
-   break;
-  case 1:
-   farmingbuff=$skill[the polka of plenty];
-   farmbuff+=1;
-   break;
-  default:
-   farmingbuff=$skill[carlweather\'s cantata of confrontation];
-   farmbuff=0;
- }
- set_property("_lastFarmBuff",farmbuff.to_string());
- int numCasts=ceil(to_float(to_burn)/(mp_cost(farmingbuff)));
- numCasts=max((numCasts/3),1);
- use_skill(numCasts,farmingbuff);
 }
 
 void publicChat(string sender, string msg){
@@ -2165,8 +2127,9 @@ void systemHandler(string msg){
  if(!m.find())return;
  string cmd=m.group(1);
  string ops=m.group(2);
- doubleRun[cmd]=!doubleRun[cmd];
- if(doubleRun[cmd])return;
+/* doubleRun[cmd]=!doubleRun[cmd];
+ print("cmd: "+cmd+" DRC: "+doubleRun[cmd]);
+ if(doubleRun[cmd])return;*/
  switch(cmd){
   case "logout":
    saveSettings(nightlySave);
@@ -2192,13 +2155,16 @@ void systemHandler(string msg){
      break;
    }
    break;
-  case "record":systemHandler("outfit farm"); systemHandler("outfit farm"); deMole(); makeRecords();break;
+  case "record":systemHandler("outfit farm"); deMole(); makeRecords();break;
   case "adventure":
-   systemHandler("outfit farm");systemHandler("outfit farm");
+   int turnsLeft=my_adventures()-burnTurns;
+   if(have_effect($effect[Astral Shell])<turnsLeft)use_skill(turnsLeft/15,$skill[Astral Shell]);
+   if(have_effect($effect[Elemental Saucesphere])<turnsLeft)use_skill(turnsLeft/15,$skill[Elemental Saucesphere]);
+   if(have_effect($effect[Scarysauce])<turnsLeft)use_skill(turnsLeft/15,$skill[Scarysauce]);
+   systemHandler("outfit farm");
    deMole();
-   if(my_adventures()<=burnTurns)break;
+   if(turnsLeft<1)break;
    if(adventure(5,$location[The Icy Peak])){}
-   burn();
    break;
 //  case "bounty":systemHandler("outfit farm");systemHandler("outfit farm"); deMole(); doBounty();break;
  }
