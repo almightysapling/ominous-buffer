@@ -1,7 +1,7 @@
 import <shared.ash>
 string chatbotScript="buffbot.ash";
-int logMinutes=3;
-int burnMinutes=50;
+int logMinutes=scriptSettings["logMinutes"];
+int burnMinutes=scriptSettings["burnMinutes"];
 
 void systemCall(string command){
  chat_private(my_name(),command);

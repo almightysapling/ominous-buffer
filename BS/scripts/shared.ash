@@ -6,11 +6,10 @@ string[string,string] userdata;
 file_to_map("userdata.txt",userdata);
 
 //Global variables
-string nightlySave="totalDaysCasting;totalCastsEver;books;winners";
-string earlySave="nunsVisits;totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins";
-string ignorePile="_breakfast;_limitBuffs;nunsVisits;_currentDeals";
-int burnTurns=105;
-int lottoMeat=8;
+string nightlySave="totalDaysCasting;totalCastsEver;books;winners;scriptSet";
+string earlySave="totalCastsEver;totalDaysCasting;_breakfast;_limitBuffs;_currentDeals;books;winners;admins;scriptSet";
+string ignorePile="_breakfast;_limitBuffs;_currentDeals";
+int[string] scriptSettings;
 string meatFam="leprechaun";
 string statFam="hovering sombrero";
 boolean errorFree=false;
@@ -25,6 +24,19 @@ associates[2046983684]=true;//Clan of 14 Days
 associates[2046991423]=true;//Margaretting Tye
 associates[76566]=true;//Imitation Plastic Death Star
 associates[72876]=true;//Hyrule*/
+
+int[string] getScriptSettings(){
+ int[string] sets;
+ string[int] splits=split_string(get_property("scriptSet"),"::");
+ string[int] splits2;
+ foreach i,s in splits if(s!=""){
+  splits2=split_string(s,":");
+  sets[splits2[0]]=splits2[1].to_int();
+ }
+ return sets;
+}
+scriptSettings=getScriptSettings();
+int burnTurns=scriptSettings["burnTurns"];
 
 aggregate checkOut(aggregate data, string resourceName){ //Load a file
  file_to_map(resourceName,data);
