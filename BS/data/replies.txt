@@ -12,7 +12,7 @@ cuss at everyone	Fuck off. I have better things to do.	4	say
 definate	definite*	0	say		
 dissapear	disappear*	0	say		
 Finker	You mean Twinker, $pname.	0	say		
-goodnight	Sweet dreams $pnick!	8	say		
+goodnight	Sweet dreams, $pnick!	8	say		
 HIMYM?	How I Met Your Mother, $pnick.	3	say		
 is being ignored	goes over and plays in the corner with $pnick	0	do		
 is chat dead	It has been $timedif minutes since $lastchatter last spoke.	16	say		
@@ -27,7 +27,7 @@ BS?	is BS, $pnick.	3	do
 om nom nom	Much better, thank you.	0	say	$ptrigger	omnomnom
 omnomnom	Chew a bit slower, $pnick.	0	say		
 payed	paid*	32	say		
-right, ob?	Right.	2	say	$player	Sentrion
+right, bs?	Right.	2	say	$player	Sentrion
 seperate	separate*	0	say		
 sewer.status	There are $grates grate(s) opened and $valves valve(s) turned.	18	say		
 should of	should have*	32	say		

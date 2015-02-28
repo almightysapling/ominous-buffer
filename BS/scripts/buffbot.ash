@@ -1570,7 +1570,7 @@ void nopredpass(string sender, string msg, boolean addressed){
  checkOut(botdata,"replies.txt");
  boolean foundmatch=false;
  boolean referred=addressed;
- matcher ref=create_matcher("(?i)(\\WBS\\W|\\WBuffSphere\\W|\\WBuff Sphere\\W)",msg);
+ matcher ref=create_matcher("(?i)(\\Wbs\\W|\\Wbuffsphere\\W|\\Wbuff sphere\\W)",msg);
  if(ref.find())referred=true;
  ref=create_matcher(" $",msg);
  msg=replace_all(ref,"");
@@ -2117,6 +2117,10 @@ void publicChat(string sender, string msg){
   case "urban":
    if(addressed)searchUrban(oper);
    return;
+ }
+ m=create_matcher("(?i),\\s*(buffsphere|buff sphere|bs)(\\.|$)",msg);
+ if(m.find()){
+  addressed=true;
  }
  nopredpass(sender,original,addressed);
  return;
