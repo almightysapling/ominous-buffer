@@ -566,6 +566,10 @@ raffle gameData{
    commit(gamesavedata,"gameMode.txt");
    continue;
   }
+  if(m.things contains $item[time's arrow]){
+   m.sender.sysInc("arrows",m.things[$item[time's arrow]]);
+   deleteMail(m);
+  }
  }
  commit(userdata,"userdata.txt");
 }
