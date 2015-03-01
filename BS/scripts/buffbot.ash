@@ -1398,21 +1398,6 @@ string predicateFilter(string sender, string msg){
  }else return msg;
  switch(pred){
 //-ADMIN FUNCTIONS-
-
-//-CLAN FUNCTIONS-
-
-//-PUBLIC FEATURES-
-  case "alias":
-   createAlias(sender,oper);
-   return "x";
-  case "alt":
-  case "multi":
-   setMulti(sender,oper);
-   return "x";
-  case "alts":
-  case "multis":
-   multilookup(sender,oper);
-   return "x";
   case "clear":
    if(oper=="")return "x";
    if(!getUF(sender,"admin")){
@@ -1440,64 +1425,11 @@ string predicateFilter(string sender, string msg){
   case "deals":
    if(getUF(sender,"admin"))updateDC(oper);
    return "x";
-  case "details":
-   userDetails(sender,oper);
-   return "x";
-  case "drop":
-  case "untrain":
-   untrain(sender,oper);
-   return "x";
-  case "fax":
-  case "get":
-   if(!matchesFrom(sender,"membership","clannie")){
-    chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
-    return "x";
-   }
-   set_property("_lastFax",sender);
-   fax(sender,oper);
-   return "x";
-  case "help":
-  case "man":
-  case "?":
-   if(oper==""){
-    chat(sender,"Thank you for your interest in my functions. For specific details, try '? \"function name\"', check out my profile, or go to [website]. Thank you!");
-   }else predicateFilter(sender,oper+" ?");
-   return "x";
-  case "host":
-   startGame(sender,oper);
-   return "x";
-  case "learn":
-  case "teach":
-  case "train":
-   train(sender,oper);
-   return "x";
   case "logout":
    logout(sender,oper);
    return "x";
-  case "market":
-   if(!analyzeMD(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
-   return "x";
-  case "math":
-   mathTutor(sender,oper);
-   return "x";
-  case "mod":
-  case "settings":
-   mod(sender,oper);
-   return "x";
   case "shutdown":
    shutdown(sender,oper);
-   return "x";
-  case "nick":
-   first=create_matcher("([\\w ']*)",oper);
-   if(first.find())oper=first.group(1);
-   else{
-    chat(sender,"Sorry, that's not a valid nickname.");
-    return "x";
-   }
-   setNick(sender,oper);
-   return "x";
-  case "ping":
-   chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
    return "x";
   case "pull":
    if(oper=="")return "x";
@@ -1531,26 +1463,11 @@ string predicateFilter(string sender, string msg){
    checkApps();
    checkMail();
    return "x";
-  case "remove":
-   removeAlias(sender,oper);
-   return "x";
-  case "roll":
-   roll(sender,oper);
-   return "x";
-  case "search":
-   search(sender,oper);
-   return "x";
   case "se":
    subEnv(oper);
    return "x";
   case "su":
    subUser(oper);
-   return "x";
-  case "title":
-   clanTitle(sender,oper);
-   return "x";
-  case "wang":
-   wangBot(sender,oper);
    return "x";
   case "whitelist":
    if(getUF(sender,"admin"))whitelistEdit(oper);
@@ -1560,12 +1477,90 @@ string predicateFilter(string sender, string msg){
    if(getUF(sender,"admin"))whitelistEdit("-"+oper);
    else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
    return "x";
+//-CLAN FUNCTIONS-
+  case "alt":
+  case "multi":
+   setMulti(sender,oper);
+   return "x";
+  case "alts":
+  case "multis":
+   multilookup(sender,oper);
+   return "x";
+  case "drop":
+  case "untrain":
+   untrain(sender,oper);
+   return "x";
+  case "fax":
+  case "get":
+   if(!matchesFrom(sender,"membership","clannie")){
+    chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
+    return "x";
+   }
+   set_property("_lastFax",sender);
+   fax(sender,oper);
+   return "x";
+  case "host":
+   startGame(sender,oper);
+   return "x";
+  case "learn":
+  case "teach":
+  case "train":
+   train(sender,oper);
+   return "x";
+  case "title":
+   clanTitle(sender,oper);
+   return "x";
+//-PUBLIC FEATURES-
+  case "alias":
+   createAlias(sender,oper);
+   return "x";
+  case "details":
+   userDetails(sender,oper);
+   return "x";
+  case "help":
+  case "man":
+  case "?":
+   if(oper==""){
+    chat(sender,"Thank you for your interest in my functions. For specific details, try '? \"function name\"', check out my profile, or go to [website]. Thank you!");
+   }else predicateFilter(sender,oper+" ?");
+   return "x";
+  case "market":
+   if(!analyzeMD(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
+   return "x";
+  case "math":
+   mathTutor(sender,oper);
+   return "x";
+  case "mod":
+  case "settings":
+   mod(sender,oper);
+   return "x";
+  case "nick":
+   first=create_matcher("([\\w ']*)",oper);
+   if(first.find())oper=first.group(1);
+   else{
+    chat(sender,"Sorry, that's not a valid nickname.");
+    return "x";
+   }
+   setNick(sender,oper);
+   return "x";
+  case "ping":
+   chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
+   return "x";
+  case "remove":
+   removeAlias(sender,oper);
+   return "x";
+  case "roll":
+   roll(sender,oper);
+   return "x";
+  case "search":
+   search(sender,oper);
+   return "x";
+  case "wang":
+   wangBot(sender,oper);
+   return "x";
   case "whois":
    lookup(sender,oper);
    return "x";
- /* case "wiki":
-   sendLink(sender,oper);
-   return "x";*/
   case "withdraw":
    userAccountEmpty(sender);
    return "x";
