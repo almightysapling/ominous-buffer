@@ -194,6 +194,13 @@ string insultCore(){
  return factCore("I",-1);
 }
 
+void getUse(effect e, item i){
+ if(have_effect(e)<1){
+  retrieve_item(1,i);
+  use(1,i);
+ }
+}
+
 void deMole(){
  if(have_effect($effect[Shape of...Mole!])>0){
   while(have_effect($effect[Shape of...Mole!])>0)(!adventure(1,$location[Mt. Molehill]));
@@ -244,6 +251,7 @@ void updateProfile(){
  int[string]books;
  checkOut(books,"books.txt");
  string buf="account.php?action=Update&tab=profile&pwd="+my_hash()+"&actions[]=quote&quote=Black Mesa Buffbot. Serving all your AT, TT, and S needs.";
+ buf+="\nFor more info, see http://forums.kingdomofloathing.com/vb/showthread.php?t=214567";
  buf+="\n\nCheck DC for casts remaining of limited use skills.\n\nCurrent Lotto for "+to_commad(14+books["thisLotto"])+",000 meat!\nLast Five Lotto Winners:";
  string wintext=get_property("winners");
  string[int] winners=split_string(wintext,"::");

@@ -54,20 +54,6 @@ void resetEvents(int[string] books){
  print_html("<font color=\"olive\">Setting times for </font><font color=\""+(limit>0?"green\">":"red\">")+limit+"</font><font color=\"olive\"> lotto event(s).</font>");
 }
 
-void balanceBuffs(){
- if(have_effect($effect[arcane in the brain])<1){
-  retrieve_item(1,$item[llama lama gong]);
-  cli_execute("gong mole");
-  if(!adventure(8,$location[mt. molehill])){
-   print("Arcane in the Brain Error","red");
-  }
- }
-/* if(have_effect($effect[Slippery Oiliness])<1){
-  retrieve_item(1,$item[oil of slipperiness]);
-  use(1,$item[oil of slipperiness]);
- }*/
-}
-
 void handleMeat(){
  string today=now_to_string("MMMM d, yyyy");
  matcher mx=create_matcher("(\\w+) (\\d+), (\\d+)",today);
@@ -231,12 +217,6 @@ void breakfast(){
  use_skill(1,$skill[Advanced Cocktailcrafting]);
  use_skill(1,$skill[Pastamastery]);
  clearBuffs();
- /*retrieve_item(7,$item[bunch of square grapes]);
- retrieve_item(1,$item[handful of nuts and berries]);
- retrieve_item(1,$item[milk of magnesium]);
- use(1,$item[milk of magnesium]);
- eatsilent(7,$item[bunch of square grapes]);
- eatsilent(1,$item[handful of nuts and berries]);
  /* When $/adv>1400:
  retrieve_item(4,$item[wrecked generator]);
  retrieve_item(2,$item[feliz navidad]);
@@ -250,18 +230,14 @@ void breakfast(){
  use(3,$item[coffee pixie stick]);
  use(1,$item[mojo filter]);
  use(1,$item[coffee pixie stick]);
-// retrieve_item(1,$item[queen's cookie]);
-// retrieve_item(3,$item[spectral pickle]);
-// retrieve_item(1,$item[super salad]);
-// retrieve_item(2,$item[handful of nuts and berries]);
-// retrieve_item(1,$item[milk of magnesium]);
- use(1,$item[milk of magnesium]);
- eatsilent(1,$item[queen's cookie]); 
- eatsilent(3,$item[spectral pickle]); 
- eatsilent(1,$item[super salad]); 
- eatsilent(1,$item[handful of nuts and berries]); 
  */
- balanceBuffs();
+ if(have_effect($effect[arcane in the brain])<1){
+  retrieve_item(1,$item[llama lama gong]);
+  cli_execute("gong mole");
+  if(!adventure(8,$location[mt. molehill])){
+   print("Arcane in the Brain Error","red");
+  }
+ }
  handleMeat();
  updateFaxes();
  set_property("_breakfast","1");
