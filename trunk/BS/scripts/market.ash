@@ -37,10 +37,10 @@ boolean harvestMD(string itemname, int hours, int endtime){
 }
 
 int unixTime(){ //This website is really really fucking stupid.
- matcher m=create_matcher("(\\d+) \\(UTC\\)",visit_url("http://www.unixtimestamp.com/index.php"));
+ matcher m=create_matcher("(\\d+) \\<small\\>",visit_url("http://www.unixtimestamp.com/index.php"));
  if(!m.find())return -1;
  return m.group(1).to_int()-3600;
- }
+}
 
 boolean marketDetails(string e, string req, int hours){
  string thed="Market Data: ";

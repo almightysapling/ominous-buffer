@@ -303,14 +303,14 @@ void buff(string sender, string msg, int numTurns, string ding){
  if(userdata[ding,"membership"]=="clannie"){
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;//Limited buffs
   else if(skillnum==6014)max=5;//Ode
-  else if(skillnum==6026)max=20;//Donho
+  else if(skillnum==6026)max=10;//Donho
   else if(skillnum>6900)max=1;//Items (arrow and the like)
   else if((skillnum>2000)&&(skillnum<3000))max=80;//TT skills
   else max=48;//Else
  }else{
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
   else if(skillnum==6014)max=5;
-  else if(skillnum==6026)max=10;
+  else if(skillnum==6026)max=4;
   else if(skillnum>6900)max=1;//Item skills
   else if((skillnum>2000)&&(skillnum<3000))max=60;
   else max=36;
@@ -385,14 +385,15 @@ void buff(string sender, string msg, int numTurns, string ding){
  }else{
   errorMessage(sender,"The cake is a lie. So is "+msg+", since I don't have that buff.");
  }
- if((my_mp()<900)&&(my_fullness()<15)){
+ if((my_mp()<1400)&&(my_fullness()<15)){
+  getUse($effect[Slippery Oiliness],$item[oil of slipperiness]);
+  getUse($effect[Mystically Oiled],$item[ointment of the occult]);
+  getUse($effect[Tomato Power],$item[tomato juice of powerful power]);
+  getUse($effect[On the Shoulders of Giants],$item[Hawking's Elixir of Brilliance]);
+  getUse($effect[Glittering Eyelashes],$item[glittery mascara]);
   retrieve_item(1,$item[Jumbo Dr. Lucifer]);
   eatsilent(1,$item[Jumbo Dr. Lucifer]);
   use_skill(1,$skill[Cannelloni Cocoon]);
- }
- while(my_mp()<952){
-  if(item_amount($item[magical mystery juice])<1)retrieve_item(1,$item[magical mystery juice]);
-  use(1,$item[magical mystery juice]);
  }
  commit(userdata,"userdata.txt");
 }
@@ -526,17 +527,25 @@ void mod(string sender, string msg){
      chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit re-imposed.");
     }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
     break;
-   case "nowarning":
-    userdata[user,"errors"]="false";
-    chat(sender,user+"\'s warnings disabled.");
-    break;
    case "default":
     userdata[user,"defaultCast"]=val.to_int().to_string();
     chat(sender,user+"\'s default cast amount set to "+val);
     break;
+   case "nowarning":
+    userdata[user,"errors"]="false";
+    chat(sender,user+"\'s warnings disabled.");
+    break;
    case "warning":
     userdata[user,"errors"]="true";
     chat(sender,user+"\'s warnings enabled.");
+    break;
+   case "nofavors":
+    userdata[user,"noHelp"]="true";
+    chat(sender,user+" will no longer be buffed by others.");
+    break;
+   case "favors":
+    userdata[user,"noHelp"]="false";
+    chat(sender,user+" can now be buffed by others.");
     break;
    case "clear":
     defaultProp(user,"ID#");
@@ -1298,6 +1307,21 @@ string performMath(string sender, string msg){
  return msg;
 }
 
+void mathTutor(string sender, string msg){
+ chat(sender,performMath(sender,msg));
+}
+
+void wangBot(string sender, string who){
+ if(is_online("wangbot")){
+  chat_private("wangbot","target "+(who==""?sender:who));
+ }else{
+  if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
+  if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
+  else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(who==""?sender:who));
+ }
+ set_property("_lastWang",(who==""?sender:who)+'|'+sender);
+}
+
 void modSessionVar(string sender,string var,string val){
  checkOut(userdata,"userdata.txt");
  userdata[sender,var]=val;
@@ -1373,6 +1397,11 @@ string predicateFilter(string sender, string msg){
   oper=first.group(2);
  }else return msg;
  switch(pred){
+//-ADMIN FUNCTIONS-
+
+//-CLAN FUNCTIONS-
+
+//-PUBLIC FEATURES-
   case "alias":
    createAlias(sender,oper);
    return "x";
@@ -1449,8 +1478,7 @@ string predicateFilter(string sender, string msg){
    if(!analyzeMD(sender,oper))errorMessage(sender,"Analysis failed. Recheck item name and parameters.");
    return "x";
   case "math":
-   oper=performMath(sender,oper);
-   chat(sender,oper);
+   mathTutor(sender,oper);
    return "x";
   case "mod":
   case "settings":
@@ -1522,14 +1550,7 @@ string predicateFilter(string sender, string msg){
    clanTitle(sender,oper);
    return "x";
   case "wang":
-   if(is_online("wangbot")){
-    chat_private("wangbot","target "+(oper==""?sender:oper));
-   }else{
-    if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
-    if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
-    else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(oper==""?sender:oper));
-   }
-   set_property("_lastWang",(oper==""?sender:oper)+'|'+sender);
+   wangBot(sender,oper);
    return "x";
   case "whitelist":
    if(getUF(sender,"admin"))whitelistEdit(oper);
@@ -2296,6 +2317,10 @@ void privateHandler(string sender, string msg){
  if(m.find()){
   sender=m.group(1);
   msg=m.group(2);
+  if(sender.getUF("noHelp")){
+   chat(sender+" does not want others to buff "+co.genderPronoun(gObj)+".");
+   return;
+  }
  }
  int turnR=0;
  m=create_matcher("[\;,]+",msg);
