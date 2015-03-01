@@ -311,7 +311,7 @@ void buff(string sender, string msg, int numTurns, string ding){
   if(((skillnum>6019) && (skillnum<6025)) || (skillnum==6028))max=1;
   else if(skillnum==6014)max=5;
   else if(skillnum==6026)max=4;
-  else if(skillnum>6900)max=1;//Item skills
+  else if(skillnum>6900)max=1;
   else if((skillnum>2000)&&(skillnum<3000))max=60;
   else max=36;
  }
@@ -342,15 +342,18 @@ void buff(string sender, string msg, int numTurns, string ding){
  }
  //This is the actual casting function.
  if(skillnum==6901){
-  if(item_amount($item[time's arrow])<1)retrieve_item(1,$item[time's arrow]);
-  if(item_amount($item[time's arrow])<1){
-   chat(ding,"Currently out of Time's Arrows. Looks like you're out of luck.");
-   return;
+  checkMail();
+  if(ding.sysInt("arrows")<1){
+   chat(ding,"Sorry, but you appear to be out of Time's Arrows.");
   }
   string t=visit_url("curse.php?action=use&pwd="+my_hash()+"&whichitem=4939&targetplayer="+sender);
-  print("Throwing Time's Arrow at "+sender);
+  if(t.index_of("hits with a satisfying")<1){
+   chat(ding,"Looks like "+sender+" has already been hit with an arrow today.");
+   return;
+  }
   checkOut(userdata,"userdata.txt");
-  sysInc(ding,"#"+skillnum);
+  sysInc(sender,"#"+skillnum);
+  sysInc(ding,"arrows",-1);
   commit(userdata,"userdata.txt");
   return;
  }
@@ -500,96 +503,90 @@ void mod(string sender, string msg){
   user=m.group(2);
  }
  if(!adminonly)user=sender;
- m=create_matcher("[., ;]+",cmd);
- cmd=replace_all(m," ");
- string[int]cmds=split_string(cmd," ");
  checkOut(userdata,"userdata.txt");
  string val;
- foreach i,tcmd in cmds{
-  m=create_matcher("(.+?)=(.*)",tcmd);
-  if(m.find()){
-   cmd=m.group(1);
-   val=m.group(2);
-  }else{
-   cmd=tcmd;
-   val="0";
-  }
-  switch(cmd){
-   case "noLimit":
-    if(adminonly){
-     userdata[user,"buffLimit"]="false";
-     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit lifted.");
-    }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
-    break;
-   case "limit":
-    if(adminonly){
-     userdata[user,"buffLimit"]="true";
-     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit re-imposed.");
-    }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
-    break;
-   case "default":
-    userdata[user,"defaultCast"]=val.to_int().to_string();
-    chat(sender,user+"\'s default cast amount set to "+val);
-    break;
-   case "nowarning":
-    userdata[user,"errors"]="false";
-    chat(sender,user+"\'s warnings disabled.");
-    break;
-   case "warning":
-    userdata[user,"errors"]="true";
-    chat(sender,user+"\'s warnings enabled.");
-    break;
-   case "nofavors":
-    userdata[user,"noHelp"]="true";
-    chat(sender,user+" will no longer be buffed by others.");
-    break;
-   case "favors":
-    userdata[user,"noHelp"]="false";
-    chat(sender,user+" can now be buffed by others.");
-    break;
-   case "clear":
-    defaultProp(user,"ID#");
+ m=create_matcher("(\\S+)\\s(.*)",cmd);
+ if(m.find()){
+  cmd=m.group(1);
+  val=m.group(2);
+ }else{
+  val="0";
+ }
+ switch(cmd){
+  case "noLimit":
+   if(adminonly){
+    userdata[user,"buffLimit"]="false";
+    chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit lifted.");
+   }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
+   break;
+  case "limit":
+   if(adminonly){
+    userdata[user,"buffLimit"]="true";
+    chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" limit re-imposed.");
+   }else errorMessage(sender,"You do not have permissions to use "+cmd+".");
+   break;
+  case "default":
+   userdata[user,"defaultCast"]=val.to_int().to_string();
+   chat(sender,user+"\'s default cast amount set to "+val);
+   break;
+  case "nowarning":
+   userdata[user,"errors"]="false";
+   chat(sender,user+"\'s warnings disabled.");
+   break;
+  case "warning":
+   userdata[user,"errors"]="true";
+   chat(sender,user+"\'s warnings enabled.");
+   break;
+  case "nofavors":
+   userdata[user,"noHelp"]="true";
+   chat(sender,user+" will no longer be buffed by others.");
+   break;
+  case "favors":
+   userdata[user,"noHelp"]="false";
+   chat(sender,user+" can now be buffed by others.");
+   break;
+  case "clear":
+   defaultProp(user,"ID#");
+   defaultProp(user,"membership");
+   chat(sender,"Clan Status cleared for "+user+".");
+   break;
+  case "add":
+   if(adminonly){
+    userdata[user,"admin"]="true";
+    chat(sender,user+" has been given administrative permissions.");
+   }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+   break;
+  case "remove":
+   if(adminonly){
+    userdata[user,"admin"]="false";
+    chat(sender,user+" is no longer an administrator.");
+   }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+   break;
+  case "whitelist":case "wl":
+   if(adminonly){
+    updateId(user,true);
+    userdata[user,"membership"]="whitelist";
+    chat(sender,user+" has been whitelisted to BS.");
+   }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+   break;
+  case "blacklist":
+   if(adminonly){
+    updateId(user,true);
+    userdata[user,"membership"]="blacklist";
+    chat(sender,user+" has been blacklisted from BS.");
+   }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+   break;
+  case "reset":
+   if(adminonly){
     defaultProp(user,"membership");
-    chat(sender,"Clan Status cleared for "+user+".");
-    break;
-   case "add":
-    if(adminonly){
-     userdata[user,"admin"]="true";
-     chat(sender,user+" has been given administrative permissions.");
-    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
-    break;
-   case "remove":
-    if(adminonly){
-     userdata[user,"admin"]="false";
-     chat(sender,user+" is no longer an administrator.");
-    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
-    break;
-   case "whitelist":case "wl":
-    if(adminonly){
-     updateId(user,true);
-     userdata[user,"membership"]="whitelist";
-     chat(sender,user+" has been whitelisted to BS.");
-    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
-    break;
-   case "blacklist":
-    if(adminonly){
-     updateId(user,true);
-     userdata[user,"membership"]="blacklist";
-     chat(sender,user+" has been blacklisted from BS.");
-    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
-    break;
-   case "reset":
-    if(adminonly){
-     defaultProp(user,"membership");
-     defaultProp(user,"ID#");
-     updateId(user,true);
-     chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" settings cleared.");
-    }else errorMessage(sender,"You do not have permission to use "+cmd+".");
-    break;
-   default:
-    errorMessage(sender,cmd+" seems to be an invalid command.");
-    break;
-  }
+    defaultProp(user,"ID#");
+    updateId(user,true);
+    chat(sender,user+" has had "+genderPronoun(user,gPosDet)+" settings cleared.");
+   }else errorMessage(sender,"You do not have permission to use "+cmd+".");
+   break;
+  default:
+   errorMessage(sender,cmd+" seems to be an invalid command.");
+   break;
  }
  commit(userdata,"userdata.txt");
 }
@@ -984,13 +981,35 @@ void search(string sender, string msg){
  cli_execute("csend to "+sender+"||"+send);
 }
 
-void clearData(string what){
+void clearData(string sender, string what){
+ if(what=="")return;
+ if(!getUF(sender,"admin")){
+  errorMessage(sender,"No, don't do that!");
+  return;
+ }
  print("ClearRQ:"+what);
  switch(what){
   case "changelog":
    string[int,string] changes;
    commit(changes,"changes.txt");
    break;
+ }
+}
+
+void count(string sender, string what){
+ if(what=="")return;
+ if(!getUF(sender,"admin")){
+  errorMessage(sender,"No, don't do that!");
+  return;
+ }
+ item whitem=to_item(what);
+ if(what=="meat"){
+  string r="Meat: "+to_string(my_meat()+my_closet_meat())+". DMS:";
+  r+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
+  chat(r);
+ }else if(whitem!=$item[none]){
+  string r=whitem.to_string()+": "+item_amount(whitem).to_string();
+  chat(r);
  }
 }
 
@@ -1055,6 +1074,7 @@ void userDetails(string sender, string who){
   cli_execute("csend to "+sender+"||"+reply);
   return;
  }
+ checkMail();
  if(userdata contains who){
   reply="User "+who+":\n";
   if(userdata[who] contains "alts"){
@@ -1074,8 +1094,9 @@ void userDetails(string sender, string who){
   }
   if(sysInt(who,"donated")>0)reply+="Donated: "+userdata[who,"donated"]+" meat.\n";
   if(who==sender){
-   if(userdata[who,"meat"].to_int()>0)reply+="Bank: "+userdata[who,"meat"]+" meat.\n";
-   if(userdata[who,"defaultCast"].to_int()>0)reply+="Default Casts: "+userdata[who,"defaultCast"]+"\n";
+   if(who.sysInt("meat")>0)reply+="Bank: "+who.sysInt("meat")+" meat.\n";
+   if(who.sysInt("arrows")>0)reply+="Stocked Arrows: "+who.sysInt("arrows")+"\n";
+   if(who.sysInt("defaultCast")>0)reply+="Default Casts: "+who.sysInt("defaultCast")+"\n";
   }
   cli_execute("csend to "+sender+"||"+reply);
  }else chat(sender,"No match found for "+who+".");
@@ -1307,7 +1328,19 @@ string performMath(string sender, string msg){
  return msg;
 }
 
+boolean isMath(string m){
+ matcher fix=create_matcher("(?i)(?<![a-z])(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)(?![a-z])",m);
+ m=replace_all(fix,"+");
+ fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]]",m);
+ if(fix.find())return false;
+ return true;
+}
+
 void mathTutor(string sender, string msg){
+ if(!msg.isMath()){
+  chat(sender,"Sorry, but that doesn't quite look like math I am familiar with.");
+  return;
+ }
  chat(sender,performMath(sender,msg));
 }
 
@@ -1399,28 +1432,10 @@ string predicateFilter(string sender, string msg){
  switch(pred){
 //-ADMIN FUNCTIONS-
   case "clear":
-   if(oper=="")return "x";
-   if(!getUF(sender,"admin")){
-    errorMessage(sender,"No, don't do that!");
-    return "x";
-   }
-   clearData(oper);
+   clearData(sender,oper);
    return "x";
   case "count":
-   if(oper=="")return "x";
-   if(!getUF(sender,"admin")){
-    errorMessage(sender,"No, don't do that!");
-    return "x";
-   }
-   whitem=to_item(oper);
-   if(oper=="meat"){
-    string r="Meat: "+to_string(my_meat()+my_closet_meat())+". DMS:";
-    r+=to_string(item_amount($item[dense meat stack])+closet_amount($item[dense meat stack]));
-    chat(r);
-   }else if(whitem!=$item[none]){
-    string r=whitem.to_string()+": "+item_amount(whitem).to_string();
-    chat(r);
-   }
+   count(sender,oper);
    return "x";
   case "deals":
    if(getUF(sender,"admin"))updateDC(oper);
@@ -1693,14 +1708,6 @@ int timeSinceLastChat(string who){
  if(nowM<0)nowM+=1440;
  if(nowM==1)return 0;
  return nowM;
-}
-
-boolean isMath(string m){
- matcher fix=create_matcher("(?i)(?<![a-z])(last|ans|floor|ceil|min|max|sqrt|pi|phi|e|sin|cos|tan|ln|log|fairy|hound|jack|jitb|lep|monkey|ant|cactus)(?![a-z])",m);
- m=replace_all(fix,"+");
- fix=create_matcher("[^\\d\\s*+/.^,\\-()\\[\\]]",m);
- if(fix.find())return false;
- return true;
 }
 
 boolean fancyMath(string sender, string equation){

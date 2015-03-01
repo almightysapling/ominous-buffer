@@ -280,7 +280,7 @@ message[int] parseMail(string box, int p){
  return parsedmail;
 }
 message[int] parseMail(){
- return parseMail("Inbox",1);
+ return parseMail("Inbox",0);
 }
 
 boolean deleteMail(message m){
