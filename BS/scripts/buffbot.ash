@@ -224,6 +224,40 @@ void shutdown(string sender,string options){
  else set_property("_forceShutdown","shutdown");
 }
 
+void pullItems(string sender, string what){
+ if(what=="")return;
+ if(!getUF(sender,"admin")){
+  errorMessage(sender,"No, don't do that!");
+  return;
+ }
+ matcher first=create_matcher("(\\d+)\\s?(.+)",what);
+ if(!first.find())return;
+ int i=first.group(1).to_int();
+ item whitem=first.group(2).to_item();
+ if(first.group(2)=="meat"){
+  i=ceil(i/1000.0);
+  if(i>1000){
+   errorMessage(sender,"More than a million seems a bit excessive, no?");
+   i=1000;
+  }
+  take_closet(i,$item[dense meat stack]);
+  cli_execute("csend "+i+" dense meat stack to "+sender+" || "+to_string(closet_amount($item[dense meat stack]))+" DMS remain.");
+ }else if(whitem!=$item[none]){
+  i=min(item_amount(whitem),i);
+  cli_execute("csend "+i+" "+whitem.to_string()+" to "+sender+" || "+to_string(item_amount(whitem)-i)+" remain.");
+ }
+}
+
+void forceCheck(string sender, string what){
+ if(!getUF(sender,"admin")){
+  errorMessage(sender,"No, don't do that!");
+  return;
+ }
+ chat("Looking for new test subjects and evaluating test data.");
+ checkApps();
+ checkMail();
+}
+
 void createAlias(string sender, string msg){
  if(msg=="?"){
   return;
@@ -418,6 +452,17 @@ int roll(string sender, string msg){
  return running;
 }
 
+void wangBot(string sender, string who){
+ if(is_online("wangbot")){
+  chat_private("wangbot","target "+(who==""?sender:who));
+ }else{
+  if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
+  if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
+  else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(who==""?sender:who));
+ }
+ set_property("_lastWang",(who==""?sender:who)+'|'+sender);
+}
+
 void startGame(string sender, string msg){
  gameData game;
  if(gameType()!=gameNone){
@@ -592,6 +637,11 @@ void mod(string sender, string msg){
 }
 
 void fax(string sender, string msg){
+ if(!matchesFrom(sender,"membership","clannie")){
+  chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
+  return;
+ }
+ set_property("_lastFax",sender);
  string[string] m;
  checkOut(m,"faxnames.txt");
  m["Hobelf"]="hobo_elf";
@@ -1102,7 +1152,7 @@ void userDetails(string sender, string who){
  }else chat(sender,"No match found for "+who+".");
 }
 
-void userAccountEmpty(string w){
+void userAccountEmpty(string w,string o){
  if(sysInt(w,"meat")<1){
   errorMessage(w,"You don't have sufficient funds to withdraw.");
   return;
@@ -1173,10 +1223,20 @@ void setMulti(string sender, string newaltlist){
 }
 
 void setNick(string sender, string w){
+ matcher first=create_matcher("([\\w ']*)",w);
+ if(first.find())w=first.group(1);
+ else{
+  chat(sender,"Sorry, that's not a valid nickname.");
+  return;
+ }
  checkOut(userdata,"userdata.txt");
  userdata[sender,"nick"]=w;
  foreach i,alt in split_string(userdata[sender,"alts"],",")if((alt!="")&&(userdata[alt,"nick"]==""))userdata[alt,"nick"]=w;
  commit(userdata,"userdata.txt");
+}
+
+void sendPing(string sender, string w){
+ chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
 }
 
 void clanTitle(string sender, string newt){
@@ -1191,7 +1251,11 @@ void clanTitle(string sender, string newt){
  visit_url("clan_members.php?pwd&action=modify&pids[]="+userdata[sender,"ID#"]+"&title"+userdata[sender,"ID#"]+"="+newt);
 }
 
-void whitelistEdit(string oper){
+void whitelistEdit(string sender, string oper){
+ if(!getUF(sender,"admin")){
+  chat("You must be an admin to edit the clan whitelist.");
+  return;
+ }
  string cw=visit_url("clan_whitelist.php");
  if(!cw.contains_text("<form")){
   chat("Oh, no. A horrible, awful, irrevocable thing has happened... You broke my heart. {Core Privelage Disabled}");
@@ -1319,7 +1383,11 @@ string performMath(string sender, string msg){
   if("*+-^/".contains_text(chunk.char_at(0)))chunk=last.to_string()+chunk;
   mathvars["last"]=userdata[sender,"lastMath"].to_float();
   mathvars["ans"]=userdata["*","lastMath"].to_float();
-  last=mathlibeval(chunk,mathvars);
+  try{
+   last=mathlibeval(chunk,mathvars);
+  }finally{
+//print("finally!");
+  }
  }
  userdata[sender,"lastMath"]=last.to_string();
  msg=last.to_string(8);
@@ -1342,17 +1410,6 @@ void mathTutor(string sender, string msg){
   return;
  }
  chat(sender,performMath(sender,msg));
-}
-
-void wangBot(string sender, string who){
- if(is_online("wangbot")){
-  chat_private("wangbot","target "+(who==""?sender:who));
- }else{
-  if(item_amount($item[WANG])<1)retrieve_item(1,$item[WANG]);
-  if(item_amount($item[WANG])<1)chat_private(sender,"We seem to be completely out of WANGs, sorry.");
-  else visit_url("curse.php?action=use&pwd&whichitem=625&targetplayer="+(who==""?sender:who));
- }
- set_property("_lastWang",(who==""?sender:who)+'|'+sender);
 }
 
 void modSessionVar(string sender,string var,string val){
@@ -1447,36 +1504,10 @@ string predicateFilter(string sender, string msg){
    shutdown(sender,oper);
    return "x";
   case "pull":
-   if(oper=="")return "x";
-   if(!getUF(sender,"admin")){
-    errorMessage(sender,"No, don't do that!");
-    return "x";
-   }
-   first=create_matcher("(\\d+)\\s?(.+)",oper);
-   if(!first.find())return "x";
-   i=first.group(1).to_int();
-   whitem=first.group(2).to_item();
-   if(first.group(2)=="meat"){
-    i=ceil(i/1000.0);
-    if(i>1000){
-     errorMessage(sender,"More than a million seems a bit excessive, no?");
-     i=1000;
-    }
-    take_closet(i,$item[dense meat stack]);
-    cli_execute("csend "+i+" dense meat stack to "+sender+" || "+to_string(closet_amount($item[dense meat stack]))+" DMS remain.");
-   }else if(whitem!=$item[none]){
-    i=min(item_amount(whitem),i);
-    cli_execute("csend "+i+" "+whitem.to_string()+" to "+sender+" || "+to_string(item_amount(whitem)-i)+" remain.");
-   }
+   pullItems(sender,oper);
    return "x";
   case "recheck":
-   if(!getUF(sender,"admin")){
-    errorMessage(sender,"No, don't do that!");
-    return "x";
-   }
-   chat("Looking for new test subjects and evaluating test data.");
-   checkApps();
-   checkMail();
+   forceCheck(sender,oper);
    return "x";
   case "se":
    subEnv(oper);
@@ -1485,12 +1516,10 @@ string predicateFilter(string sender, string msg){
    subUser(oper);
    return "x";
   case "whitelist":
-   if(getUF(sender,"admin"))whitelistEdit(oper);
-   else chat("You must be an admin to edit the clan whitelist.");
+   whitelistEdit(sender,oper);
    return "x";
   case "unwhitelist":
-   if(getUF(sender,"admin"))whitelistEdit("-"+oper);
-   else chat("You must be an admin to UNwhitelist (ugh) people from clan.");
+   whitelistEdit(sender,"-"+oper);
    return "x";
 //-CLAN FUNCTIONS-
   case "alt":
@@ -1507,11 +1536,6 @@ string predicateFilter(string sender, string msg){
    return "x";
   case "fax":
   case "get":
-   if(!matchesFrom(sender,"membership","clannie")){
-    chat(sender,"You must be in Black Mesa to utilize its faxing rights.");
-    return "x";
-   }
-   set_property("_lastFax",sender);
    fax(sender,oper);
    return "x";
   case "host":
@@ -1535,7 +1559,7 @@ string predicateFilter(string sender, string msg){
   case "help":
   case "man":
   case "?":
-   if(oper==""){
+   if((oper=="")||(oper=="help")||(oper=="man")||(oper=="?")){
     chat(sender,"Thank you for your interest in my functions. For specific details, try '? \"function name\"', check out my profile, or go to [website]. Thank you!");
    }else predicateFilter(sender,oper+" ?");
    return "x";
@@ -1550,16 +1574,10 @@ string predicateFilter(string sender, string msg){
    mod(sender,oper);
    return "x";
   case "nick":
-   first=create_matcher("([\\w ']*)",oper);
-   if(first.find())oper=first.group(1);
-   else{
-    chat(sender,"Sorry, that's not a valid nickname.");
-    return "x";
-   }
    setNick(sender,oper);
    return "x";
   case "ping":
-   chat(sender,"Reply from BuffSphere"+(get_property("hostName")==""?".":" c/o "+get_property("hostName")));
+   sendPing(sender,oper);
    return "x";
   case "remove":
    removeAlias(sender,oper);
@@ -1577,7 +1595,7 @@ string predicateFilter(string sender, string msg){
    lookup(sender,oper);
    return "x";
   case "withdraw":
-   userAccountEmpty(sender);
+   userAccountEmpty(sender,oper);
    return "x";
  }
  return msg;
